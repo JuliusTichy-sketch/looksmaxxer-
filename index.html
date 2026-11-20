@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Looksmaxxer 3000 – Das Glow-Up-Idle-Game</title>
+<!--
+  ==========================================================================
+  LOOKSMAXXER 3000
+  Ein augenzwinkerndes Incremental/Idle-Game in einer einzigen Datei.
+  Aufbau dieser Datei:
+    1. CSS      – Aussehen (Farben, Layout, Animationen, Handy-Ansicht)
+    2. HTML     – Grundgerüst (Charakter-Editor, Spielbildschirm, Pop-ups)
+    3. JavaScript
+       3.1 Spieldaten   (Upgrades, Meilensteine, Events, Auswahl-Optionen)
+       3.2 Spielstand   (laden, speichern, zurücksetzen)
+       3.3 Berechnungen (Aura pro Sekunde, Klickwert, Glow-Score, Preise)
+       3.4 Figur zeichnen (SVG, verändert sich mit den Upgrades)
+       3.5 Oberfläche   (Shop, Anzeigen, Pop-ups)
+       3.6 Events, Meilensteine, Prestige
+       3.7 Spielschleife & Start
+  ==========================================================================
+-->
+<style>
+  /* ---------- 1. CSS: Grundfarben als Variablen ---------- */
+  :root {
+    --bg1: #1a0b2e;
+    --bg2: #3a0f5c;
+    --card: rgba(255, 255, 255, 0.08);
+    --card-border: rgba(255, 255, 255, 0.15);
+    --pink: #ff4fd8;
+    --cyan: #3ef2ff;
+    --gold: #ffd166;
+    --green: #4ef0a0;
+    --red: #ff5d73;
+    --text: #fdf7ff;
+    --muted: #c7b5dc;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--text);
+    background: radial-gradient(circle at 20% 10%, #5b1d8a 0%, transparent 45%),
+                radial-gradient(circle at 85% 80%, #0f5a7a 0%, transparent 45%),
+                linear-gradient(160deg, var(--bg1), var(--bg2));
+    background-attachment: fixed;
+    -webkit-tap-highlight-color: transparent;
+    overflow-x: hidden;
+  }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    color: inherit;
+  }
+
+  /* Karten mit "Glas"-Effekt */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    padding: 16px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .hidden { display: none !important; }
+
+  /* ---------- Kopfzeile ---------- */
+  header {
+    text-align: center;
+    padding: 14px 10px 4px;
+  }
+  header h1 {
+    margin: 0;
+    font-size: clamp(1.6rem, 5vw, 2.4rem);
+    letter-spacing: 1px;
+    background: linear-gradient(90deg, var(--pink), var(--gold), var(--cyan));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  header p { margin: 2px 0 0; color: var(--muted); font-size: 0.9rem; }
+
+  /* ---------- Statistik-Leiste oben ---------- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    max-width: 1200px;
+    margin: 10px auto;
+    padding: 0 12px;
+  }
+  .stat { text-align: center; padding: 10px 6px; }
+  .stat .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .stat .value { font-size: 1.35rem; font-weight: 800; margin-top: 2px; }
+  .stat.aura .value { color: var(--gold); font-size: 1.6rem; }
+  .stat.aps .value { color: var(--green); }
+  .stat.glow .value { color: var(--pink); }
+  .stat.mult .value { color: var(--cyan); }
+
+  /* ---------- Hauptbereich: links Figur, rechts Shop ---------- */
+  main {
+    display: grid;
+    grid-template-columns: minmax(300px, 420px) minmax(0, 1fr);
+    gap: 14px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 12px 30px;
+  }
+  .left, .right { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+  /* Figur-Karte */
+  .char-card { text-align: center; position: relative; }
+  .char-name { font-size: 1.3rem; font-weight: 800; margin: 0; }
+  .char-title {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--pink), #9b5cff);
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+  .char-wrap { position: relative; width: 100%; max-width: 300px; margin: 6px auto 0; }
+  .char-wrap svg { width: 100%; height: auto; display: block; }
+
+  /* Sprechblase der Figur */
+  .bubble {
+    position: absolute;
+    top: 4%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    color: #2a1140;
+    padding: 6px 12px;
+    border-radius: 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    max-width: 90%;
+    box-shadow: 0 4px 14px rgba(0,0,0,.3);
+    animation: pop .25s ease-out;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  /* Fortschritt zum nächsten Titel */
+  .progress {
+    height: 10px;
+    background: rgba(255,255,255,.12);
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 6px 0 2px;
+  }
+  .progress > div {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--pink), var(--gold));
+    border-radius: 999px;
+    transition: width .3s;
+  }
+  .small { font-size: 0.8rem; color: var(--muted); }
+
+  /* Der große Klick-Button */
+  .routine-btn {
+    position: relative;
+    width: 100%;
+    padding: 18px 10px;
+    margin-top: 12px;
+    font-size: 1.3rem;
+    font-weight: 900;
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--pink), #9b5cff 55%, var(--cyan));
+    box-shadow: 0 6px 0 #5a1f8a, 0 10px 25px rgba(255, 79, 216, .35);
+    transition: transform .06s, box-shadow .06s;
+    user-select: none;
+    touch-action: manipulation;
+  }
+  .routine-btn:active { transform: translateY(5px); box-shadow: 0 1px 0 #5a1f8a, 0 4px 12px rgba(255,79,216,.3); }
+  .routine-btn small { display: block; font-size: 0.85rem; font-weight: 600; opacity: .9; }
+
+  /* Fliegende "+X"-Zahlen beim Klicken */
+  .floater {
+    position: fixed;
+    pointer-events: none;
+    font-weight: 900;
+    color: var(--gold);
+    text-shadow: 0 2px 6px rgba(0,0,0,.5);
+    animation: floatUp 1s ease-out forwards;
+    z-index: 50;
+    font-size: 1.2rem;
+  }
+  @keyframes floatUp {
+    from { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    to   { opacity: 0; transform: translate(-50%, -80px) scale(1.3); }
+  }
+
+  /* Aktive Effekte (Events) */
+  .effects { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+  .effect {
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+  }
+  .effect.good { background: rgba(78, 240, 160, .18); border: 1px solid rgba(78,240,160,.5); }
+  .effect.bad  { background: rgba(255, 93, 115, .18); border: 1px solid rgba(255,93,115,.5); }
+  .effect .bar { position: absolute; left: 0; bottom: 0; height: 3px; background: currentColor; opacity: .6; }
+
+  /* ---------- Shop ---------- */
+  .tabs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+  }
+  .tab {
+    flex: 0 0 auto;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.08);
+    font-weight: 700;
+    font-size: 0.9rem;
+    position: relative;
+    white-space: nowrap;
+  }
+  .tab.active { background: linear-gradient(135deg, var(--pink), #9b5cff); }
+  .tab .dot {
+    position: absolute; top: 3px; right: 3px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 6px var(--gold);
+  }
+
+  .shop-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .shop-head h2 { margin: 0; font-size: 1.2rem; }
+  .amount-toggle { display: flex; gap: 4px; }
+  .amount-toggle button {
+    padding: 6px 10px; border-radius: 8px;
+    background: rgba(255,255,255,.1); font-weight: 700; font-size: .85rem;
+  }
+  .amount-toggle button.active { background: var(--cyan); color: #10202a; }
+
+  .items { display: flex; flex-direction: column; gap: 10px; }
+  .item {
+    display: grid;
+    grid-template-columns: 48px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+    border-radius: 14px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+  }
+  .item .icon { font-size: 2rem; text-align: center; }
+  .item .name { font-weight: 800; }
+  .item .lvl { font-size: .75rem; color: var(--cyan); margin-left: 6px; font-weight: 700; }
+  .item .desc { font-size: .82rem; color: var(--muted); margin: 2px 0; }
+  .item .eff { font-size: .78rem; color: var(--green); font-weight: 600; }
+  .item.locked { opacity: .5; }
+  .item.maxed { border-color: var(--gold); }
+
+  .buy-btn {
+    min-width: 96px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--gold), #ff9f43);
+    color: #3a1d00;
+    font-size: .9rem;
+    line-height: 1.2;
+  }
+  .buy-btn small { display: block; font-weight: 600; font-size: .7rem; }
+  .buy-btn:disabled { background: rgba(255,255,255,.12); color: rgba(255,255,255,.45); cursor: not-allowed; }
+
+  /* Prestige-Karte */
+  .prestige h3, .settings h3 { margin: 0 0 6px; }
+  .prestige-btn {
+    width: 100%; margin-top: 10px; padding: 14px;
+    border-radius: 14px; font-weight: 900; font-size: 1.1rem;
+    background: linear-gradient(135deg, var(--gold), var(--pink));
+    color: #2a0b3a;
+  }
+  .prestige-btn:disabled { background: rgba(255,255,255,.12); color: rgba(255,255,255,.45); cursor: not-allowed; }
+  .prestige-btn:not(:disabled) { animation: pulse 1.5s infinite; }
+
+  .settings .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ghost-btn {
+    flex: 1; padding: 10px; border-radius: 12px;
+    background: rgba(255,255,255,.1); font-weight: 700;
+  }
+  .danger-btn { background: rgba(255,93,115,.25); border: 1px solid var(--red); }
+  .stat-list { font-size: .85rem; color: var(--muted); line-height: 1.6; margin-top: 10px; }
+
+  /* ---------- Toast-Nachrichten (kleine Pop-ups) ---------- */
+  #toasts {
+    position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; gap: 8px;
+    z-index: 100; width: min(92vw, 420px);
+    pointer-events: none;
+  }
+  .toast {
+    padding: 12px 16px; border-radius: 14px;
+    background: rgba(30, 10, 50, .95);
+    border: 1px solid var(--card-border);
+    box-shadow: 0 8px 24px rgba(0,0,0,.4);
+    animation: pop .3s ease-out;
+    font-size: .9rem;
+  }
+  .toast b { display: block; font-size: 1rem; margin-bottom: 2px; }
+  .toast.good { border-color: var(--green); }
+  .toast.bad { border-color: var(--red); }
+  .toast.milestone {
+    background: linear-gradient(135deg, #ff4fd8, #9b5cff);
+    border-color: var(--gold);
+    text-align: center;
+  }
+  .toast.milestone b { font-size: 1.2rem; }
+  .toast.fade { opacity: 0; transition: opacity .5s; }
+
+  /* ---------- Modal (großes Fenster, z. B. für Bestätigungen) ---------- */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(10, 0, 20, .75);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 200; padding: 14px;
+  }
+  .modal {
+    width: min(94vw, 420px);
+    background: linear-gradient(160deg, #2b0f4a, #1a0b2e);
+    border: 1px solid var(--card-border);
+    border-radius: 20px; padding: 20px; text-align: center;
+    animation: pop .25s ease-out;
+  }
+  .modal h2 { margin-top: 0; }
+  .modal .row { display: flex; gap: 8px; margin-top: 16px; }
+  .modal .row button { flex: 1; padding: 12px; border-radius: 12px; font-weight: 800; }
+  .btn-primary { background: linear-gradient(135deg, var(--pink), #9b5cff); }
+  .btn-secondary { background: rgba(255,255,255,.12); }
+
+  /* ---------- Charakter-Editor ---------- */
+  #creator {
+    position: fixed; inset: 0; z-index: 150;
+    overflow-y: auto;
+    background: linear-gradient(160deg, var(--bg1), var(--bg2));
+    padding: 14px;
+  }
+  .creator-inner {
+    max-width: 900px; margin: 0 auto;
+    display: grid; grid-template-columns: 300px 1fr; gap: 16px;
+  }
+  .creator-inner h1 { grid-column: 1 / -1; text-align: center; margin: 6px 0 0; }
+  .creator-inner .sub { grid-column: 1 / -1; text-align: center; color: var(--muted); margin: 0; }
+  .preview-card { text-align: center; align-self: start; position: sticky; top: 10px; }
+  .preview-card svg { width: 100%; max-width: 260px; }
+  .opt-group { margin-bottom: 14px; }
+  .opt-group h3 { margin: 0 0 6px; font-size: 1rem; }
+  .opts { display: flex; flex-wrap: wrap; gap: 8px; }
+  .opt {
+    padding: 8px 12px; border-radius: 12px;
+    background: rgba(255,255,255,.1); font-weight: 700;
+    border: 2px solid transparent;
+  }
+  .opt.active { border-color: var(--cyan); background: rgba(62,242,255,.18); }
+  .swatch {
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 3px solid rgba(255,255,255,.25);
+  }
+  .swatch.active { border-color: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+  #nameInput {
+    width: 100%; padding: 12px; border-radius: 12px;
+    border: 2px solid var(--card-border);
+    background: rgba(0,0,0,.25); color: var(--text);
+    font-size: 1rem; font-family: inherit;
+  }
+  #nameInput:focus { outline: none; border-color: var(--pink); }
+  .start-btn {
+    width: 100%; padding: 16px; margin-top: 6px;
+    border-radius: 16px; font-size: 1.2rem; font-weight: 900;
+    background: linear-gradient(135deg, var(--pink), #9b5cff 55%, var(--cyan));
+  }
+
+  /* ---------- Animationen ---------- */
+  @keyframes pop {
+    from { transform: scale(.85); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 209, 102, .6); }
+    50%      { box-shadow: 0 0 0 10px rgba(255, 209, 102, 0); }
+  }
+  /* Funkeln und Schweben in der Figur */
+  .twinkle { animation: twinkle 1.8s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  @keyframes twinkle {
+    0%, 100% { opacity: .2; transform: scale(.6); }
+    50%      { opacity: 1; transform: scale(1.1); }
+  }
+  .waft { animation: waft 2.5s ease-in-out infinite; }
+  @keyframes waft {
+    0%, 100% { opacity: .2; transform: translateY(0); }
+    50%      { opacity: .8; transform: translateY(-5px); }
+  }
+  .breathe { animation: breathe 3s ease-in-out infinite; transform-origin: 100px 250px; }
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.012); }
+  }
+  .bounce { animation: bounce .25s ease-out; }
+  @keyframes bounce {
+    0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); }
+  }
+
+  /* ---------- Handy-Ansicht ---------- */
+  @media (max-width: 800px) {
+    main { grid-template-columns: minmax(0, 1fr); }
+    .creator-inner { grid-template-columns: 1fr; }
+    .preview-card { position: static; }
+    .preview-card svg { max-width: 200px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .char-wrap { max-width: 230px; }
+  }
+  @media (max-width: 420px) {
+    .item { grid-template-columns: 36px 1fr; }
+    .item .icon { font-size: 1.6rem; }
+    .item .buy-btn { grid-column: 1 / -1; width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ======================= 2. HTML ======================= -->
+
+<!-- Charakter-Editor (wird beim ersten Start angezeigt) -->
+<div id="creator" class="hidden">
+  <div class="creator-inner">
+    <h1>✨ Erstelle deinen Charakter ✨</h1>
+    <p class="sub">Jede Legende fängt mal klein an. Sehr klein. Mit Pickeln.</p>
+
+    <div class="card preview-card">
+      <div id="previewChar"></div>
+      <p class="small">So siehst du aktuell aus. <i>Noch.</i></p>
+    </div>
+
+    <div class="card">
+      <div class="opt-group">
+        <h3>Name</h3>
+        <input id="nameInput" maxlength="20" placeholder="z. B. Kevin, Chantal, Maximilian …">
+      </div>
+      <div class="opt-group"><h3>Frisur</h3><div class="opts" id="optHair"></div></div>
+      <div class="opt-group"><h3>Haarfarbe</h3><div class="opts" id="optHairColor"></div></div>
+      <div class="opt-group"><h3>Hautfarbe</h3><div class="opts" id="optSkin"></div></div>
+      <div class="opt-group"><h3>Augenfarbe</h3><div class="opts" id="optEyes"></div></div>
+      <div class="opt-group"><h3>Outfit</h3><div class="opts" id="optOutfit"></div></div>
+      <button class="start-btn" id="startBtn">Los geht's – Glow-Up starten! 🚀</button>
+    </div>
+  </div>
+</div>
+
+<!-- Eigentlicher Spielbildschirm -->
+<div id="game" class="hidden">
+  <header>
+    <h1>LOOKSMAXXER 3000</h1>
+    <p>Vom NPC zum Gigachad – eine Hautpflege-Routine nach der anderen.</p>
+  </header>
+
+  <section class="stats">
+    <div class="card stat aura"><div class="label">Aura-Punkte</div><div class="value" id="sAura">0</div></div>
+    <div class="card stat aps"><div class="label">Aura / Sekunde</div><div class="value" id="sAps">0</div></div>
+    <div class="card stat glow"><div class="label">Glow-Score</div><div class="value" id="sGlow">0</div></div>
+    <div class="card stat mult"><div class="label">Multiplikator</div><div class="value" id="sMult">x1</div></div>
+  </section>
+
+  <main>
+    <!-- Linke Spalte: Figur & Klick-Button -->
+    <div class="left">
+      <div class="card char-card">
+        <p class="char-name" id="charName">Name</p>
+        <div class="char-title" id="charTitle">NPC</div>
+        <div class="char-wrap" id="charWrap">
+          <div id="mainChar"></div>
+        </div>
+        <div class="progress"><div id="titleProgress"></div></div>
+        <div class="small" id="nextTitle">Nächster Titel: …</div>
+
+        <button class="routine-btn" id="routineBtn">
+          🪞 Daily Routine
+          <small id="clickValue">+1 Aura</small>
+        </button>
+
+        <div class="effects" id="effects"></div>
+      </div>
+
+      <!-- Prestige -->
+      <div class="card prestige">
+        <h3>🌟 Glow Up (Prestige)</h3>
+        <div class="small" id="prestigeInfo"></div>
+        <button class="prestige-btn" id="prestigeBtn" disabled>Glow Up!</button>
+      </div>
+    </div>
+
+    <!-- Rechte Spalte: Shop -->
+    <div class="right">
+      <div class="card">
+        <div class="tabs" id="tabs"></div>
+      </div>
+      <div class="card">
+        <div class="shop-head">
+          <h2 id="shopTitle">Upgrades</h2>
+          <div class="amount-toggle" id="amountToggle">
+            <button data-amt="1">x1</button>
+            <button data-amt="10">x10</button>
+            <button data-amt="max">Max</button>
+          </div>
+        </div>
+        <div class="items" id="items"></div>
+      </div>
+
+      <div class="card settings">
+        <h3>⚙️ Einstellungen</h3>
+        <div class="row">
+          <button class="ghost-btn" id="editCharBtn">🎨 Aussehen ändern</button>
+          <button class="ghost-btn danger-btn" id="resetBtn">🗑️ Spielstand löschen</button>
+        </div>
+        <div class="stat-list" id="statList"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Container für kleine Pop-up-Nachrichten -->
+<div id="toasts"></div>
+<!-- Container für große Fenster (Bestätigungen usw.) -->
+<div id="modalRoot"></div>
+
+<script>
+/* ======================================================================
+   3. JAVASCRIPT
+   ====================================================================== */
+
+/* ---------------------------------------------------------------
+   3.1 SPIELDATEN
+   Hier kannst du ganz leicht Werte ändern, um das Spiel anzupassen!
+   - base:  Startpreis des Upgrades
+   - aps:   Aura pro Sekunde, die JEDE Stufe bringt
+   - click: zusätzliche Aura pro Klick, die JEDE Stufe bringt
+   - glow:  Glow-Score, den JEDE Stufe bringt
+   --------------------------------------------------------------- */
+
+// Maximale Stufe pro Upgrade und wie stark der Preis pro Stufe steigt (+15 %)
+const MAX_LEVEL = 25;
+const COST_GROWTH = 1.15;
+
+// Die Upgrade-Kategorien (Reiter im Shop)
+const CATEGORIES = [
+  { id: 'skin',    name: 'Skincare',           emoji: '🧴' },
+  { id: 'hair',    name: 'Haare',              emoji: '💇' },
+  { id: 'fit',     name: 'Fitness',            emoji: '💪' },
+  { id: 'sleep',   name: 'Schlaf & Ernährung', emoji: '😴' },
+  { id: 'posture', name: 'Haltung & Mewing',   emoji: '🗿' },
+  { id: 'style',   name: 'Style',              emoji: '👔' },
+  { id: 'teeth',   name: 'Zähne',              emoji: '🦷' },
+  { id: 'conf',    name: 'Selbstbewusstsein',  emoji: '😎' },
+];
+
+// Alle Upgrades. Innerhalb einer Kategorie wird das nächste erst
+// freigeschaltet, wenn das vorherige mindestens Stufe 1 hat.
+const UPGRADES = [
+  // --- Skincare ---
+  { id: 'reinigung',    cat: 'skin', emoji: '🧼', name: 'Gesichtsreinigung', base: 15,    aps: 0.2, click: 0,   glow: 1,
+    desc: 'Wasser ins Gesicht. Revolutionär.' },
+  { id: 'feuchtigkeit', cat: 'skin', emoji: '💧', name: 'Feuchtigkeitscreme', base: 120,  aps: 1.2, click: 0,   glow: 2,
+    desc: 'Deine Haut sagt endlich „Danke“ statt „Hilfe“.' },
+  { id: 'sonnencreme',  cat: 'skin', emoji: '☀️', name: 'Sonnencreme LSF 50', base: 900,  aps: 6,   click: 0,   glow: 4,
+    desc: 'Auch im Winter. Auch drinnen. Auch nachts? Sicher ist sicher.' },
+  { id: 'retinol',      cat: 'skin', emoji: '🧪', name: 'Retinol',            base: 7000, aps: 30,  click: 0,   glow: 8,
+    desc: 'Klingt wie ein Endgegner, ist aber ein Serum.' },
+
+  // --- Haare ---
+  { id: 'friseur',   cat: 'hair', emoji: '✂️', name: 'Friseurbesuch',         base: 50,    aps: 0.5, click: 0, glow: 1,
+    desc: '„Nur die Spitzen“ – und diesmal hält er sich dran.' },
+  { id: 'styling',   cat: 'hair', emoji: '🫙', name: 'Styling-Produkte',      base: 600,   aps: 4,   click: 0, glow: 3,
+    desc: 'Wachs, Gel, Paste, Clay. Du kennst jetzt den Unterschied.' },
+  { id: 'signature', cat: 'hair', emoji: '👑', name: 'Signature-Haarschnitt', base: 12000, aps: 50,  click: 0, glow: 10,
+    desc: 'Ein Haarschnitt so ikonisch, er hat eigene Follower.' },
+
+  // --- Fitness ---
+  { id: 'liegestuetze', cat: 'fit', emoji: '🤸', name: 'Liegestütze',     base: 30,    aps: 0.3, click: 0.5, glow: 1,
+    desc: 'Drei Stück. Am Stück. Fast.' },
+  { id: 'gym',          cat: 'fit', emoji: '🏋️', name: 'Gym-Abo',         base: 2500,  aps: 15,  click: 0,   glow: 5,
+    desc: 'Diesmal gehst du auch hin. Versprochen.' },
+  { id: 'trainer',      cat: 'fit', emoji: '📣', name: 'Personal Trainer', base: 40000, aps: 150, click: 0,   glow: 15,
+    desc: 'Schreit dich motivierend an. Du zahlst dafür.' },
+
+  // --- Schlaf & Ernährung ---
+  { id: 'schlaf', cat: 'sleep', emoji: '🛌', name: '8 Stunden Schlaf', base: 80,   aps: 0.8, click: 0, glow: 1,
+    desc: 'Augenringe kündigen fristlos.' },
+  { id: 'wasser', cat: 'sleep', emoji: '🚰', name: 'Wasser trinken',   base: 400,  aps: 3,   click: 0, glow: 2,
+    desc: 'Ein Liter Wasser statt drei Energy-Drinks. Wild.' },
+  { id: 'kochen', cat: 'sleep', emoji: '🥗', name: 'Gesund kochen',    base: 5000, aps: 25,  click: 0, glow: 6,
+    desc: 'Meal Prep Sonntag. Brokkoli ist jetzt dein Freund.' },
+
+  // --- Haltung & Mewing (Running Gag) ---
+  { id: 'haltung',       cat: 'posture', emoji: '🧍', name: 'Gerade Haltung',        base: 200,    aps: 1.5, click: 0, glow: 2,
+    desc: 'Schultern zurück, Brust raus, Handy runter.' },
+  { id: 'mewing',        cat: 'posture', emoji: '👅', name: 'Mewing',                base: 1500,   aps: 8,   click: 0, glow: 4,
+    desc: 'Zunge an den Gaumen. Für immer. Sprich nie wieder.' },
+  { id: 'meisterklasse', cat: 'posture', emoji: '🗿', name: 'Mewing-Meisterklasse',  base: 100000, aps: 400, click: 0, glow: 25,
+    desc: 'Dein Kiefer kann jetzt Glas schneiden. Bitte nicht ausprobieren.' },
+
+  // --- Style ---
+  { id: 'basics',      cat: 'style', emoji: '👕', name: 'Saubere Basics',     base: 100,   aps: 1,   click: 0, glow: 1,
+    desc: 'Ein T-Shirt ohne Ketchup-Fleck. Ein Anfang.' },
+  { id: 'kleidung',    cat: 'style', emoji: '🧥', name: 'Passende Kleidung',  base: 3000,  aps: 18,  click: 0, glow: 5,
+    desc: 'Klamotten in deiner Größe statt „wird schon passen“.' },
+  { id: 'parfum',      cat: 'style', emoji: '🌸', name: 'Parfum',             base: 20000, aps: 90,  click: 0, glow: 10,
+    desc: 'Zwei Sprüher. Nicht zwölf. ZWEI.' },
+  { id: 'accessoires', cat: 'style', emoji: '⌚', name: 'Accessoires',        base: 80000, aps: 300, click: 0, glow: 20,
+    desc: 'Uhr, Kette, Sonnenbrille im Haar. Main-Character-Energie.' },
+
+  // --- Zähne ---
+  { id: 'zahnseide',  cat: 'teeth', emoji: '🧵', name: 'Zahnseide',  base: 60,    aps: 0.4, click: 0, glow: 1,
+    desc: 'Dein Zahnarzt weint vor Freude.' },
+  { id: 'bleaching',  cat: 'teeth', emoji: '✨', name: 'Bleaching',  base: 8000,  aps: 40,  click: 0, glow: 7,
+    desc: 'Weißer als dein Kontostand danach.' },
+  { id: 'zahnspange', cat: 'teeth', emoji: '😬', name: 'Zahnspange', base: 50000, aps: 200, click: 0, glow: 15,
+    desc: 'Ab Stufe 10 kommt sie raus – und das Lächeln ist perfekt.' },
+
+  // --- Selbstbewusstsein (stärkt vor allem deine Klicks) ---
+  { id: 'augenkontakt', cat: 'conf', emoji: '👀', name: 'Augenkontakt', base: 25,    aps: 0,  click: 1,  glow: 1,
+    desc: 'Drei Sekunden halten. Nicht starren. Okay, jetzt starrst du.' },
+  { id: 'smalltalk',    cat: 'conf', emoji: '💬', name: 'Smalltalk',    base: 1000,  aps: 5,  click: 5,  glow: 3,
+    desc: 'Du kannst jetzt übers Wetter reden. Fließend.' },
+  { id: 'laecheln',     cat: 'conf', emoji: '😁', name: 'Lächeln',      base: 15000, aps: 60, click: 25, glow: 8,
+    desc: 'Mit den Augen lächeln. Das sogenannte „Smizing“.' },
+];
+
+// Meilensteine: Ab welchem Glow-Score bekommst du welchen Titel?
+const MILESTONES = [
+  { glow: 0,    title: 'NPC',                       text: 'Du bist ein Hintergrund-Charakter. Noch.' },
+  { glow: 10,   title: 'Statist mit Sprechrolle',   text: 'Jemand hat „Hallo“ zu dir gesagt. Absichtlich!' },
+  { glow: 40,   title: 'Hat sich mal gekämmt',      text: 'Deine Mutter ist stolz auf dich.' },
+  { glow: 100,  title: 'Gym-Anfänger mit Ambitionen', text: 'Du postest jetzt Spiegel-Selfies aus der Umkleide.' },
+  { glow: 200,  title: 'Side Character',            text: 'Du hast jetzt eine eigene Nebenhandlung.' },
+  { glow: 400,  title: 'Main Character',            text: 'Die Kamera folgt jetzt DIR. Lauf langsamer durch den Regen.' },
+  { glow: 700,  title: 'Sigma im Praktikum',        text: 'Du trinkst Kaffee schwarz und schaust nachdenklich aus dem Fenster.' },
+  { glow: 1100, title: 'Model-Scout schaut zweimal hin', text: 'Er hat sich umgedreht. Zweimal.' },
+  { glow: 1600, title: 'Chad',                      text: 'Türen öffnen sich jetzt automatisch für dich. Auch die ohne Sensor.' },
+  { glow: 2300, title: 'Gigachad',                  text: 'Dein Kinn hat einen eigenen Postleitzahlbereich.' },
+  { glow: 3200, title: 'Gigachad Ultra HD',         text: 'Kameras schalten automatisch auf 4K, wenn du vorbeiläufst.' },
+  { glow: 4000, title: 'Kosmisches Glow-Wesen',     text: 'Die Sonne benutzt DICH als Lichtquelle.' },
+];
+
+// Prestige: ab welchem Glow-Score möglich, und wie viel Bonus pro Stern
+const PRESTIGE_MIN_GLOW = 600;
+const GLOW_PER_STAR = 200;    // pro 200 Glow-Score gibt es 1 Glow-Stern
+const BONUS_PER_STAR = 0.2;   // jeder Stern = +20 % auf alle Aura dauerhaft
+
+// Zufällige Events. Gute und schlechte. (aps/click = Multiplikator)
+const EVENTS = [
+  { good: false, title: 'Pickel am Morgen des Dates! 😱', text: '-10 % Aura pro Sekunde für 30 Sekunden.', dur: 30, aps: 0.9, flag: 'pimple' },
+  { good: false, title: 'Bad Hair Day 🌪️', text: 'Der Wind hat entschieden. Klicks bringen 50 % weniger (30 s).', dur: 30, click: 0.5, flag: 'badhair' },
+  { good: false, title: 'Mewing vergessen! 😶', text: 'Doppelkinn im Video-Call. -20 % Aura/s für 20 Sekunden.', dur: 20, aps: 0.8, flag: 'doublechin' },
+  { good: false, title: 'Die Ex hat dich in Jogginghose gesehen 🩳', text: 'Du verlierst 5 % deiner Aura-Punkte.', instantPct: -0.05 },
+  { good: false, title: 'Spinat zwischen den Zähnen 🥬', text: 'Seit drei Stunden. Keiner hat was gesagt. -15 % Aura/s (25 s).', dur: 25, aps: 0.85 },
+  { good: true,  title: 'Perfektes Fahrstuhl-Licht ✨', text: 'Doppelte Aura pro Sekunde für 30 Sekunden!', dur: 30, aps: 2 },
+  { good: true,  title: 'Golden Hour Selfie 📸', text: 'Klicks bringen 5x so viel für 20 Sekunden!', dur: 20, click: 5 },
+  { good: true,  title: 'Viral auf TikTok! 📈', text: '„Wie sieht man so gut aus?!“ – 3x Aura/s für 15 Sekunden.', dur: 15, aps: 3 },
+  { good: true,  title: 'Oma sagt, du bist hübsch geworden 👵', text: 'Sofort-Bonus: 60 Sekunden Aura gratis!', instantSec: 60 },
+  { good: true,  title: 'Der Friseur hat es WIRKLICH verstanden ✂️', text: '+50 % Aura/s für 60 Sekunden.', dur: 60, aps: 1.5 },
+  { good: true,  title: 'Jemand fragt nach deinem Parfum 🌸', text: 'Sofort-Bonus: 2 Minuten Aura!', instantSec: 120 },
+];
+
+// Sprüche, die die Figur ab und zu beim Klicken sagt
+const QUOTES = [
+  'Ich bin nicht eitel, ich bin selbstbewusst.',
+  'Mewing seit 3 Minuten. Sieht man schon, oder?',
+  'Erst die Routine, dann die Welt.',
+  'Spieglein, Spieglein … ach, ich weiß es schon.',
+  'Hydration ist ein Lifestyle.',
+  'Mein Skincare-Regal hat mehr Stufen als ich.',
+  'Heute ist Leg Day. Glaube ich.',
+  'Sonnencreme? Hab ich. Zweimal.',
+  'Augenkontakt … halten … halten …',
+  'Ich glow nicht, ich strahle.',
+];
+
+// Auswahlmöglichkeiten im Charakter-Editor
+const OPTIONS = {
+  hair: [
+    { id: 'kurz',    label: 'Kurz' },
+    { id: 'locken',  label: 'Locken' },
+    { id: 'scheitel', label: 'Seitenscheitel' },
+    { id: 'lang',    label: 'Lang' },
+    { id: 'glatze',  label: 'Glatze' },
+  ],
+  hairColor: ['#1c1c1c', '#4a2f1b', '#8b5a2b', '#d8b45a', '#a8431f', '#e8e8e8', '#3a6df0', '#ff6fb5'],
+  skin:      ['#ffe0c4', '#f1c27d', '#e0ac69', '#c68642', '#8d5524', '#5c3a1e'],
+  eyes:      ['#6b3e1f', '#3a7bd5', '#3c9a5f', '#8a96a3', '#d4a017', '#8e44ad'],
+  outfit: [
+    { id: 'hoodie',      label: 'Hoodie' },
+    { id: 'tshirt',      label: 'T-Shirt' },
+    { id: 'hemd',        label: 'Hemd' },
+    { id: 'lederjacke',  label: 'Lederjacke' },
+    { id: 'anzug',       label: 'Anzug' },
+  ],
+};
+
+/* ---------------------------------------------------------------
+   3.2 SPIELSTAND (wird im Browser gespeichert – localStorage)
+   --------------------------------------------------------------- */
+const SAVE_KEY = 'looksmaxxer3000_save_v1';
+
+// So sieht ein brandneuer Spielstand aus
+function newState() {
+  return {
+    created: false,          // wurde schon ein Charakter erstellt?
+    name: '',
+    look: { hair: 'kurz', hairColor: '#4a2f1b', skin: '#f1c27d', eyes: '#3a7bd5', outfit: 'hoodie' },
+    aura: 0,                 // aktuelle Aura-Punkte
+    runAura: 0,              // in diesem Durchlauf gesammelt
+    lifetimeAura: 0,         // insgesamt jemals gesammelt
+    clicks: 0,               // Anzahl Klicks
+    levels: {},              // Stufe jedes Upgrades, z. B. { reinigung: 3 }
+    stars: 0,                // Glow-Sterne aus Prestige
+    glowUps: 0,              // wie oft Prestige gemacht
+    bestMilestone: 0,        // höchster je erreichter Meilenstein (für Pop-ups)
+    buyAmount: 1,            // x1 / x10 / max
+    tab: 'skin',             // aktuell geöffneter Shop-Reiter
+    lastSave: Date.now(),
+  };
+}
+
+let S = newState();      // "S" = der aktuelle Spielstand
+let effects = [];        // aktive Events (werden nicht gespeichert)
+let nextEventAt = Date.now() + rand(45, 90) * 1000;
+
+function save() {
+  S.lastSave = Date.now();
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* z. B. privater Modus */ }
+}
+
+function load() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    // Mit Standardwerten zusammenführen, falls später neue Felder dazukommen
+    S = Object.assign(newState(), data);
+    S.look = Object.assign(newState().look, data.look || {});
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function resetGame() {
+  localStorage.removeItem(SAVE_KEY);
+  S = newState();
+  effects = [];
+  location.reload();
+}
+
+/* ---------------------------------------------------------------
+   3.3 BERECHNUNGEN
+   --------------------------------------------------------------- */
+
+// Zufallszahl zwischen a und b
+function rand(a, b) { return a + Math.random() * (b - a); }
+
+// Stufe eines Upgrades abfragen (0, wenn nie gekauft)
+function lvl(id) { return S.levels[id] || 0; }
+
+// Preis für die NÄCHSTE Stufe eines Upgrades
+function costAt(u, level) { return Math.ceil(u.base * Math.pow(COST_GROWTH, level)); }
+
+// Wie viele Stufen kaufen wir und was kostet das? (je nach x1 / x10 / Max)
+function bulkInfo(u) {
+  const current = lvl(u.id);
+  const remaining = MAX_LEVEL - current;
+  if (remaining <= 0) return { count: 0, cost: 0 };
+
+  if (S.buyAmount === 'max') {
+    // So viele Stufen wie bezahlbar (mindestens Preis von 1 anzeigen)
+    let count = 0, cost = 0;
+    while (count < remaining) {
+      const next = costAt(u, current + count);
+      if (cost + next > S.aura) break;
+      cost += next; count++;
+    }
+    if (count === 0) return { count: 1, cost: costAt(u, current) };
+    return { count, cost };
+  }
+
+  const count = Math.min(S.buyAmount, remaining);
+  let cost = 0;
+  for (let i = 0; i < count; i++) cost += costAt(u, current + i);
+  return { count, cost };
+}
+
+// Prestige-Multiplikator (dauerhaft)
+function prestigeMult() { return 1 + S.stars * BONUS_PER_STAR; }
+
+// Multiplikatoren aktiver Events
+function eventMult(type) {
+  return effects.reduce((m, e) => m * (e[type] || 1), 1);
+}
+
+// Aura pro Sekunde OHNE Multiplikatoren
+function baseAps() {
+  return UPGRADES.reduce((sum, u) => sum + lvl(u.id) * u.aps, 0);
+}
+
+// Aura pro Sekunde MIT allen Boni
+function totalAps() { return baseAps() * prestigeMult() * eventMult('aps'); }
+
+// Wert eines Klicks auf "Daily Routine"
+function clickValue() {
+  const fromUpgrades = UPGRADES.reduce((sum, u) => sum + lvl(u.id) * u.click, 0);
+  // Klicks bekommen zusätzlich 3 % der Aura/s – damit Klicken nie nutzlos wird
+  return (1 + fromUpgrades + baseAps() * 0.03) * prestigeMult() * eventMult('click');
+}
+
+// Glow-Score = Summe aller Glow-Werte der gekauften Stufen
+function glowScore() {
+  return UPGRADES.reduce((sum, u) => sum + lvl(u.id) * u.glow, 0);
+}
+
+// Aktueller Meilenstein (Index in MILESTONES)
+function milestoneIndex(glow) {
+  let idx = 0;
+  MILESTONES.forEach((m, i) => { if (glow >= m.glow) idx = i; });
+  return idx;
+}
+
+// Wie viele Glow-Sterne würde ein Prestige jetzt bringen?
+function starsForPrestige() {
+  const g = glowScore();
+  return g >= PRESTIGE_MIN_GLOW ? Math.floor(g / GLOW_PER_STAR) : 0;
+}
+
+// Ist ein Upgrade freigeschaltet? (vorheriges in der Kategorie mind. Stufe 1)
+function isUnlocked(u) {
+  const inCat = UPGRADES.filter(x => x.cat === u.cat);
+  const i = inCat.indexOf(u);
+  return i === 0 || lvl(inCat[i - 1].id) > 0;
+}
+
+// Große Zahlen hübsch formatieren (deutsche Schreibweise)
+function fmt(n) {
+  if (!isFinite(n)) return '∞';
+  if (n < 0) return '-' + fmt(-n);
+  if (n < 10) return n.toLocaleString('de-DE', { maximumFractionDigits: 1 });
+  if (n < 100000) return Math.floor(n).toLocaleString('de-DE');
+  const units = ['', 'Tsd.', 'Mio.', 'Mrd.', 'Bio.', 'Brd.', 'Trill.', 'Trd.', 'Quadr.'];
+  let i = 0;
+  while (n >= 1000 && i < units.length - 1) { n /= 1000; i++; }
+  return n.toLocaleString('de-DE', { maximumFractionDigits: n < 100 ? 2 : 1 }) + ' ' + units[i];
+}
+
+/* ---------------------------------------------------------------
+   3.4 FIGUR ZEICHNEN (SVG)
+   Die Figur wird jedes Mal komplett neu "gemalt". Je nach
+   Upgrade-Stufen ändern sich Haut, Haare, Schultern, Haltung usw.
+   --------------------------------------------------------------- */
+
+// Farbe heller (amt > 0) oder dunkler (amt < 0) machen
+function shade(hex, amt) {
+  const n = parseInt(hex.slice(1), 16);
+  const f = c => Math.max(0, Math.min(255, Math.round(c * (1 + amt))));
+  const r = f((n >> 16) & 255), g = f((n >> 8) & 255), b = f(n & 255);
+  return '#' + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1);
+}
+
+// Zwei Farben mischen (t = 0 → Farbe a, t = 1 → Farbe b)
+function mix(a, b, t) {
+  const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
+  const ch = (p, s) => (p >> s) & 255;
+  const m = s => Math.round(ch(pa, s) + (ch(pb, s) - ch(pa, s)) * t);
+  return '#' + ((1 << 24) | (m(16) << 16) | (m(8) << 8) | m(0)).toString(16).slice(1);
+}
+
+// Fester Farbsatz für jedes Outfit
+const OUTFIT_COLORS = {
+  hoodie:     { main: '#7d8597', dark: '#5c6370' },
+  tshirt:     { main: '#e63946', dark: '#b02a35' },
+  hemd:       { main: '#dbe7f5', dark: '#a9bcd6' },
+  lederjacke: { main: '#2b2b2b', dark: '#151515' },
+  anzug:      { main: '#1d3557', dark: '#12223a' },
+};
+
+/**
+ * Erzeugt das SVG der Figur als Text.
+ * @param look   Aussehen (Frisur, Farben, Outfit)
+ * @param L      Funktion, die zu einer Upgrade-ID die Stufe liefert
+ * @param opts   { flags: aktive Event-Effekte, glow, stars, uid }
+ */
+function characterSVG(look, L, opts = {}) {
+  const flags = opts.flags || {};
+  const glow = opts.glow || 0;
+  const stars = opts.stars || 0;
+  const uid = opts.uid || 'c';   // eindeutige Kennung, falls mehrere Figuren auf der Seite sind
+
+  // --- Summen der Kategorien (steuern das Aussehen) ---
+  const skinT  = L('reinigung') + L('feuchtigkeit') + L('sonnencreme') + L('retinol');
+  const hairT  = L('friseur') + L('styling') + L('signature');
+  const fitT   = L('liegestuetze') + L('gym') + L('trainer');
+  const sleepT = L('schlaf') + L('wasser') + L('kochen');
+  const postT  = L('haltung') + L('mewing') + L('meisterklasse');
+  const mewT   = L('mewing') + L('meisterklasse');
+  const confT  = L('augenkontakt') + L('smalltalk') + L('laecheln');
+  const acc    = L('accessoires');
+
+  // --- Farben ---
+  const skin = look.skin, skinD = shade(skin, -0.15), skinDD = shade(skin, -0.35);
+  const hairC = look.hairColor;
+  const oc = OUTFIT_COLORS[look.outfit] || OUTFIT_COLORS.hoodie;
+
+  // --- Körpermaße ---
+  const sw = 28 + Math.min(24, fitT * 0.5);                          // halbe Schulterbreite
+  const armW = 11 + Math.min(9, fitT * 0.2);                         // Armdicke
+  const waist = 30 - Math.min(7, fitT * 0.25) - (L('kleidung') > 0 ? 2 : 0); // halbe Taillenbreite
+  const tilt = Math.max(0, 12 - postT * 0.8);                        // Vorbeugen (schlechte Haltung)
+  const smile = -0.4 + Math.min(1.4, confT * 0.12);                  // -0.4 = mürrisch, 1 = strahlend
+
+  let s = '';
+
+  // ===== Hintergrund-Aura (wird mit Glow-Score & Prestige stärker) =====
+  const auraHues = ['#ff4fd8', '#3ef2ff', '#ffd166', '#4ef0a0', '#ff8c42', '#b388ff'];
+  const auraColor = auraHues[stars % auraHues.length];
+  const auraOpacity = Math.min(0.9, 0.12 + glow / 2500 + stars * 0.05);
+  s += `<defs>
+    <radialGradient id="aura-${uid}" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="${auraColor}" stop-opacity="${auraOpacity}"/>
+      <stop offset="100%" stop-color="${auraColor}" stop-opacity="0"/>
+    </radialGradient>
+  </defs>`;
+  s += `<circle cx="100" cy="135" r="100" fill="url(#aura-${uid})"/>`;
+
+  // Boden-Schatten
+  s += `<ellipse cx="100" cy="252" rx="45" ry="6" fill="rgba(0,0,0,.3)"/>`;
+
+  s += `<g class="breathe">`;
+
+  // ===== Beine & Schuhe =====
+  const pants = look.outfit === 'anzug' ? oc.main : '#2f3e5c';
+  s += `<rect x="${100 - waist + 3}" y="196" width="${waist - 4}" height="52" rx="4" fill="${pants}"/>`;
+  s += `<rect x="${101}" y="196" width="${waist - 4}" height="52" rx="4" fill="${pants}"/>`;
+  s += `<ellipse cx="${100 - waist / 2}" cy="249" rx="${waist / 2 + 3}" ry="5" fill="#222"/>`;
+  s += `<ellipse cx="${100 + waist / 2}" cy="249" rx="${waist / 2 + 3}" ry="5" fill="#222"/>`;
+
+  // ===== Oberkörper (dreht sich bei schlechter Haltung nach vorne) =====
+  s += `<g transform="rotate(${tilt * 0.35} 100 200)">`;
+
+  // Arme (links/rechts), mit Hand
+  const armTop = 114, armLen = 78;
+  const sleeveFull = look.outfit !== 'tshirt';
+  [[-1, 8], [1, -8]].forEach(([side, rot]) => {
+    const cx = 100 + side * (sw - armW * 0.3);
+    s += `<g transform="rotate(${rot} ${cx} ${armTop + 2})">`;
+    s += `<rect x="${cx - armW / 2}" y="${armTop}" width="${armW}" height="${armLen}" rx="${armW / 2}" fill="${sleeveFull ? oc.main : skin}"/>`;
+    if (!sleeveFull) s += `<rect x="${cx - armW / 2 - 1}" y="${armTop - 2}" width="${armW + 2}" height="26" rx="${armW / 2}" fill="${oc.main}"/>`;
+    s += `<circle cx="${cx}" cy="${armTop + armLen}" r="${armW * 0.55}" fill="${skin}"/>`;
+    // Uhr am linken Handgelenk (Accessoires ab Stufe 1)
+    if (acc >= 1 && side === -1) s += `<rect x="${cx - armW / 2 - 1}" y="${armTop + armLen - 12}" width="${armW + 2}" height="5" rx="2" fill="#ffd166"/>`;
+    s += `</g>`;
+  });
+
+  // Hals
+  s += `<rect x="92" y="96" width="16" height="20" fill="${skinD}"/>`;
+
+  // Rumpf
+  const torso = `M${100 - sw},122 Q${100 - sw},110 ${100 - sw + 12},110 L${100 + sw - 12},110 Q${100 + sw},110 ${100 + sw},122 L${100 + waist},200 L${100 - waist},200 Z`;
+  s += `<path d="${torso}" fill="${oc.main}"/>`;
+
+  // Outfit-Details
+  if (look.outfit === 'hoodie') {
+    s += `<path d="M84,110 Q100,124 116,110" fill="none" stroke="${oc.dark}" stroke-width="5"/>`;
+    s += `<line x1="95" y1="116" x2="94" y2="138" stroke="#eee" stroke-width="1.5"/>`;
+    s += `<line x1="105" y1="116" x2="106" y2="138" stroke="#eee" stroke-width="1.5"/>`;
+    s += `<rect x="84" y="165" width="32" height="18" rx="6" fill="${oc.dark}"/>`;
+  } else if (look.outfit === 'tshirt') {
+    s += `<path d="M90,110 Q100,120 110,110" fill="${skinD}"/>`;
+  } else if (look.outfit === 'hemd') {
+    s += `<path d="M90,108 L100,122 L94,126 Z M110,108 L100,122 L106,126 Z" fill="#fff" stroke="${oc.dark}" stroke-width="1"/>`;
+    for (let y = 132; y < 196; y += 14) s += `<circle cx="100" cy="${y}" r="1.6" fill="${oc.dark}"/>`;
+  } else if (look.outfit === 'lederjacke') {
+    s += `<path d="M88,110 L112,110 L100,165 Z" fill="#f3f3f3"/>`;
+    s += `<path d="M88,110 L96,150 L84,135 Z M112,110 L104,150 L116,135 Z" fill="#444"/>`;
+  } else if (look.outfit === 'anzug') {
+    s += `<path d="M88,110 L112,110 L100,170 Z" fill="#fff"/>`;
+    s += `<path d="M98,114 L102,114 L104,150 L100,156 L96,150 Z" fill="#e63946"/>`;
+    s += `<path d="M88,110 L97,160 L82,138 Z M112,110 L103,160 L118,138 Z" fill="${oc.dark}"/>`;
+  }
+
+  // Ketchup-Fleck, solange keine "Sauberen Basics" gekauft wurden
+  if (L('basics') === 0) {
+    s += `<circle cx="112" cy="150" r="4.5" fill="#b5341f" opacity=".75"/><circle cx="116" cy="154" r="2" fill="#b5341f" opacity=".75"/>`;
+  }
+  // Gürtel, wenn die Kleidung passt
+  if (L('kleidung') > 0) {
+    s += `<rect x="${100 - waist}" y="193" width="${waist * 2}" height="6" fill="#5a3a1a"/><rect x="96" y="192" width="8" height="8" rx="1" fill="#ffd166"/>`;
+  }
+  // Goldkette (Accessoires ab Stufe 5)
+  if (acc >= 5) s += `<path d="M88,112 Q100,134 112,112" fill="none" stroke="#ffd166" stroke-width="2.5"/>`;
+  // Parfum-Duftwolken
+  if (L('parfum') > 0) {
+    s += `<g class="waft" stroke="#ff9ff3" stroke-width="2" fill="none" stroke-linecap="round">
+      <path d="M${100 + sw + 6},112 q5,-6 0,-12 q-5,-6 0,-12"/>
+      <path d="M${100 - sw - 6},118 q-5,-6 0,-12 q5,-6 0,-12"/>
+    </g>`;
+  }
+
+  // ===== Kopf (bei schlechter Haltung nach vorne/unten geschoben) =====
+  s += `<g transform="translate(${tilt * 0.6} ${tilt * 0.5})">`;
+
+  // Lange Haare hinter dem Kopf
+  if (look.hair === 'lang') {
+    s += `<path d="M66,62 Q66,30 100,28 Q134,30 134,62 L136,118 Q100,126 64,118 Z" fill="${hairC}"/>`;
+  }
+
+  // Ohren
+  s += `<circle cx="70" cy="72" r="6" fill="${skinD}"/><circle cx="130" cy="72" r="6" fill="${skinD}"/>`;
+
+  // Gesicht
+  s += `<ellipse cx="100" cy="70" rx="30" ry="34" fill="${skin}"/>`;
+
+  // Kantiger Kiefer durch Mewing
+  if (mewT >= 3) {
+    const k = Math.min(1, mewT / 25);                 // 0..1 – wie kantig
+    s += `<path d="M70,72 L${72 - k * 3},${92 + k * 2} Q${78 - k * 2},${102 + k * 2} 92,104 L100,${105 + k * 3} L108,104 Q${122 + k * 2},${102 + k * 2} ${128 + k * 3},${92 + k * 2} L130,72 Z" fill="${skin}"/>`;
+    s += `<path d="M${72 - k * 3},${92 + k * 2} Q${78 - k * 2},${102 + k * 2} 92,104" fill="none" stroke="${skinD}" stroke-width="1.5"/>`;
+    s += `<path d="M${128 + k * 3},${92 + k * 2} Q${122 + k * 2},${102 + k * 2} 108,104" fill="none" stroke="${skinD}" stroke-width="1.5"/>`;
+    if (mewT >= 15) s += `<line x1="100" y1="${103 + k * 3}" x2="100" y2="${107 + k * 3}" stroke="${skinD}" stroke-width="1.2"/>`; // Kinngrübchen
+  }
+  // Doppelkinn (ohne Mewing & mit schlechter Haltung – oder beim Event)
+  if ((mewT === 0 && postT < 5) || flags.doublechin) {
+    s += `<path d="M86,104 Q100,116 114,104" fill="none" stroke="${skinD}" stroke-width="2"/>`;
+  }
+
+  // Pickel (verschwinden mit Skincare)
+  const pimplePos = [[82, 54], [118, 82], [88, 86], [114, 52], [80, 78], [106, 46]];
+  const pimples = Math.max(0, 6 - Math.floor(skinT / 2));
+  for (let i = 0; i < pimples; i++) {
+    s += `<circle cx="${pimplePos[i][0]}" cy="${pimplePos[i][1]}" r="2" fill="#e05a5a" opacity=".85"/>`;
+  }
+  // Riesen-Pickel beim Event
+  if (flags.pimple) s += `<circle cx="113" cy="60" r="4.5" fill="#ff3b3b" stroke="#fff3" stroke-width="1"/><circle cx="112" cy="59" r="1.4" fill="#fff9e0"/>`;
+
+  // Haut-Glow (reine Haut ab viel Skincare)
+  if (skinT >= 15) {
+    const o = Math.min(0.45, (skinT - 10) / 100);
+    s += `<ellipse cx="88" cy="52" rx="9" ry="5" fill="#fff" opacity="${o}"/>`;
+    s += `<ellipse cx="116" cy="76" rx="5" ry="3" fill="#fff" opacity="${o}"/>`;
+  }
+  // Rote Wangen beim Lächeln
+  if (smile > 0.4) {
+    s += `<ellipse cx="82" cy="82" rx="6" ry="3.5" fill="#ff7b9c" opacity=".35"/><ellipse cx="118" cy="82" rx="6" ry="3.5" fill="#ff7b9c" opacity=".35"/>`;
+  }
+
+  // Augen
+  [88, 112].forEach(x => {
+    s += `<ellipse cx="${x}" cy="68" rx="5.5" ry="4.2" fill="#fff"/>`;
+    s += `<circle cx="${x}" cy="68.5" r="2.8" fill="${look.eyes}"/>`;
+    s += `<circle cx="${x}" cy="68.5" r="1.3" fill="#111"/>`;
+    s += `<circle cx="${x + 1}" cy="67.3" r=".7" fill="#fff"/>`;
+  });
+  // Augenringe (verschwinden mit Schlaf & Ernährung)
+  const bags = Math.max(0, 1 - sleepT / 8);
+  if (bags > 0) {
+    s += `<path d="M83,74 Q88,78 93,74 M107,74 Q112,78 117,74" fill="none" stroke="${skinDD}" stroke-width="1.6" opacity="${bags}"/>`;
+  }
+
+  // Augenbrauen (selbstbewusster = höher & gerader)
+  const browY = 60 - Math.min(2, confT * 0.15);
+  const worry = Math.max(0, 3 - confT * 0.3);
+  s += `<path d="M81,${browY} L94,${browY - worry} M106,${browY - worry} L119,${browY}" stroke="${look.hair === 'glatze' ? shade(hairC, -0.1) : hairC}" stroke-width="2.6" stroke-linecap="round"/>`;
+
+  // Nase
+  s += `<path d="M100,70 Q96,82 100,84 Q102,84.5 104,83" fill="none" stroke="${skinDD}" stroke-width="1.4" stroke-linecap="round"/>`;
+
+  // Mund & Zähne
+  const teethQ = L('zahnseide') + L('bleaching') * 3;
+  const teethColor = mix('#d9c27a', '#ffffff', Math.min(1, teethQ / 30));
+  const braces = L('zahnspange') >= 1 && L('zahnspange') < 10;
+  if (smile >= 0.4) {
+    const d = 4 + smile * 6;
+    s += `<path d="M88,91 Q100,${91 + d * 1.6} 112,91 Z" fill="${teethColor}" stroke="#7a1f2b" stroke-width="1.5" stroke-linejoin="round"/>`;
+    if (braces) {
+      s += `<line x1="90" y1="93" x2="110" y2="93" stroke="#9aa4b1" stroke-width="1.2"/>`;
+      for (let x = 92; x <= 108; x += 4) s += `<rect x="${x - 1}" y="92" width="2" height="2" fill="#c0c8d2"/>`;
+    }
+    // Strahlendes Lächeln mit perfekten Zähnen
+    if (L('zahnspange') >= 10) s += `<path class="twinkle" d="M116,88 l1.5,3 l3,1.5 l-3,1.5 l-1.5,3 l-1.5,-3 l-3,-1.5 l3,-1.5 Z" fill="#fff"/>`;
+  } else {
+    s += `<path d="M90,93 Q100,${93 + smile * 10} 110,93" fill="none" stroke="#7a1f2b" stroke-width="2" stroke-linecap="round"/>`;
+  }
+
+  // ===== Haare vorne =====
+  const messy = hairT < 3 || flags.badhair;
+  const hs = look.hair;
+  if (hs === 'kurz') {
+    s += `<path d="M69,66 Q66,32 100,31 Q134,32 131,66 Q126,48 112,46 Q100,51 86,46 Q74,48 69,66 Z" fill="${hairC}"/>`;
+  } else if (hs === 'scheitel') {
+    s += `<path d="M69,68 Q63,30 102,29 Q137,31 131,62 Q124,45 104,45 Q88,45 80,54 Q72,58 69,68 Z" fill="${hairC}"/>`;
+    s += `<path d="M84,40 Q100,32 122,42" fill="none" stroke="${shade(hairC, -0.25)}" stroke-width="1.5"/>`;
+  } else if (hs === 'locken') {
+    s += `<path d="M69,64 Q66,34 100,32 Q134,34 131,64 Q120,50 100,48 Q80,50 69,64 Z" fill="${hairC}"/>`;
+    [[70, 58], [75, 45], [85, 36], [100, 32], [115, 36], [125, 45], [130, 58], [92, 44], [108, 44]].forEach(([x, y]) => {
+      s += `<circle cx="${x}" cy="${y}" r="9" fill="${hairC}"/>`;
+    });
+  } else if (hs === 'lang') {
+    s += `<path d="M68,74 Q62,29 100,29 Q138,29 132,74 Q128,48 100,44 Q72,48 68,74 Z" fill="${hairC}"/>`;
+  }
+  // Signature-Haarschnitt: extra Volumen (Tolle)
+  if (L('signature') >= 1 && hs !== 'glatze') {
+    s += `<path d="M84,38 Q96,10 126,28 Q112,26 104,38 Z" fill="${hairC}"/>`;
+    if (L('signature') >= 10) s += `<path d="M92,30 Q104,16 120,26" fill="none" stroke="#ffd166" stroke-width="2.5" stroke-linecap="round"/>`;
+  }
+  // Ungekämmte Strähnen
+  if (messy && hs !== 'glatze') {
+    s += `<g stroke="${hairC}" stroke-width="3" stroke-linecap="round">
+      <line x1="88" y1="34" x2="83" y2="22"/><line x1="100" y1="31" x2="102" y2="18"/>
+      <line x1="111" y1="34" x2="118" y2="23"/><line x1="78" y1="42" x2="69" y2="35"/>
+      <line x1="122" y1="42" x2="131" y2="37"/></g>`;
+  }
+  // Glatze: Bartstoppeln bei wenig Pflege, Hochglanz-Politur mit Haar-Upgrades
+  if (hs === 'glatze') {
+    if (messy) for (let i = 0; i < 14; i++) s += `<circle cx="${76 + (i * 37) % 48}" cy="${40 + (i * 13) % 14}" r=".9" fill="${shade(skin, -0.45)}"/>`;
+    if (hairT >= 3) s += `<ellipse cx="90" cy="44" rx="${6 + Math.min(6, hairT / 4)}" ry="3.5" fill="#fff" opacity="${Math.min(0.8, 0.3 + hairT / 60)}"/>`;
+  }
+  // Glanz im Haar (gute Pflege)
+  if (hairT >= 8 && hs !== 'glatze') {
+    s += `<path d="M80,42 Q94,34 110,37" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity=".35"/>`;
+  }
+  // Sonnenbrille im Haar (Accessoires ab Stufe 10)
+  if (acc >= 10) {
+    s += `<g fill="#111" stroke="#ffd166" stroke-width="1"><ellipse cx="89" cy="37" rx="8" ry="5"/><ellipse cx="111" cy="37" rx="8" ry="5"/></g><line x1="97" y1="37" x2="103" y2="37" stroke="#ffd166" stroke-width="1.5"/>`;
+  }
+
+  s += `</g>`; // Ende Kopf
+  s += `</g>`; // Ende Oberkörper
+  s += `</g>`; // Ende Atmen
+
+  // ===== Funkeln rund um die Figur (ab hohem Glow-Score) =====
+  const sparkleCount = Math.min(8, Math.floor(glow / 300));
+  const spots = [[30, 60], [170, 50], [25, 160], [175, 150], [50, 20], [150, 15], [20, 220], [180, 225]];
+  for (let i = 0; i < sparkleCount; i++) {
+    const [x, y] = spots[i];
+    s += `<path class="twinkle" style="animation-delay:${(i * 0.37).toFixed(2)}s" d="M${x},${y - 7} L${x + 2},${y - 2} L${x + 7},${y} L${x + 2},${y + 2} L${x},${y + 7} L${x - 2},${y + 2} L${x - 7},${y} L${x - 2},${y - 2} Z" fill="${i % 2 ? '#ffd166' : '#fff'}"/>`;
+  }
+
+  return `<svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Deine Figur">${s}</svg>`;
+}
+
+// Hauptfigur im Spiel neu zeichnen
+function renderCharacter() {
+  const flags = {};
+  effects.forEach(e => { if (e.flag) flags[e.flag] = true; });
+  document.getElementById('mainChar').innerHTML =
+    characterSVG(S.look, lvl, { flags, glow: glowScore(), stars: S.stars, uid: 'main' });
+}
+
+/* ---------------------------------------------------------------
+   3.5 OBERFLÄCHE
+   --------------------------------------------------------------- */
+const $ = id => document.getElementById(id);
+
+// --- Charakter-Editor ---
+let draftLook = null;   // Aussehen, das gerade im Editor ausgewählt wird
+
+function openCreator() {
+  draftLook = Object.assign({}, S.look);
+  $('nameInput').value = S.name || '';
+  $('startBtn').textContent = S.created ? 'Speichern ✔️' : "Los geht's – Glow-Up starten! 🚀";
+  buildCreatorOptions();
+  $('creator').classList.remove('hidden');
+}
+
+function buildCreatorOptions() {
+  // Text-Buttons (Frisur, Outfit)
+  const textOpts = (containerId, key, list) => {
+    $(containerId).innerHTML = list.map(o =>
+      `<button class="opt ${draftLook[key] === o.id ? 'active' : ''}" data-key="${key}" data-val="${o.id}">${o.label}</button>`
+    ).join('');
+  };
+  // Farbkreise (Haare, Haut, Augen)
+  const colorOpts = (containerId, key, list) => {
+    $(containerId).innerHTML = list.map(c =>
+      `<button class="swatch ${draftLook[key] === c ? 'active' : ''}" style="background:${c}" data-key="${key}" data-val="${c}" aria-label="Farbe ${c}"></button>`
+    ).join('');
+  };
+  textOpts('optHair', 'hair', OPTIONS.hair);
+  colorOpts('optHairColor', 'hairColor', OPTIONS.hairColor);
+  colorOpts('optSkin', 'skin', OPTIONS.skin);
+  colorOpts('optEyes', 'eyes', OPTIONS.eyes);
+  textOpts('optOutfit', 'outfit', OPTIONS.outfit);
+
+  // Vorschau: neuer Charakter = Stufe 0, sonst aktueller Fortschritt
+  const L = S.created ? lvl : () => 0;
+  $('previewChar').innerHTML = characterSVG(draftLook, L, { glow: S.created ? glowScore() : 0, stars: S.stars, uid: 'prev' });
+}
+
+// Klick auf eine Option im Editor
+document.querySelector('.creator-inner').addEventListener('click', e => {
+  const btn = e.target.closest('[data-key]');
+  if (!btn) return;
+  draftLook[btn.dataset.key] = btn.dataset.val;
+  buildCreatorOptions();
+});
+
+// Editor bestätigen
+$('startBtn').addEventListener('click', () => {
+  S.name = $('nameInput').value.trim() || 'Namenloser NPC';
+  S.look = draftLook;
+  const first = !S.created;
+  S.created = true;
+  save();
+  $('creator').classList.add('hidden');
+  showGame();
+  if (first) {
+    toast(`Willkommen, ${escapeHtml(S.name)}!`, 'Klicke auf „Daily Routine“, sammle Aura-Punkte und kauf dir dein erstes Upgrade. Die Reise zum Gigachad beginnt jetzt.', 'milestone', 6000);
+  }
+});
+
+// Sonderzeichen im Namen ungefährlich machen (damit niemand HTML einschleust)
+function escapeHtml(t) {
+  return t.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// --- Spielbildschirm anzeigen ---
+function showGame() {
+  $('game').classList.remove('hidden');
+  $('charName').textContent = S.name;
+  buildTabs();
+  buildShop();
+  renderCharacter();
+  updateUI();
+}
+
+// --- Shop-Reiter ---
+function buildTabs() {
+  $('tabs').innerHTML = CATEGORIES.map(c =>
+    `<button class="tab ${S.tab === c.id ? 'active' : ''}" data-tab="${c.id}">${c.emoji} ${c.name}<span class="dot hidden"></span></button>`
+  ).join('');
+}
+$('tabs').addEventListener('click', e => {
+  const b = e.target.closest('[data-tab]');
+  if (!b) return;
+  S.tab = b.dataset.tab;
+  buildTabs();
+  buildShop();
+  updateUI();
+});
+
+// --- x1 / x10 / Max ---
+$('amountToggle').addEventListener('click', e => {
+  const b = e.target.closest('[data-amt]');
+  if (!b) return;
+  S.buyAmount = b.dataset.amt === 'max' ? 'max' : Number(b.dataset.amt);
+  updateUI();
+});
+
+// --- Upgrade-Liste aufbauen ---
+function effectText(u) {
+  const parts = [];
+  if (u.aps) parts.push(`+${fmt(u.aps)} Aura/s`);
+  if (u.click) parts.push(`+${fmt(u.click)} pro Klick`);
+  parts.push(`+${u.glow} Glow`);
+  return parts.join(' · ') + ' pro Stufe';
+}
+
+function buildShop() {
+  const cat = CATEGORIES.find(c => c.id === S.tab);
+  $('shopTitle').textContent = `${cat.emoji} ${cat.name}`;
+  const list = UPGRADES.filter(u => u.cat === S.tab);
+  $('items').innerHTML = list.map(u => `
+    <div class="item" id="item-${u.id}">
+      <div class="icon">${u.emoji}</div>
+      <div>
+        <div><span class="name">${u.name}</span><span class="lvl" id="lvl-${u.id}"></span></div>
+        <div class="desc" id="desc-${u.id}">${u.desc}</div>
+        <div class="eff">${effectText(u)}</div>
+      </div>
+      <button class="buy-btn" id="buy-${u.id}" data-buy="${u.id}"></button>
+    </div>`).join('');
+}
+
+$('items').addEventListener('click', e => {
+  const b = e.target.closest('[data-buy]');
+  if (b) buy(b.dataset.buy);
+});
+
+// --- Upgrade kaufen ---
+function buy(id) {
+  const u = UPGRADES.find(x => x.id === id);
+  if (!isUnlocked(u)) return;
+  const { count, cost } = bulkInfo(u);
+  if (count === 0 || cost > S.aura) return;
+  S.aura -= cost;
+  S.levels[id] = lvl(id) + count;
+
+  renderCharacter();
+  // kleiner "Hüpfer" der Figur als Belohnung
+  const w = $('charWrap');
+  w.classList.remove('bounce'); void w.offsetWidth; w.classList.add('bounce');
+
+  if (lvl(id) === MAX_LEVEL) toast(`${u.emoji} ${u.name} gemeistert!`, 'Maximale Stufe erreicht. Mehr geht nicht. Wirklich nicht.', 'good');
+  checkMilestones();
+  updateUI();
+  save();
+}
+
+// --- Alle Anzeigen aktualisieren (läuft mehrmals pro Sekunde) ---
+function updateUI() {
+  const glow = glowScore();
+  $('sAura').textContent = fmt(S.aura);
+  $('sAps').textContent = fmt(totalAps());
+  $('sGlow').textContent = fmt(glow);
+  const mult = prestigeMult() * eventMult('aps');
+  $('sMult').textContent = 'x' + mult.toLocaleString('de-DE', { maximumFractionDigits: 2 });
+  $('clickValue').textContent = `+${fmt(clickValue())} Aura pro Klick`;
+
+  // Titel & Fortschritt zum nächsten Titel
+  const mi = milestoneIndex(glow);
+  $('charTitle').textContent = MILESTONES[mi].title;
+  const next = MILESTONES[mi + 1];
+  if (next) {
+    const prev = MILESTONES[mi].glow;
+    $('titleProgress').style.width = Math.min(100, (glow - prev) / (next.glow - prev) * 100) + '%';
+    $('nextTitle').textContent = `Nächster Titel: „${next.title}“ bei ${fmt(next.glow)} Glow`;
+  } else {
+    $('titleProgress').style.width = '100%';
+    $('nextTitle').textContent = 'Höchster Titel erreicht. Du bist jetzt ein Naturgesetz.';
+  }
+
+  // x1/x10/Max-Buttons markieren
+  document.querySelectorAll('#amountToggle button').forEach(b => {
+    b.classList.toggle('active', String(S.buyAmount) === b.dataset.amt);
+  });
+
+  // Shop-Einträge aktualisieren
+  UPGRADES.filter(u => u.cat === S.tab).forEach(u => {
+    const item = $('item-' + u.id), btn = $('buy-' + u.id);
+    if (!item) return;
+    const l = lvl(u.id), unlocked = isUnlocked(u);
+    $('lvl-' + u.id).textContent = `Stufe ${l}/${MAX_LEVEL}`;
+    item.classList.toggle('locked', !unlocked);
+    item.classList.toggle('maxed', l >= MAX_LEVEL);
+    if (!unlocked) {
+      const inCat = UPGRADES.filter(x => x.cat === u.cat);
+      btn.disabled = true;
+      btn.innerHTML = '🔒 Gesperrt';
+      $('desc-' + u.id).textContent = `Kaufe zuerst „${inCat[inCat.indexOf(u) - 1].name}“.`;
+    } else {
+      $('desc-' + u.id).textContent = u.desc;
+      if (l >= MAX_LEVEL) {
+        btn.disabled = true;
+        btn.innerHTML = '✅ MAX';
+      } else {
+        const { count, cost } = bulkInfo(u);
+        btn.disabled = cost > S.aura;
+        btn.innerHTML = `${fmt(cost)} ✨<small>${count > 1 ? count + ' Stufen' : 'kaufen'}</small>`;
+      }
+    }
+  });
+
+  // Gelber Punkt auf Reitern, in denen man etwas kaufen kann
+  document.querySelectorAll('.tab').forEach(t => {
+    const affordable = UPGRADES.some(u => u.cat === t.dataset.tab && isUnlocked(u) &&
+      lvl(u.id) < MAX_LEVEL && costAt(u, lvl(u.id)) <= S.aura);
+    t.querySelector('.dot').classList.toggle('hidden', !affordable);
+  });
+
+  // Prestige-Info
+  const st = starsForPrestige();
+  if (st > 0) {
+    $('prestigeInfo').innerHTML = `Starte neu und erhalte <b>${st} Glow-Sterne ⭐</b>. Jeder Stern gibt dauerhaft +${BONUS_PER_STAR * 100} % auf alle Aura. Dein Multiplikator wäre danach <b>x${(1 + (S.stars + st) * BONUS_PER_STAR).toLocaleString('de-DE', { maximumFractionDigits: 2 })}</b>.`;
+  } else {
+    $('prestigeInfo').innerHTML = `Ab <b>${PRESTIGE_MIN_GLOW} Glow-Score</b> kannst du einen Glow Up machen: Alles startet neu, aber du bekommst dauerhaft einen Bonus. (Aktuell: ${fmt(glow)} / ${PRESTIGE_MIN_GLOW})<br>Deine Glow-Sterne: ${S.stars} ⭐`;
+  }
+  $('prestigeBtn').disabled = st === 0;
+
+  // Aktive Effekte anzeigen
+  const now = Date.now();
+  $('effects').innerHTML = effects.map(e => {
+    const left = Math.max(0, (e.until - now) / 1000);
+    return `<div class="effect ${e.good ? 'good' : 'bad'}">${e.title} – noch ${Math.ceil(left)} s
+      <div class="bar" style="width:${left / e.dur * 100}%; color:${e.good ? 'var(--green)' : 'var(--red)'}"></div></div>`;
+  }).join('');
+
+  // Statistik
+  $('statList').innerHTML = `
+    📊 Klicks insgesamt: <b>${fmt(S.clicks)}</b><br>
+    ✨ Aura in diesem Durchlauf: <b>${fmt(S.runAura)}</b><br>
+    🌌 Aura insgesamt (für immer): <b>${fmt(S.lifetimeAura)}</b><br>
+    🌟 Glow Ups gemacht: <b>${S.glowUps}</b>`;
+}
+
+// --- Toast (kleine Nachricht oben) ---
+function toast(title, text, type = '', ms = 4500) {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.innerHTML = `<b>${title}</b>${text}`;
+  $('toasts').appendChild(el);
+  // höchstens 4 gleichzeitig
+  while ($('toasts').children.length > 4) $('toasts').firstChild.remove();
+  setTimeout(() => { el.classList.add('fade'); setTimeout(() => el.remove(), 500); }, ms);
+}
+
+// --- Modal (großes Fenster mit Buttons) ---
+function modal(title, html, buttons) {
+  const root = $('modalRoot');
+  root.innerHTML = `<div class="overlay"><div class="modal"><h2>${title}</h2><div>${html}</div>
+    <div class="row">${buttons.map((b, i) => `<button class="${b.primary ? 'btn-primary' : 'btn-secondary'}" data-i="${i}">${b.label}</button>`).join('')}</div>
+  </div></div>`;
+  root.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      root.innerHTML = '';
+      const cb = buttons[btn.dataset.i].action;
+      if (cb) cb();
+    });
+  });
+}
+
+// --- Klick auf "Daily Routine" ---
+$('routineBtn').addEventListener('click', e => {
+  const v = clickValue();
+  gainAura(v);
+  S.clicks++;
+
+  // fliegende Zahl an der Klickposition (bei Tastatur: Mitte des Buttons)
+  const r = e.currentTarget.getBoundingClientRect();
+  const x = e.clientX || (r.left + r.width / 2);
+  const y = e.clientY || (r.top + 10);
+  const f = document.createElement('div');
+  f.className = 'floater';
+  f.textContent = '+' + fmt(v);
+  f.style.left = x + 'px';
+  f.style.top = (y - 20) + 'px';
+  document.body.appendChild(f);
+  setTimeout(() => f.remove(), 1000);
+
+  // ab und zu sagt die Figur etwas
+  if (Math.random() < 0.07) say(QUOTES[Math.floor(Math.random() * QUOTES.length)]);
+  updateUI();
+});
+
+// Sprechblase über der Figur
+let bubbleTimer = null;
+function say(text) {
+  document.querySelectorAll('.bubble').forEach(b => b.remove());
+  const b = document.createElement('div');
+  b.className = 'bubble';
+  b.textContent = text;
+  $('charWrap').appendChild(b);
+  clearTimeout(bubbleTimer);
+  bubbleTimer = setTimeout(() => b.remove(), 2800);
+}
+
+// Aura gutschreiben
+function gainAura(v) {
+  S.aura += v;
+  S.runAura += v;
+  S.lifetimeAura += v;
+}
+
+// Einstellungen
+$('editCharBtn').addEventListener('click', openCreator);
+$('resetBtn').addEventListener('click', () => {
+  modal('Spielstand löschen? 🗑️',
+    'Wirklich ALLES löschen? Charakter, Upgrades, Glow-Sterne – alles weg. Das kann man nicht rückgängig machen.',
+    [{ label: 'Abbrechen' }, { label: 'Ja, löschen', primary: true, action: resetGame }]);
+});
+
+/* ---------------------------------------------------------------
+   3.6 EVENTS, MEILENSTEINE, PRESTIGE
+   --------------------------------------------------------------- */
+
+// Zufälliges Event auslösen
+function triggerEvent() {
+  // gute Events etwas häufiger als schlechte (60 : 40)
+  const good = Math.random() < 0.6;
+  const pool = EVENTS.filter(e => e.good === good);
+  const ev = pool[Math.floor(Math.random() * pool.length)];
+
+  if (ev.instantSec) {
+    const gain = totalAps() * ev.instantSec;
+    gainAura(gain);
+    toast(ev.title, `${ev.text} (+${fmt(gain)} Aura)`, 'good');
+  } else if (ev.instantPct) {
+    const loss = S.aura * -ev.instantPct;
+    S.aura -= loss;
+    toast(ev.title, `${ev.text} (-${fmt(loss)} Aura)`, 'bad');
+  } else {
+    // dasselbe Event nicht doppelt gleichzeitig
+    effects = effects.filter(e => e.title !== ev.title);
+    effects.push(Object.assign({}, ev, { until: Date.now() + ev.dur * 1000 }));
+    toast(ev.title, ev.text, ev.good ? 'good' : 'bad');
+    if (ev.flag) renderCharacter();
+  }
+}
+
+// Neue Meilensteine prüfen und feiern
+function checkMilestones() {
+  const mi = milestoneIndex(glowScore());
+  if (mi > S.bestMilestone) {
+    S.bestMilestone = mi;
+    const m = MILESTONES[mi];
+    toast(`🏆 Neuer Titel: ${m.title}!`, m.text, 'milestone', 6000);
+    say(`Nennt mich ab jetzt „${m.title}“.`);
+  }
+}
+
+// Prestige: "Glow Up"
+$('prestigeBtn').addEventListener('click', () => {
+  const st = starsForPrestige();
+  if (st === 0) return;
+  modal('🌟 Glow Up machen?',
+    `Du startest wieder als NPC – alle Upgrades und Aura-Punkte werden zurückgesetzt.<br><br>
+     Dafür bekommst du <b>${st} Glow-Sterne ⭐</b> und damit dauerhaft <b>+${Math.round(st * BONUS_PER_STAR * 100)} %</b> auf alle Aura.<br><br>
+     <i>„Ich bin nicht neu angefangen. Ich bin wiedergeboren.“</i>`,
+    [{ label: 'Noch nicht' }, { label: 'Glow Up! ✨', primary: true, action: () => doPrestige(st) }]);
+});
+
+function doPrestige(st) {
+  S.stars += st;
+  S.glowUps++;
+  S.aura = 0;
+  S.runAura = 0;
+  S.levels = {};
+  effects = [];
+  save();
+  renderCharacter();
+  updateUI();
+  toast('✨ GLOW UP! ✨', `Du hast jetzt ${S.stars} Glow-Sterne. Multiplikator: x${prestigeMult().toLocaleString('de-DE', { maximumFractionDigits: 2 })}. Die Aura um dich hat eine neue Farbe!`, 'milestone', 6000);
+}
+
+/* ---------------------------------------------------------------
+   3.7 SPIELSCHLEIFE & START
+   --------------------------------------------------------------- */
+let lastTick = performance.now();
+let saveTimer = 0;
+
+function tick() {
+  const now = performance.now();
+  const dt = Math.min(1, (now - lastTick) / 1000);  // vergangene Sekunden (max. 1)
+  lastTick = now;
+  if (!S.created) return;
+
+  // passive Aura
+  gainAura(totalAps() * dt);
+
+  // abgelaufene Events entfernen
+  const before = effects.length;
+  const hadFlag = effects.some(e => e.flag);
+  effects = effects.filter(e => e.until > Date.now());
+  if (effects.length !== before) {
+    if (hadFlag) renderCharacter();
+    if (effects.length < before) toast('Effekt vorbei', 'Alles wieder normal. Mehr oder weniger.', '', 2500);
+  }
+
+  // neues Zufalls-Event? (erst, wenn man schon etwas passive Aura hat)
+  if (Date.now() > nextEventAt) {
+    if (baseAps() >= 1) triggerEvent();
+    nextEventAt = Date.now() + rand(45, 90) * 1000;
+  }
+
+  updateUI();
+
+  // alle 5 Sekunden automatisch speichern
+  saveTimer += dt;
+  if (saveTimer > 5) { saveTimer = 0; save(); }
+}
+
+// Belohnung für die Zeit, in der das Spiel geschlossen war ("Beauty Sleep")
+function offlineProgress() {
+  const secs = Math.min(8 * 3600, (Date.now() - S.lastSave) / 1000);   // max. 8 Stunden
+  const aps = baseAps() * prestigeMult();
+  if (secs < 60 || aps <= 0) return;
+  const gain = aps * secs * 0.5;   // offline gibt es 50 %
+  gainAura(gain);
+  const mins = Math.floor(secs / 60);
+  const timeText = mins >= 60 ? `${Math.floor(mins / 60)} Std. ${mins % 60} Min.` : `${mins} Min.`;
+  modal('😴 Beauty Sleep',
+    `Du warst <b>${timeText}</b> weg. Während du geschlafen hast, hat deine Routine weitergearbeitet:<br><br>
+     <span style="font-size:1.6rem;color:var(--gold);font-weight:900">+${fmt(gain)} Aura</span>`,
+    [{ label: 'Nice! 😎', primary: true }]);
+}
+
+// Spiel starten
+function init() {
+  const hasSave = load();
+  if (hasSave && S.created) {
+    offlineProgress();
+    showGame();
+  } else {
+    openCreator();
+  }
+  setInterval(tick, 100);                         // 10x pro Sekunde
+  window.addEventListener('beforeunload', save);  // beim Schließen speichern
+  document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
+}
+
+init();
+</script>
+</body>
+</html>
