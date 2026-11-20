@@ -27,8 +27,8 @@
        3.4 Figur zeichnen (SVG, verändert sich mit den Upgrades)
        3.5 Oberfläche   (Shop, Anzeigen, Pop-ups)
        3.6 Events, Meilensteine, Prestige
-       3.6b Freunde, Stadt, Mog Battles, Ansprechen, App-Installation
-       3.6c Geld & Jobs, Luxus-Shop, Zigaretten & Alkohol, Casino, Endboss Leon, Leaderboard
+       3.6b Freunde, Stadt, Mog Battles, Fans gewinnen, App-Installation
+       3.6c Geld & Jobs, Luxus-Shop, Endboss Leon, Leaderboard
        3.7 Spielschleife & Start
   ==========================================================================
 -->
@@ -462,7 +462,7 @@
     padding: 2px 7px; border-radius: 999px; background: rgba(20,5,35,.8);
   }
   .tag.t-player { color: var(--gold); border: 1px solid var(--gold); }
-  .tag.t-woman  { color: #ff9ad5; }
+  .tag.t-fan    { color: #ff9ad5; }
   .tag.t-friend { color: var(--cyan); }
   .tag.t-rival  { color: #ffb36b; }
   .tag.t-done   { color: var(--green); }
@@ -543,11 +543,6 @@
 
   /* ---------- Endboss, Stadt-Rucksack ---------- */
   .tag.t-boss { color: #ffd166; background: linear-gradient(90deg, #7a0010, #3a0040); border: 1px solid #ffd166; font-size: 12px; }
-  #townHud { position: absolute; top: 10px; left: 10px; display: flex; gap: 6px; z-index: 5000; flex-wrap: wrap; max-width: 75%; }
-  #townHud button {
-    padding: 7px 11px; border-radius: 10px; background: rgba(20,5,35,.88);
-    border: 1px solid var(--card-border); font-weight: 800; font-size: .85rem;
-  }
 
   /* ---------- Job-Minispiel ---------- */
   .mg-bar { position: relative; height: 34px; border-radius: 999px; background: rgba(255,255,255,.12); overflow: hidden; margin: 16px 0 10px; }
@@ -555,46 +550,6 @@
   .mg-perfect { position: absolute; top: 0; bottom: 0; background: rgba(255,209,102,.95); }
   .mg-marker { position: absolute; top: -2px; bottom: -2px; width: 6px; margin-left: -3px; background: #fff; border-radius: 3px; box-shadow: 0 0 8px #fff; }
   .mg-results { display: flex; gap: 6px; justify-content: center; min-height: 32px; flex-wrap: wrap; }
-
-  /* ---------- Casino ---------- */
-  .casino-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .casino-grid h3 { margin: 0 0 8px; }
-  .bet-bar { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 10px; font-weight: 800; }
-  .bet-bar input, .rou-num-bet input {
-    width: 110px; padding: 8px; border-radius: 10px; border: 2px solid var(--card-border);
-    background: rgba(0,0,0,.25); color: var(--text); font-size: 1rem; font-family: inherit;
-  }
-  .bet-bar button, .rou-bets button, .rou-num-bet button { padding: 8px 12px; border-radius: 10px; background: rgba(255,255,255,.12); font-weight: 800; }
-  .casino-btn {
-    flex: 1; width: 100%; padding: 12px; border-radius: 12px; font-weight: 900; font-size: 1rem;
-    background: linear-gradient(135deg, var(--gold), #ff9f43); color: #3a1d00; margin-top: 8px;
-  }
-  .casino-btn:disabled { opacity: .5; cursor: not-allowed; }
-  .casino-msg { min-height: 24px; margin-top: 8px; font-weight: 800; text-align: center; }
-  .reels { display: flex; gap: 8px; justify-content: center; }
-  .reel {
-    width: 72px; height: 80px; border-radius: 14px; background: #fff; font-size: 2.6rem;
-    display: flex; align-items: center; justify-content: center; box-shadow: inset 0 -6px 0 rgba(0,0,0,.12);
-  }
-  .roulette-num {
-    width: 90px; height: 90px; margin: 0 auto 10px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    font-size: 2.2rem; font-weight: 900; background: #1b7a3a; border: 6px solid var(--gold);
-  }
-  .rou-bets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-  .rou-bets .red { background: #c1121f; } .rou-bets .black { background: #111; }
-  .rou-num-bet { display: flex; gap: 6px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
-  .cards { display: flex; gap: 6px; min-height: 64px; margin: 4px 0 8px; flex-wrap: wrap; }
-  .pcard {
-    width: 44px; height: 62px; border-radius: 8px; background: #fff; color: #111; font-weight: 900;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; animation: pop .25s ease-out;
-  }
-  .pcard.red { color: #c1121f; }
-  .pcard.back { background: repeating-linear-gradient(45deg, #9b5cff, #9b5cff 6px, #ff4fd8 6px, #ff4fd8 12px); }
-  #bjBtns { display: flex; gap: 6px; flex-wrap: wrap; }
-  .mb-fighters { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; }
-  .mb-fighters svg { width: 100%; max-width: 110px; height: auto; }
-  .mb-btn { width: 100%; margin-top: 6px; padding: 9px; border-radius: 10px; font-weight: 800; background: linear-gradient(135deg, #ff8c42, var(--red)); }
-  .mb-btn:disabled { opacity: .5; }
 
   /* ---------- Leaderboard ---------- */
   .lb-row {
@@ -620,7 +575,6 @@
     .preview-card svg { max-width: 200px; }
     .stats { grid-template-columns: repeat(2, 1fr); }
     .stat.money { grid-column: span 2; }
-    .casino-grid { grid-template-columns: 1fr !important; }
     .char-wrap { max-width: 230px; }
     .two-col { grid-template-columns: 1fr; }
     .mainnav { gap: 5px; }
@@ -673,7 +627,6 @@
       <button data-view="home" class="active">🪞 Glow-Up</button>
       <button data-view="jobs">💼 Jobs</button>
       <button data-view="town">🏙️ Stadt</button>
-      <button data-view="casino">🎰 Casino</button>
       <button data-view="friends">👥 Freunde</button>
       <button data-view="leader">🏆 Leaderboard</button>
     </nav>
@@ -749,17 +702,16 @@
     <div class="card">
       <h2 style="margin:0 0 4px">🏙️ Glow City</h2>
       <p class="town-help">👆 Tippe auf eine Stelle, um dorthin zu laufen (am PC auch Pfeiltasten / WASD).
-        Geh nah an Leute heran, um sie anzusprechen oder zum <b>Mog Battle</b> herauszufordern.</p>
+        Geh nah an Leute heran, um sie als <b>Fans</b> zu gewinnen oder zum <b>Mog Battle</b> herauszufordern.</p>
       <div id="townViewport">
         <div id="townWorld"></div>
         <div id="interactBar" class="hidden"></div>
-        <div id="townHud"></div>
       </div>
     </div>
     <div class="two-col">
       <div class="card">
-        <h3 style="margin:0">📱 Deine Kontakte <span id="contactCount"></span></h3>
-        <div class="small">Nummern, die du in der Stadt bekommen hast.</div>
+        <h3 style="margin:0">⭐ Deine Fans <span id="contactCount"></span></h3>
+        <div class="small">Leute aus der Stadt, die du begeistert hast und die dir jetzt folgen.</div>
         <div class="chips" id="contactList"></div>
       </div>
       <div class="card">
@@ -768,11 +720,7 @@
         <div class="small" style="margin-top:6px">Rivalen in der Stadt: Gym-Bro Dennis, Influencer Luca, Mewing-Meister Kai und Gigachad Sven. Deine Freunde laufen hier auch herum – und irgendwo wartet <b style="color:var(--gold)">👑 Endboss LEON</b>.</div>
       </div>
     </div>
-      <div class="card">
-      <h3 style="margin:0">🏪 Späti</h3>
-      <div class="small">Zigaretten & Alkohol. Benutzen kannst du sie in der Stadt (Knöpfe oben links im Stadtbild). Sie senken deinen Glow-Score!</div>
-      <div class="items" id="kioskList" style="margin-top:8px"></div>
-    </div>
+      
   </section>
 
   <!-- ===== Bereich: JOBS ===== -->
@@ -788,52 +736,6 @@
       <h2 style="margin:0 0 4px">🛍️ Luxus-Shop</h2>
       <p class="small">Gönn dir was: kurzfristige Boosts für dein Geld.</p>
       <div class="items" id="luxList"></div>
-    </div>
-  </section>
-
-  <!-- ===== Bereich: CASINO ===== -->
-  <section class="view hidden" id="viewCasino">
-    <div class="card">
-      <h2 style="margin:0">🎰 Casino Royal-Glow</h2>
-      <div class="small">Nur Spielgeld – das Haus gewinnt trotzdem meistens. 😉</div>
-      <div class="bet-bar" id="betBar">Einsatz:
-        <input id="betInput" type="number" min="1" value="10" inputmode="numeric"> €
-        <button data-bet="10">10</button><button data-bet="100">100</button><button data-bet="1000">1.000</button>
-        <button data-bet="half">½</button><button data-bet="max">Alles</button>
-      </div>
-    </div>
-    <div class="casino-grid">
-      <div class="card" id="gSlots">
-        <h3>🎰 Glow-Slots</h3>
-        <div class="reels"><div class="reel" id="reel0">💎</div><div class="reel" id="reel1">👑</div><div class="reel" id="reel2">🗿</div></div>
-        <div class="small" style="text-align:center;margin-top:8px">3 gleiche: 🍒x5 · 💅x10 · 🧴x15 · 🗿x25 · 💎x50 · 👑x100<br>2 gleiche: Einsatz zurück</div>
-        <button class="casino-btn" id="slotBtn">Drehen!</button>
-        <div class="casino-msg" id="slotMsg"></div>
-      </div>
-      <div class="card" id="gRoulette">
-        <h3>🎡 Roulette</h3>
-        <div class="roulette-num" id="rouNum">0</div>
-        <div class="rou-bets">
-          <button data-rou="rot" class="red">Rot x2</button><button data-rou="schwarz" class="black">Schwarz x2</button><button data-rou="gerade">Gerade x2</button>
-          <button data-rou="ungerade">Ungerade x2</button><button data-rou="low">1–18 x2</button><button data-rou="high">19–36 x2</button>
-        </div>
-        <div class="rou-num-bet">Zahl: <input id="rouPick" type="number" min="0" max="36" value="7" inputmode="numeric">
-          <button data-rou="zahl">Auf Zahl setzen (x36)</button></div>
-        <div class="casino-msg" id="rouMsg"></div>
-      </div>
-      <div class="card" id="gBlackjack">
-        <h3>🃏 Blackjack</h3>
-        <div class="small">Dealer <span id="bjDealerVal"></span></div><div class="cards" id="bjDealer"></div>
-        <div class="small">Du <span id="bjYouVal"></span></div><div class="cards" id="bjYou"></div>
-        <div id="bjBtns"></div>
-        <div class="casino-msg" id="bjMsg"></div>
-      </div>
-      <div class="card" id="gMogBet">
-        <h3>⚔️ Mog-Wetten</h3>
-        <div class="small" style="margin-bottom:8px">Zwei Typen, ein Mog Battle. Auf wen setzt du? Je kleiner die Gewinnchance, desto höher die Quote.</div>
-        <div id="mbFighters"></div>
-        <div class="casino-msg" id="mbMsg"></div>
-      </div>
     </div>
   </section>
 
@@ -1005,10 +907,10 @@ const BONUS_PER_STAR = 0.2;   // jeder Stern = +20 % auf alle Aura dauerhaft
 
 // Zufällige Events. Gute und schlechte. (aps/click = Multiplikator)
 const EVENTS = [
-  { good: false, title: 'Pickel am Morgen des Dates! 😱', text: '-10 % Aura pro Sekunde für 30 Sekunden.', dur: 30, aps: 0.9, flag: 'pimple' },
+  { good: false, title: 'Pickel am Morgen des Klassenfotos! 😱', text: '-10 % Aura pro Sekunde für 30 Sekunden.', dur: 30, aps: 0.9, flag: 'pimple' },
   { good: false, title: 'Bad Hair Day 🌪️', text: 'Der Wind hat entschieden. Klicks bringen 50 % weniger (30 s).', dur: 30, click: 0.5, flag: 'badhair' },
   { good: false, title: 'Mewing vergessen! 😶', text: 'Doppelkinn im Video-Call. -20 % Aura/s für 20 Sekunden.', dur: 20, aps: 0.8, flag: 'doublechin' },
-  { good: false, title: 'Die Ex hat dich in Jogginghose gesehen 🩳', text: 'Du verlierst 5 % deiner Aura-Punkte.', instantPct: -0.05 },
+  { good: false, title: 'Dein Lehrer hat dich in Jogginghose gesehen 🩳', text: 'Du verlierst 5 % deiner Aura-Punkte.', instantPct: -0.05 },
   { good: false, title: 'Spinat zwischen den Zähnen 🥬', text: 'Seit drei Stunden. Keiner hat was gesagt. -15 % Aura/s (25 s).', dur: 25, aps: 0.85 },
   { good: true,  title: 'Perfektes Fahrstuhl-Licht ✨', text: 'Doppelte Aura pro Sekunde für 30 Sekunden!', dur: 30, aps: 2 },
   { good: true,  title: 'Golden Hour Selfie 📸', text: 'Klicks bringen 5x so viel für 20 Sekunden!', dur: 20, click: 5 },
@@ -1081,16 +983,12 @@ function newState() {
     lastSave: Date.now(),
     id: makeId(),            // eigene Spieler-ID (für Freundescodes)
     friends: [],             // Freundesliste (aus Freundescodes)
-    contacts: [],            // Nummern aus der Stadt
+    contacts: [],            // Fans aus der Stadt
     mogWins: 0,              // gewonnene Mog Battles
     mogLosses: 0,            // verlorene Mog Battles
-    money: 0,                // Geld (aus Jobs & Casino)
+    money: 0,                // Geld (aus Jobs)
     moneyEarned: 0,          // insgesamt verdientes Geld
     jobCd: {},               // Pausen der Jobs
-    inv: { zigarette: 0, bier: 0, wodka: 0 },   // Rucksack
-    vice: 0,                 // Glow-Abzug durch Zigaretten & Alkohol
-    casinoNet: 0,            // Gewinn/Verlust im Casino
-    biggestWin: 0,           // größter Casino-Gewinn
     bossWins: 0,             // wie oft Leon besiegt
   };
 }
@@ -1112,7 +1010,8 @@ function load() {
     // Mit Standardwerten zusammenführen, falls später neue Felder dazukommen
     S = Object.assign(newState(), data);
     S.look = Object.assign(newState().look, data.look || {});
-    S.inv = Object.assign(newState().inv, data.inv || {});
+    // Reste aus älteren Versionen (Casino, Späti) aufräumen
+    ['inv', 'vice', 'casinoNet', 'biggestWin'].forEach(k => { delete S[k]; });
     return true;
   } catch (e) {
     return false;
@@ -1190,8 +1089,7 @@ function clickValue() {
 function baseGlow() {
   return UPGRADES.reduce((sum, u) => sum + lvl(u.id) * u.glow, 0);
 }
-// Glow-Score MIT Abzug durch Zigaretten & Alkohol
-function glowScore() { return Math.max(0, Math.round(baseGlow() - S.vice)); }
+function glowScore() { return baseGlow(); }
 
 // Aktueller Meilenstein (Index in MILESTONES)
 function milestoneIndex(glow) {
@@ -1284,7 +1182,7 @@ function characterSVG(look, L, opts = {}) {
   // NPCs können eine eigene Outfit-Farbe haben (look.color)
   const oc = look.color ? { main: look.color, dark: shade(look.color, -0.3) }
                         : (OUTFIT_COLORS[look.outfit] || OUTFIT_COLORS.hoodie);
-  const fem = !!look.fem;   // weibliche Figur (für die Frauen in der Stadt)
+  const fem = !!look.fem;   // weibliche Figur (z. B. für Fans in der Stadt)
 
   // --- Körpermaße ---
   const sw = fem ? 22 + Math.min(5, fitT * 0.1) : 28 + Math.min(24, fitT * 0.5);                          // halbe Schulterbreite
@@ -1446,14 +1344,6 @@ function characterSVG(look, L, opts = {}) {
     s += `<path d="M83,74 Q88,78 93,74 M107,74 Q112,78 117,74" fill="none" stroke="${skinDD}" stroke-width="1.6" opacity="${bags}"/>`;
   }
 
-  // Betrunken: halb geschlossene Augen & rote Wangen
-  if (flags.drunk) {
-    [88, 112].forEach(x => { s += `<path d="M${x - 6},63 L${x + 6},63 L${x + 6},68.5 Q${x},66.5 ${x - 6},68.5 Z" fill="${skin}"/>`; });
-    s += `<ellipse cx="82" cy="82" rx="6" ry="3.5" fill="#ff5d73" opacity=".5"/><ellipse cx="118" cy="82" rx="6" ry="3.5" fill="#ff5d73" opacity=".5"/>`;
-  }
-  // Raucher: fahle Haut
-  if (flags.smoke) s += `<ellipse cx="100" cy="70" rx="30" ry="34" fill="#9aa08a" opacity=".18"/>`;
-
   // Augenbrauen (selbstbewusster = höher & gerader)
   const browY = 60 - Math.min(2, confT * 0.15);
   const worry = Math.max(0, 3 - confT * 0.3);
@@ -1467,13 +1357,9 @@ function characterSVG(look, L, opts = {}) {
   // Nase
   s += `<path d="M100,70 Q96,82 100,84 Q102,84.5 104,83" fill="none" stroke="${skinDD}" stroke-width="1.4" stroke-linecap="round"/>`;
 
-  // Rote Nase (betrunken)
-  if (flags.drunk) s += `<circle cx="101" cy="81" r="3.5" fill="#ff5d73" opacity=".85"/>`;
-
   // Mund & Zähne
   const teethQ = L('zahnseide') + L('bleaching') * 3;
-  let teethColor = mix('#d9c27a', '#ffffff', Math.min(1, teethQ / 30));
-  if (flags.smoke) teethColor = mix(teethColor, '#b8962e', 0.55);   // Raucherzähne
+  const teethColor = mix('#d9c27a', '#ffffff', Math.min(1, teethQ / 30));
   const braces = L('zahnspange') >= 1 && L('zahnspange') < 10;
   if (smile >= 0.4) {
     const d = 4 + smile * 6;
@@ -1486,13 +1372,6 @@ function characterSVG(look, L, opts = {}) {
     if (L('zahnspange') >= 10) s += `<path class="twinkle" d="M116,88 l1.5,3 l3,1.5 l-3,1.5 l-1.5,3 l-1.5,-3 l-3,-1.5 l3,-1.5 Z" fill="#fff"/>`;
   } else {
     s += `<path d="M90,93 Q100,${93 + smile * 10} 110,93" fill="none" stroke="${fem ? '#c2185b' : '#7a1f2b'}" stroke-width="${fem ? 3 : 2}" stroke-linecap="round"/>`;
-  }
-
-  // Zigarette im Mund + Rauch
-  if (flags.smoke) {
-    s += `<rect x="108" y="92" width="16" height="3" rx="1" fill="#f5f5f5" transform="rotate(-10 108 93)"/>`;
-    s += `<circle cx="124" cy="90.3" r="1.8" fill="#ff7b00"/>`;
-    s += `<g class="waft" fill="none" stroke="#c8c8c8" stroke-width="2" stroke-linecap="round"><path d="M125,86 q4,-5 0,-10 q-4,-5 0,-10"/><path d="M131,82 q3,-4 0,-8"/></g>`;
   }
 
   // ===== Haare vorne =====
@@ -1723,7 +1602,7 @@ function updateUI() {
   const glow = glowScore();
   $('sAura').textContent = fmt(S.aura);
   $('sAps').textContent = fmt(totalAps());
-  $('sGlow').innerHTML = fmt(glow) + (S.vice >= 1 ? ` <span style="font-size:.6em;color:var(--red)">(-${Math.ceil(S.vice)} 🚬🍺)</span>` : '');
+  $('sGlow').textContent = fmt(glow);
   $('sMoney').textContent = fmtMoney(S.money);
   updateJobs();
   const mult = prestigeMult() * eventMult('aps');
@@ -1805,8 +1684,8 @@ function updateUI() {
     🌌 Aura insgesamt (für immer): <b>${fmt(S.lifetimeAura)}</b><br>
     🌟 Glow Ups gemacht: <b>${S.glowUps}</b><br>
     ⚔️ Mog Battles: <b>${S.mogWins}</b> gewonnen / <b>${S.mogLosses}</b> verloren<br>
-    📱 Kontakte: <b>${S.contacts.length}</b> · 👥 Freunde: <b>${S.friends.length}</b><br>
-    💵 Geld verdient: <b>${fmtMoney(S.moneyEarned)}</b> · 🎰 Casino-Bilanz: <b>${S.casinoNet >= 0 ? '+' : '-'}${fmtMoney(Math.abs(S.casinoNet))}</b><br>
+    ⭐ Fans: <b>${S.contacts.length}</b> · 👥 Freunde: <b>${S.friends.length}</b><br>
+    💵 Geld verdient: <b>${fmtMoney(S.moneyEarned)}</b><br>
     👑 Leon besiegt: <b>${S.bossWins}x</b>`;
 }
 
@@ -2008,9 +1887,7 @@ function versusHTML(a, b) {
 
 // Mich selbst als "Kämpfer" beschreiben
 function meAsFighter() {
-  // factor: Zigaretten & Alkohol schwächen dich auch im Mog Battle
-  const base = baseGlow();
-  return { name: S.name, look: S.look, L: lvl, stars: S.stars, glow: glowScore(), factor: base ? glowScore() / base : 1 };
+  return { name: S.name, look: S.look, L: lvl, stars: S.stars, glow: glowScore() };
 }
 
 // Einen Mog Battle ausrechnen: 5 zufällige Kategorien mit etwas Glück (±25 %)
@@ -2265,73 +2142,80 @@ function mogBattle(opp) {
   setTimeout(step, 600);
 }
 
-/* ===================== FRAUEN IN DER STADT ===================== */
-const WOMAN_NAMES = ['Lena', 'Sophie', 'Mia', 'Emma', 'Hannah', 'Lea', 'Anna', 'Laura', 'Marie', 'Chiara',
-  'Jana', 'Selin', 'Aylin', 'Nele', 'Clara', 'Zoe', 'Amira', 'Paula', 'Ida', 'Luisa', 'Sara', 'Elif', 'Nina', 'Maja'];
-// Wie viel "Rizz" man für Ausstrahlung 1–10 ungefähr braucht
-const BEAUTY_REQ = [20, 50, 100, 180, 300, 450, 700, 1000, 1500, 2200];
-const DRESS_COLORS = ['#e63946', '#ff8fab', '#9b5cff', '#3a86ff', '#2a9d8f', '#ffb703', '#f1faee', '#222222', '#06d6a0'];
+/* ===================== FANS IN DER STADT ===================== */
+// In der Stadt laufen Leute herum, die du als Fans gewinnen kannst.
+// Je höher ihr Promi-Level (1–10 ⭐), desto schwerer sind sie zu beeindrucken.
+const FAN_NAMES_F = ['Lena', 'Sophie', 'Mia', 'Emma', 'Hannah', 'Lea', 'Anna', 'Laura', 'Marie', 'Chiara', 'Selin', 'Aylin', 'Nele', 'Zoe', 'Amira', 'Paula'];
+const FAN_NAMES_M = ['Paul', 'Felix', 'Noah', 'Elias', 'Finn', 'Emil', 'Luis', 'Ben', 'Yusuf', 'Mats', 'Jonas', 'Can', 'Milan', 'Theo', 'Anton', 'Karim'];
+// Was die Leute machen (zeigt, wie „berühmt“ sie selbst sind)
+const FAN_ROLES = ['Schüler', 'Azubi', 'Skater', 'Gamer', 'Barista', 'Fitness-Fan', 'Fotograf', 'TikTok-Creator', 'Model', 'Mega-Influencer'];
+// Wie viel Charisma man für Promi-Level 1–10 ungefähr braucht
+const FAME_REQ = [20, 50, 100, 180, 300, 450, 700, 1000, 1500, 2200];
+const OUTFIT_COLORS_NPC = ['#e63946', '#ff8fab', '#9b5cff', '#3a86ff', '#2a9d8f', '#ffb703', '#f1faee', '#222222', '#06d6a0'];
 
-function makeWoman(usedNames) {
-  const beauty = 1 + Math.floor(Math.random() * 10);   // Ausstrahlung 1–10
-  // Je höher die Ausstrahlung, desto gepflegter (Haut, Haare, Style …)
-  const base = Math.round(Math.pow(beauty, 1.5) * 0.8);
-  const L = id => (id === 'mewing' || id === 'meisterklasse') ? 0 : Math.min(MAX_LEVEL, base);
-  const free = WOMAN_NAMES.filter(n => !usedNames.includes(n));
+function makeFan(usedNames) {
+  const fame = 1 + Math.floor(Math.random() * 10);   // Promi-Level 1–10
+  const fem = Math.random() < 0.5;
+  // Je berühmter, desto gepflegter (Haut, Haare, Style …)
+  const base = Math.round(Math.pow(fame, 1.5) * 0.8);
+  const L = id => (fem && (id === 'mewing' || id === 'meisterklasse')) ? 0 : Math.min(MAX_LEVEL, base);
+  const names = fem ? FAN_NAMES_F : FAN_NAMES_M;
+  const free = names.filter(n => !usedNames.includes(n));
   return {
-    kind: 'woman',
-    id: 'w_' + makeId(),
-    name: pick(free.length ? free : WOMAN_NAMES),
-    beauty, L, stars: 0,
-    glow: beauty * beauty * 25,     // nur für Glitzer & Aura in der Zeichnung
+    kind: 'fan',
+    id: 'f_' + makeId(),
+    name: pick(free.length ? free : names),
+    role: FAN_ROLES[fame - 1],
+    fame, L, stars: 0,
+    glow: fame * fame * 25,     // nur für Glitzer & Aura in der Zeichnung
     look: {
-      fem: true,
-      hair: pick(['lang', 'lang', 'locken', 'dutt', 'kurz', 'scheitel']),
+      fem,
+      hair: pick(fem ? ['lang', 'lang', 'locken', 'dutt', 'kurz', 'scheitel'] : ['kurz', 'locken', 'scheitel', 'glatze', 'kurz']),
       hairColor: pick(OPTIONS.hairColor),
       skin: pick(OPTIONS.skin),
       eyes: pick(OPTIONS.eyes),
-      outfit: pick(['kleid', 'kleid', 'top', 'hemd', 'lederjacke', 'hoodie']),
-      color: pick(DRESS_COLORS),
-      earrings: beauty >= 6,
+      outfit: pick(fem ? ['kleid', 'top', 'hemd', 'lederjacke', 'hoodie'] : ['hoodie', 'tshirt', 'hemd', 'lederjacke']),
+      color: pick(OUTFIT_COLORS_NPC),
+      earrings: fem && fame >= 6,
     },
-    got: false,       // Nummer schon bekommen?
-    cooldown: 0,      // nach einem Korb kurz genervt
+    got: false,       // schon dein Fan?
+    cooldown: 0,      // nach einem Fehlversuch kurz genervt
   };
 }
 
-// Dein "Rizz": Glow-Score + Selbstbewusstsein (zählt extra!) + Glow-Sterne
+// Dein Charisma: Glow-Score + Selbstbewusstsein (zählt extra!) + Glow-Sterne
 function rizzScore() { return glowScore() + confOf(lvl) * 10 + S.stars * 30; }
 
 function dateChance(w, mod = 0) {
-  const req = BEAUTY_REQ[w.beauty - 1];
+  const req = FAME_REQ[w.fame - 1];
   return clamp(0.5 + 0.45 * (rizzScore() - req) / req + mod + rizzMod(), 0.03, 0.97);
 }
 
-// Mögliche Anmachsprüche (mod = Bonus/Malus auf die Chance)
+// Womit du die Leute beeindrucken willst (mod = Bonus/Malus auf die Chance)
 const OPENERS = [
-  { t: '„Hi, ich bin {me}. Wie läuft dein Tag so?“', mod: 0.10 },
-  { t: '„Bist du WLAN? Ich spüre da eine Verbindung.“', mod: () => rand(-0.25, 0.2) },
-  { t: '„Übrigens: Mein Kiefer ist gemewt.“', mod: -0.15 },
+  { t: '„Hi, ich bin {me}! Selfie zusammen?“ 🤳', mod: 0.10 },
+  { t: '„Willst du ein Autogramm?“ ✍️', mod: () => glowScore() >= 300 ? 0.15 : -0.15 },
+  { t: '*Mewing-Pose machen und wissend nicken* 🗿', mod: () => rand(-0.25, 0.2) },
   { t: '„Coole Jacke! Wo hast du die her?“', mod: 0.08 },
-  { t: '*Augenkontakt halten und lächeln* 😏', mod: () => confOf(lvl) >= 10 ? 0.15 : -0.1 },
+  { t: '*Augenkontakt halten und freundlich lächeln* 🙂', mod: () => confOf(lvl) >= 10 ? 0.15 : -0.1 },
   { t: '„Ich hab heute 8 Stunden geschlafen und 3 Liter Wasser getrunken.“', mod: -0.08 },
-  { t: '„Kennst du hier ein gutes Café? Ich lad dich ein.“', mod: 0.06 },
+  { t: '„Soll ich dir einen Skincare-Tipp geben?“ 🧴', mod: 0.06 },
   { t: '*Nervös winken und schnell weitergehen* 👋', mod: -0.3 },
-  { t: '„Darf ich was sagen? Du hast ein echt schönes Lachen.“', mod: 0.12 },
+  { t: '„Übrigens: Mein Kiefer ist gemewt.“', mod: -0.15 },
   { t: '„Willst du meine Skincare-Routine hören? Sie hat 14 Schritte.“', mod: -0.12 },
 ];
-const DATE_YES = [
-  '„Haha, du bist lustig. Hier ist meine Nummer!“ 📱',
-  '„Okay, du hast Aura. Kaffee am Samstag?“ ☕',
-  '„Ich mag dein Selbstbewusstsein. Schreib mir!“ 💌',
-  '„Na gut, überredet. Aber du zahlst die Pommes.“ 🍟',
+const FAN_YES = [
+  '„Krass, du hast ja richtig Aura! Ich folge dir!“ 📲',
+  '„Darf ich ein Selfie mit dir posten?“ 🤳',
+  '„Wie machst du das mit den Haaren?! Ich bin jetzt Fan.“ ⭐',
+  '„Okay, du bist der Main Character. Ich abonniere dich.“ 🔔',
 ];
-const DATE_NO = [
-  'Sie tut so, als würde sie telefonieren. Das Handy ist aus.',
-  '„Ich hab einen Freund.“ – Der Freund ist ihr Hund. Er heißt Bruno.',
-  'Sie sagt „Nein danke“ – so freundlich, dass es doppelt wehtut.',
-  'Sie hat dich nicht mal bemerkt. Mehr Aura nötig.',
-  '„Sorry, ich muss los.“ Sie läuft in die falsche Richtung. Schnell.',
+const FAN_NO = [
+  '{n} schaut demonstrativ aufs Handy. Das Handy ist aus.',
+  '„Sorry … kenn ich dich?“ – Autsch.',
+  '{n} sagt „Nein danke“ – so freundlich, dass es doppelt wehtut.',
+  '{n} hat dich nicht mal bemerkt. Mehr Aura nötig.',
+  '„Sorry, ich muss los.“ {n} läuft in die falsche Richtung. Schnell.',
 ];
 
 function approach(w) {
@@ -2343,14 +2227,14 @@ function approach(w) {
   }
   const ops = shuffle(OPENERS.slice()).slice(0, 3);
   const ch = Math.round(dateChance(w) * 100);
-  bigModal(`<h2>💬 ${escapeHtml(w.name)} ansprechen</h2>
+  bigModal(`<h2>⭐ ${escapeHtml(w.name)} begeistern</h2>
     <div class="versus"><div class="fighter">${characterSVG(w.look, w.L, { glow: w.glow, uid: 'w' + (svgCounter++) })}
-      <b>${escapeHtml(w.name)}</b><span class="small">Ausstrahlung ${w.beauty}/10 ⭐</span></div></div>
+      <b>${escapeHtml(w.name)}</b><span class="small">${w.role} · Promi-Level ${w.fame}/10 ⭐</span></div></div>
     <div id="approachBody">
       <div class="chance">Deine Chance: ~${ch} %</div>
-      <div class="small">Dein Rizz: ${fmt(rizzScore())} · gebraucht: ca. ${fmt(BEAUTY_REQ[w.beauty - 1])}<br>
-        (Rizz = Glow-Score + Selbstbewusstsein ×10 + Glow-Sterne ×30)</div>
-      <div style="margin-top:10px;font-weight:800">Was sagst du?</div>
+      <div class="small">Dein Charisma: ${fmt(rizzScore())} · gebraucht: ca. ${fmt(FAME_REQ[w.fame - 1])}<br>
+        (Charisma = Glow-Score + Selbstbewusstsein ×10 + Glow-Sterne ×30)</div>
+      <div style="margin-top:10px;font-weight:800">Was machst du?</div>
       ${ops.map((o, i) => `<button class="opener" data-op="${i}">${o.t.replace('{me}', escapeHtml(S.name))}</button>`).join('')}
     </div>`, [{ label: 'Lieber doch nicht 🙈' }]);
 
@@ -2365,20 +2249,21 @@ function approach(w) {
 function resolveApproach(w, mod) {
   const chance = dateChance(w, mod);
   const success = Math.random() < chance;
+  const name = escapeHtml(w.name);
   let html;
   if (success) {
     w.got = true;
-    S.contacts.push({ name: w.name, stars: w.beauty, t: Date.now() });
+    S.contacts.push({ name: w.name, stars: w.fame, t: Date.now() });
     if (S.contacts.length > 200) S.contacts.shift();
-    const reward = Math.max(30, totalAps() * 15 * w.beauty);
+    const reward = Math.max(30, totalAps() * 15 * w.fame);
     gainAura(reward);
-    html = `<div class="verdict" style="color:var(--green)">💘 Erfolg!</div>
-      <p>${pick(DATE_YES)}</p>
-      <p>${escapeHtml(w.name)} ist jetzt in deinen Kontakten. <b style="color:var(--gold)">+${fmt(reward)} Aura</b></p>`;
+    html = `<div class="verdict" style="color:var(--green)">⭐ Neuer Fan!</div>
+      <p>${pick(FAN_YES)}</p>
+      <p>${name} folgt dir jetzt. <b style="color:var(--gold)">+${fmt(reward)} Aura</b></p>`;
   } else {
     w.cooldown = Date.now() + 45000;
-    html = `<div class="verdict" style="color:var(--red)">💔 Korb!</div>
-      <p>${pick(DATE_NO)}</p>
+    html = `<div class="verdict" style="color:var(--red)">😬 Nicht beeindruckt!</div>
+      <p>${pick(FAN_NO).replace(/\{n\}/g, name)}</p>
       ${chance < 0.35 ? '<p class="small">Tipp: Mehr Glow-Score und vor allem Selbstbewusstsein (Augenkontakt, Smalltalk, Lächeln) erhöhen deine Chancen.</p>' : ''}`;
   }
   $('approachBody').innerHTML = html;
@@ -2416,8 +2301,7 @@ const BUILDINGS = [
   { x: 800,  y: 80,  w: 230, h: 160, color: '#c08552', roof: '#8c5a33', sign: '☕ Café Mewing' },
   { x: 1090, y: 50,  w: 260, h: 190, color: '#4d908e', roof: '#2f6664', sign: '🛍️ Drip Mall' },
   { x: 820,  y: 620, w: 220, h: 150, color: '#7fc8d8', roof: '#3f8fa8', sign: '🦷 Dr. Strahleweiß' },
-  { x: 1110, y: 640, w: 220, h: 140, color: '#2b1a4a', roof: '#d4af37', sign: '🎰 CASINO', action: 'casino', hint: 'Slots, Roulette, Blackjack & Mog-Wetten' },
-  { x: 400,  y: 295, w: 170, h: 110, color: '#e9c46a', roof: '#c08a2e', sign: '🏪 Späti', action: 'kiosk', hint: 'Zigaretten, Bier & Wodka' },
+  { x: 1110, y: 640, w: 220, h: 140, color: '#b388ff', roof: '#7c4dff', sign: '🪞 Selfie-Studio' },
 ];
 const FOUNTAIN = { x: 330, y: 780, r: 50 };
 const TREES = [[90, 640], [180, 920], [560, 640], [560, 910], [90, 860], [440, 930], [250, 640], [470, 700]];
@@ -2511,13 +2395,13 @@ function buildTown() {
 
   if (!town) {
     town = { people: [], player: { kind: 'player', x: 700, y: 610 } };
-    for (let i = 0; i < 7; i++) town.people.push(makeWoman(town.people.map(p => p.name)));
+    for (let i = 0; i < 8; i++) town.people.push(makeFan(town.people.map(p => p.name)));
     RIVALS.forEach(r => town.people.push(Object.assign({ kind: 'rival', L: id => r.lv[id] || 0 }, r)));
     town.people.push(Object.assign({ kind: 'boss', L: id => BOSS.lv[id] || 0, taunt: pick(BOSS_TAUNTS) }, BOSS));
   } else {
-    // Frauen, deren Nummer du schon hast, gehen nach Hause – neue Leute kommen
-    town.people = town.people.map(p => (p.kind === 'woman' && p.got)
-      ? makeWoman(town.people.map(q => q.name)) : p);
+    // Leute, die schon deine Fans sind, gehen weiter – neue Leute kommen
+    town.people = town.people.map(p => (p.kind === 'fan' && p.got)
+      ? makeFan(town.people.map(q => q.name)) : p);
   }
 
   // Freunde in die Stadt holen (aktuelle Freundesliste)
@@ -2535,7 +2419,6 @@ function buildTown() {
   });
   currentNear = null;
   lastInteractHTML = '';
-  refreshViceUI();
 }
 
 // Eine Figur als kleines "Sprite" für die Stadt
@@ -2559,9 +2442,9 @@ function updateTag(p) {
   const tag = p.el.querySelector('.tag');
   if (p.kind === 'player') { tag.className = 'tag t-player'; tag.textContent = '👑 ' + S.name; }
   else if (p.kind === 'boss') { tag.className = 'tag t-boss'; tag.textContent = '💀 LEON · ENDBOSS'; }
-  else if (p.kind === 'woman') {
-    tag.className = 'tag ' + (p.got ? 't-done' : 't-woman');
-    tag.textContent = (p.got ? '💚 ' : '') + p.name + ' · ' + p.beauty + '⭐';
+  else if (p.kind === 'fan') {
+    tag.className = 'tag ' + (p.got ? 't-done' : 't-fan');
+    tag.textContent = (p.got ? '💚 ' : '') + p.name + ' · ' + p.fame + '⭐';
   }
   else if (p.kind === 'friend') { tag.className = 'tag t-friend'; tag.textContent = '👥 ' + p.name; }
   else { tag.className = 'tag t-rival'; tag.textContent = '⚔️ ' + p.name; }
@@ -2588,10 +2471,6 @@ function townLoop(t) {
       const vx = P.target.x - P.x, vy = P.target.y - P.y, d = Math.hypot(vx, vy);
       if (d < 4) P.target = null; else { dx = vx / d; dy = vy / d; }
     }
-  }
-  if ((dx || dy) && hasFlag('drunk')) {   // betrunken = Schlangenlinien
-    dx += Math.sin(t / 170) * 0.9;
-    dy += Math.cos(t / 230) * 0.7;
   }
   const len = Math.hypot(dx, dy);
   P.moving = len > 0;
@@ -2654,12 +2533,12 @@ function updateInteract() {
   if (best) {
     const name = escapeHtml(best.name);
     const cd = mogCooldown[best.id] > now ? Math.ceil((mogCooldown[best.id] - now) / 1000) : 0;
-    if (best.kind === 'woman') {
+    if (best.kind === 'fan') {
       const wcd = best.cooldown > now ? Math.ceil((best.cooldown - now) / 1000) : 0;
-      const info = best.got ? 'Ihr habt schon Nummern getauscht 💚'
-        : wcd ? `Ist gerade genervt … (${wcd} s)` : `Ausstrahlung ${best.beauty}/10 · Chance ~${Math.round(dateChance(best) * 100)} %`;
+      const info = best.got ? 'Ist schon dein Fan 💚'
+        : wcd ? `Ist gerade genervt … (${wcd} s)` : `${best.role} · Promi-Level ${best.fame}/10 · Chance ~${Math.round(dateChance(best) * 100)} %`;
       html = `<div class="who">${name}<small>${info}</small></div>
-        <button class="act-btn" data-act="talk" ${best.got || wcd ? 'disabled' : ''}>💬 Ansprechen</button>`;
+        <button class="act-btn" data-act="talk" ${best.got || wcd ? 'disabled' : ''}>⭐ Begeistern</button>`;
     } else if (best.kind === 'boss') {
       html = `<div class="who">💀 LEON · Endboss<small>${fmt(glowPower(glowOf(best.L), best.stars))} Glow-Power · „${escapeHtml(best.taunt)}“</small></div>
         <button class="act-btn mog" data-act="mog" ${cd ? 'disabled' : ''}>👑 Herausfordern${cd ? ` (${cd} s)` : ''}</button>`;
@@ -2686,13 +2565,13 @@ $('interactBar').addEventListener('click', e => {
   if (b.dataset.act === 'talk' && currentNear) approach(currentNear);
   if (b.dataset.act === 'mog' && currentNear) mogBattle(currentNear);
   if (b.dataset.act === 'door' && currentDoor) {
-    if (currentDoor.action === 'casino') setView('casino'); else openKiosk();
+    setView(currentDoor.action);
   }
 });
 
 // Antippen/Klicken in der Stadt = dorthin laufen
 $('townViewport').addEventListener('pointerdown', e => {
-  if (e.target.closest('#interactBar') || e.target.closest('#townHud') || !town) return;
+  if (e.target.closest('#interactBar') || !town) return;
   const r = $('townViewport').getBoundingClientRect();
   const x = e.clientX - r.left + camX, y = e.clientY - r.top + camY;
   town.player.target = { x, y };
@@ -2721,17 +2600,17 @@ document.addEventListener('keydown', e => {
 document.addEventListener('keyup', e => { const k = KEYMAP[e.key]; if (k) keys[k] = false; });
 window.addEventListener('blur', () => Object.keys(keys).forEach(k => { keys[k] = false; }));
 
-// Kontakte & Mog-Bilanz unter der Stadt
+// Fans & Mog-Bilanz unter der Stadt
 function renderTownInfo() {
   $('contactCount').textContent = `(${S.contacts.length})`;
   $('contactList').innerHTML = S.contacts.length
-    ? S.contacts.slice().reverse().map(c => `<span class="chip">💌 ${escapeHtml(c.name)} · ${c.stars}⭐</span>`).join('')
-    : '<span class="small">Noch keine Nummern. Trau dich! 😅</span>';
+    ? S.contacts.slice().reverse().map(c => `<span class="chip">⭐ ${escapeHtml(c.name)} · ${c.stars}⭐</span>`).join('')
+    : '<span class="small">Noch keine Fans. Trau dich! 😅</span>';
   $('mogStats').innerHTML = `✅ Siege: <b>${S.mogWins}</b> &nbsp; ❌ Niederlagen: <b>${S.mogLosses}</b>`;
 }
 
 /* ===================== NAVIGATION ===================== */
-const VIEWS = { home: 'viewHome', jobs: 'viewJobs', town: 'viewTown', casino: 'viewCasino', friends: 'viewFriends', leader: 'viewLeader' };
+const VIEWS = { home: 'viewHome', jobs: 'viewJobs', town: 'viewTown', friends: 'viewFriends', leader: 'viewLeader' };
 function setView(v) {
   Object.entries(VIEWS).forEach(([k, id]) => $(id).classList.toggle('hidden', k !== v));
   document.querySelectorAll('#mainnav button').forEach(b => b.classList.toggle('active', b.dataset.view === v));
@@ -2744,7 +2623,6 @@ function setView(v) {
   }
   if (v === 'friends') renderFriends();
   if (v === 'jobs') renderJobs();
-  if (v === 'casino') renderCasino();
   if (v === 'leader') renderLeaderboard();
 }
 $('mainnav').addEventListener('click', e => {
@@ -2780,14 +2658,13 @@ $('installBtn').addEventListener('click', async () => {
    3.6c GELD, JOBS, LUXUS-SHOP, LASTER, CASINO, ENDBOSS & LEADERBOARD
    --------------------------------------------------------------- */
 function fmtMoney(n) { return fmt(Math.floor(n)) + ' €'; }
-function hasFlag(f) { return effects.some(e => e.flag === f); }
-// Bonus/Malus beim Ansprechen durch aktive Effekte (z. B. Bier = Mut)
+// Bonus/Malus beim Begeistern von Fans durch aktive Effekte
 function rizzMod() { return effects.reduce((sum, e) => sum + (e.rizz || 0), 0); }
 
 // innerHTML nur setzen, wenn sich etwas geändert hat (verhindert verschluckte Klicks)
 function setHTML(el, html) { if (el && el._h !== html) { el._h = html; el.innerHTML = html; } }
 
-// Einen Effekt starten (z. B. aus dem Luxus-Shop oder dem Späti)
+// Einen Effekt starten (z. B. aus dem Luxus-Shop)
 function addEffect(def, good) {
   effects = effects.filter(e => e.title !== def.title);
   effects.push(Object.assign({ good }, def, { until: Date.now() + def.dur * 1000 }));
@@ -2943,330 +2820,6 @@ function startJob(job) {
   });
 }
 
-/* ===================== LASTER: ZIGARETTEN & ALKOHOL ===================== */
-// penalty = so viel Glow-Score geht verloren (erholt sich langsam wieder)
-const VICE_DECAY = 0.08;   // Glow-Punkte Erholung pro Sekunde
-const VICES = [
-  { id: 'zigarette', emoji: '🚬', name: 'Zigarette', price: 15, penalty: 25, verb: 'Rauchen',
-    desc: 'Gelbe Zähne, fahle Haut, Geruch nach Bushaltestelle. Frauen finden das eher nicht so gut.',
-    effect: { title: '🚬 Riechst nach Rauch (-15 % Chance beim Ansprechen)', dur: 120, flag: 'smoke', rizz: -0.15 },
-    msgs: ['Du hustest. Stilvoll, glaubst du.', 'Deine Haut hat gerade leise „Warum?“ gefragt.', 'Du riechst jetzt wie ein Aschenbecher mit WLAN.'] },
-  { id: 'bier', emoji: '🍺', name: 'Bier', price: 8, penalty: 15, verb: 'Trinken',
-    desc: 'Gibt kurz etwas Mut beim Ansprechen, macht deine Klicks aber wackelig. Und dein Sixpack weint.',
-    effect: { title: '🍺 Angetrunken (+Mut, Klicks -20 %)', dur: 60, flag: 'drunk', rizz: 0.08, click: 0.8 },
-    msgs: ['Liquid Courage! Du fühlst dich wie Gigachad. Du bist es nicht.', 'Prost! Dein Bauch freut sich, dein Sixpack nicht.'] },
-  { id: 'wodka', emoji: '🥃', name: 'Wodka-Shot', price: 25, penalty: 45, verb: 'Trinken',
-    desc: 'Viel Mut, kein Gleichgewicht. Die Stadt dreht sich – und du läufst Schlangenlinien.',
-    effect: { title: '🥃 Betrunken (Klicks -50 %)', dur: 90, flag: 'drunk', rizz: 0.03, click: 0.5 },
-    msgs: ['Die Stadt dreht sich. Oder du.', 'Du hast gerade einer Laterne ein Kompliment gemacht.', 'Du erklärst einem Mülleimer Mewing.'] },
-];
-
-function viceShopHTML() {
-  return VICES.map(v => `
-    <div class="item">
-      <div class="icon">${v.emoji}</div>
-      <div><div class="name">${v.name}<span class="lvl">${S.inv[v.id] || 0}x im Rucksack</span></div>
-        <div class="desc">${v.desc}</div>
-        <div class="eff" style="color:var(--red)">-${v.penalty} Glow-Score beim ${v.verb}</div></div>
-      <button class="buy-btn" data-vice="${v.id}" ${S.money < v.price ? 'disabled' : ''}>${fmtMoney(v.price)}<small>kaufen</small></button>
-    </div>`).join('');
-}
-function refreshViceUI() {
-  if ($('kioskList')) $('kioskList').innerHTML = viceShopHTML();
-  if ($('kioskModalList')) $('kioskModalList').innerHTML = viceShopHTML();
-  $('townHud').innerHTML = VICES.filter(v => S.inv[v.id] > 0)
-    .map(v => `<button data-usevice="${v.id}">${v.emoji} ${v.verb} (${S.inv[v.id]})</button>`).join('');
-}
-function openKiosk() {
-  bigModal(`<h2>🏪 Späti</h2><p class="small">„Was darf's sein, Chef?“ · Dein Geld: <b>${fmtMoney(S.money)}</b></p>
-    <div class="items" id="kioskModalList">${viceShopHTML()}</div>`, [{ label: 'Raus hier 🚪' }]);
-}
-function buyVice(id) {
-  const v = VICES.find(x => x.id === id);
-  if (!v || S.money < v.price) return;
-  S.money -= v.price;
-  S.inv[id] = (S.inv[id] || 0) + 1;
-  toast(`${v.emoji} ${v.name} gekauft`, 'Benutzen kannst du sie in der Stadt (Knopf oben links).', '', 2500);
-  refreshViceUI();
-  save();
-}
-function useVice(id) {
-  const v = VICES.find(x => x.id === id);
-  if (!v || !(S.inv[id] > 0)) return;
-  S.inv[id]--;
-  S.vice += v.penalty;
-  addEffect(v.effect, false);
-  renderCharacter();
-  toast(`${v.emoji} ${v.verb} …`, `${pick(v.msgs)} <b>-${v.penalty} Glow-Score</b> (erholt sich langsam wieder)`, 'bad');
-  refreshViceUI();
-  save();
-}
-// Kaufen & Benutzen: ein gemeinsamer Klick-Empfänger für alle Knöpfe
-document.addEventListener('click', e => {
-  const b = e.target.closest('[data-vice]');
-  if (b && !b.disabled) buyVice(b.dataset.vice);
-  const u = e.target.closest('[data-usevice]');
-  if (u) useVice(u.dataset.usevice);
-});
-
-/* ===================== CASINO ===================== */
-// Einsatz lesen & abziehen (0 = ungültig)
-function getBet() {
-  const v = Math.floor(Number($('betInput').value));
-  if (!v || v < 1) { toast('🎰 Einsatz?', 'Gib einen Einsatz von mindestens 1 € ein.', 'bad', 2500); return 0; }
-  if (v > S.money) { toast('💸 Zu wenig Geld', `Du hast nur ${fmtMoney(S.money)}. Ab zur Arbeit! 💼`, 'bad', 3000); return 0; }
-  S.money -= v;
-  S.casinoNet -= v;
-  return v;
-}
-function casinoPay(amount) {
-  S.money += amount;
-  S.casinoNet += amount;
-  if (amount > S.biggestWin) S.biggestWin = amount;
-  save();
-}
-$('betBar').addEventListener('click', e => {
-  const b = e.target.closest('[data-bet]');
-  if (!b) return;
-  const t = b.dataset.bet;
-  $('betInput').value = t === 'half' ? Math.max(1, Math.floor(S.money / 2)) : t === 'max' ? Math.max(1, Math.floor(S.money)) : t;
-});
-
-function renderCasino() {
-  if (!mb) newMogBet();
-  renderBJ();
-}
-
-// ----- Spielautomat -----
-// [Symbol, Häufigkeit, Gewinn-Faktor bei 3 gleichen]
-const SLOT_SYMBOLS = [['🍒', 30, 5], ['💅', 25, 10], ['🧴', 20, 15], ['🗿', 13, 25], ['💎', 8, 50], ['👑', 4, 100]];
-function slotRoll() {
-  let r = Math.random() * 100;
-  for (const sym of SLOT_SYMBOLS) { r -= sym[1]; if (r < 0) return sym; }
-  return SLOT_SYMBOLS[0];
-}
-let slotBusy = false;
-$('slotBtn').addEventListener('click', () => {
-  if (slotBusy) return;
-  const bet = getBet();
-  if (!bet) return;
-  slotBusy = true;
-  $('slotBtn').disabled = true;
-  $('slotMsg').textContent = '';
-  const result = [slotRoll(), slotRoll(), slotRoll()];
-  const stopped = [false, false, false];
-  const spin = setInterval(() => {
-    for (let i = 0; i < 3; i++) if (!stopped[i]) $('reel' + i).textContent = pick(SLOT_SYMBOLS)[0];
-  }, 70);
-  [700, 1000, 1300].forEach((ms, i) => setTimeout(() => {
-    stopped[i] = true;
-    $('reel' + i).textContent = result[i][0];
-    if (i < 2) return;
-    clearInterval(spin);
-    const syms = result.map(r => r[0]);
-    let win = 0, msg;
-    if (syms[0] === syms[1] && syms[1] === syms[2]) {
-      win = bet * result[0][2];
-      msg = `🎉 JACKPOT ${syms[0]}${syms[0]}${syms[0]}! +${fmtMoney(win)}`;
-    } else if (syms[0] === syms[1] || syms[1] === syms[2] || syms[0] === syms[2]) {
-      win = bet;
-      msg = 'Zwei gleiche – Einsatz zurück.';
-    } else {
-      msg = '😩 Nichts. Das Haus bedankt sich.';
-    }
-    casinoPay(win);
-    $('slotMsg').innerHTML = `<span style="color:${win > bet ? 'var(--green)' : win ? 'var(--text)' : 'var(--red)'}">${msg}</span>`;
-    slotBusy = false;
-    $('slotBtn').disabled = false;
-  }, ms));
-});
-
-// ----- Roulette -----
-const RED_NUMBERS = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
-let rouBusy = false;
-function showRou(n) {
-  const el = $('rouNum');
-  el.textContent = n;
-  el.style.background = n === 0 ? '#1b7a3a' : RED_NUMBERS.includes(n) ? '#c1121f' : '#111';
-}
-$('gRoulette').addEventListener('click', e => {
-  const b = e.target.closest('[data-rou]');
-  if (!b || rouBusy) return;
-  const type = b.dataset.rou;
-  const pickNum = Math.floor(Number($('rouPick').value));
-  if (type === 'zahl' && !(pickNum >= 0 && pickNum <= 36)) { toast('🎡 Ungültige Zahl', 'Wähle eine Zahl von 0 bis 36.', 'bad', 2500); return; }
-  const bet = getBet();
-  if (!bet) return;
-  rouBusy = true;
-  $('rouMsg').textContent = 'Die Kugel rollt … 🎱';
-  let delay = 40;
-  const step = () => {
-    const n = Math.floor(Math.random() * 37);
-    showRou(n);
-    delay *= 1.15;
-    if (delay < 420) { setTimeout(step, delay); return; }
-    const red = RED_NUMBERS.includes(n);
-    const win = {
-      rot: red, schwarz: n > 0 && !red, gerade: n > 0 && n % 2 === 0, ungerade: n % 2 === 1,
-      low: n >= 1 && n <= 18, high: n >= 19, zahl: n === pickNum,
-    }[type];
-    const pay = win ? bet * (type === 'zahl' ? 36 : 2) : 0;
-    casinoPay(pay);
-    $('rouMsg').innerHTML = win
-      ? `<span style="color:var(--green)">🎉 ${n}! Gewonnen: +${fmtMoney(pay)}</span>`
-      : `<span style="color:var(--red)">${n} – leider verloren.</span>`;
-    rouBusy = false;
-  };
-  step();
-});
-
-// ----- Blackjack -----
-const SUITS = ['♠', '♥', '♦', '♣'];
-const RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-let bj = null;   // aktuelle Runde
-function newDeck() {
-  const d = [];
-  SUITS.forEach(s => RANKS.forEach(r => d.push({ r, s, v: r === 'A' ? 11 : 'JQK'.includes(r) ? 10 : Number(r) })));
-  return shuffle(d);
-}
-function handVal(h) {
-  let v = 0, aces = 0;
-  h.forEach(c => { v += c.v; if (c.r === 'A') aces++; });
-  while (v > 21 && aces) { v -= 10; aces--; }   // Ass zählt dann 1 statt 11
-  return v;
-}
-function cardHTML(c, hidden) {
-  if (hidden) return '<div class="pcard back"></div>';
-  return `<div class="pcard ${c.s === '♥' || c.s === '♦' ? 'red' : ''}">${c.r}<span>${c.s}</span></div>`;
-}
-function renderBJ(msg) {
-  const running = bj && !bj.done;
-  $('bjDealer').innerHTML = bj ? bj.dealer.map((c, i) => cardHTML(c, running && i === 1)).join('') : '';
-  $('bjYou').innerHTML = bj ? bj.you.map(c => cardHTML(c)).join('') : '';
-  $('bjYouVal').textContent = bj ? `(${handVal(bj.you)})` : '';
-  $('bjDealerVal').textContent = bj && bj.done ? `(${handVal(bj.dealer)})` : '';
-  $('bjBtns').innerHTML = !running
-    ? '<button class="casino-btn" data-bj="deal">🃏 Austeilen</button>'
-    : `<button class="casino-btn" data-bj="hit">Karte ziehen</button><button class="casino-btn" data-bj="stand">Halten</button>
-       ${bj.you.length === 2 && S.money >= bj.bet ? '<button class="casino-btn" data-bj="double">Verdoppeln</button>' : ''}`;
-  if (msg !== undefined) $('bjMsg').innerHTML = msg;
-}
-function bjStand() {
-  while (handVal(bj.dealer) < 17) bj.dealer.push(bj.deck.pop());   // Dealer zieht bis 17
-  bjFinish();
-}
-function bjFinish() {
-  bj.done = true;
-  const y = handVal(bj.you), d = handVal(bj.dealer);
-  const natural = y === 21 && bj.you.length === 2;
-  const dealerNatural = d === 21 && bj.dealer.length === 2;
-  let pay = 0, msg;
-  if (y > 21) msg = '💥 Überkauft! Verloren.';
-  else if (natural && !dealerNatural) { pay = bj.bet * 2.5; msg = '🌟 BLACKJACK!'; }
-  else if (d > 21) { pay = bj.bet * 2; msg = '🎉 Dealer überkauft – du gewinnst!'; }
-  else if (y > d) { pay = bj.bet * 2; msg = '🎉 Gewonnen!'; }
-  else if (y === d) { pay = bj.bet; msg = '🤝 Unentschieden – Einsatz zurück.'; }
-  else msg = '😩 Der Dealer gewinnt.';
-  casinoPay(pay);
-  renderBJ(`${msg}${pay ? ` <span style="color:var(--green)">+${fmtMoney(pay)}</span>` : ''}`);
-}
-$('bjBtns').addEventListener('click', e => {
-  const b = e.target.closest('[data-bj]');
-  if (!b) return;
-  const a = b.dataset.bj;
-  if (a === 'deal') {
-    const bet = getBet();
-    if (!bet) return;
-    bj = { deck: newDeck(), bet, you: [], dealer: [], done: false };
-    bj.you.push(bj.deck.pop(), bj.deck.pop());
-    bj.dealer.push(bj.deck.pop(), bj.deck.pop());
-    if (handVal(bj.you) === 21) bjStand(); else renderBJ('');
-  } else if (!bj || bj.done) {
-    return;
-  } else if (a === 'hit') {
-    bj.you.push(bj.deck.pop());
-    const v = handVal(bj.you);
-    if (v > 21) bjFinish(); else if (v === 21) bjStand(); else renderBJ();
-  } else if (a === 'stand') {
-    bjStand();
-  } else if (a === 'double' && S.money >= bj.bet) {
-    S.money -= bj.bet;
-    S.casinoNet -= bj.bet;
-    bj.bet *= 2;
-    bj.you.push(bj.deck.pop());
-    if (handVal(bj.you) > 21) bjFinish(); else bjStand();
-  }
-});
-
-// ----- Mog-Wetten -----
-const MB_PREFIX = ['Gym-Bro', 'Sigma', 'Drip-Lord', 'Model', 'Jawline', 'Rizz-Gott', 'Mewing-Mönch', 'Skincare-King'];
-const MB_NAMES = ['Dennis', 'Marco', 'Tobi', 'Jonas', 'Can', 'Elias', 'Finn', 'Ben', 'Yusuf', 'Mehmet', 'Niklas', 'Tim', 'Malte', 'Kevin', 'Justin', 'Ole'];
-let mb = null;   // aktueller Wett-Kampf
-
-function randomFighter(tier = rand(2, 22)) {
-  const lv = {};
-  UPGRADES.forEach(u => { lv[u.id] = clamp(Math.round(tier * rand(0.3, 1.5)), 0, MAX_LEVEL); });
-  return {
-    id: 'mb_' + makeId(),
-    name: pick(MB_PREFIX) + ' ' + pick(MB_NAMES),
-    L: id => lv[id] || 0,
-    stars: Math.random() < 0.3 ? 1 + Math.floor(Math.random() * 3) : 0,
-    look: { hair: pick(OPTIONS.hair).id, hairColor: pick(OPTIONS.hairColor), skin: pick(OPTIONS.skin), eyes: pick(OPTIONS.eyes), outfit: pick(OPTIONS.outfit).id },
-  };
-}
-// Gewinnchance schätzen, indem wir den Kampf 300x simulieren
-function winProb(A, B) {
-  let w = 0;
-  for (let i = 0; i < 300; i++) if (simulateBattle(A, B).won) w++;
-  return clamp(w / 300, 0.03, 0.97);
-}
-function newMogBet() {
-  // ähnlich starke Gegner, damit es spannend bleibt
-  const tier = rand(3, 20);
-  const A = randomFighter(tier * rand(0.75, 1.3)), B = randomFighter(tier * rand(0.75, 1.3));
-  const p = winProb(A, B);
-  const odds = q => Math.round(clamp(0.92 / q, 1.05, 25) * 100) / 100;   // 8 % gehen ans Haus
-  mb = { A, B, oa: odds(p), ob: odds(1 - p), busy: false };
-  $('mbMsg').innerHTML = '';
-  renderMogBet();
-}
-function renderMogBet() {
-  const f = (F, o, side) => `<div>${characterSVG(F.look, F.L, { glow: glowOf(F.L), stars: F.stars, uid: 'mb' + (svgCounter++) })}
-    <b>${escapeHtml(F.name)}</b><div class="small">${fmt(glowOf(F.L))} Glow · ${F.stars} ⭐</div>
-    <button class="mb-btn" data-mb="${side}" ${mb.busy ? 'disabled' : ''}>Wetten · Quote ${o.toLocaleString('de-DE')}</button></div>`;
-  $('mbFighters').innerHTML = `<div class="mb-fighters">${f(mb.A, mb.oa, 'A')}${f(mb.B, mb.ob, 'B')}</div>`;
-}
-$('gMogBet').addEventListener('click', e => {
-  if (e.target.closest('[data-mbnew]')) { newMogBet(); return; }
-  const b = e.target.closest('[data-mb]');
-  if (!b || !mb || mb.busy) return;
-  const side = b.dataset.mb;
-  const bet = getBet();
-  if (!bet) return;
-  mb.busy = true;
-  renderMogBet();
-  const res = simulateBattle(mb.A, mb.B);
-  $('mbMsg').innerHTML = '<div class="rounds" id="mbRounds"></div><div id="mbVerdict"></div>';
-  let i = 0;
-  const step = () => {
-    if (!$('mbRounds')) return;
-    if (i < res.rounds.length) {
-      $('mbRounds').insertAdjacentHTML('beforeend', roundHTML(res.rounds[i], i + 1));
-      i++;
-      setTimeout(step, 600);
-      return;
-    }
-    const winner = res.won ? mb.A : mb.B;
-    const won = (side === 'A') === res.won;
-    const pay = won ? Math.floor(bet * (side === 'A' ? mb.oa : mb.ob)) : 0;
-    casinoPay(pay);
-    $('mbVerdict').innerHTML = `<div class="verdict" style="color:${won ? 'var(--green)' : 'var(--red)'}">
-      ${escapeHtml(winner.name)} moggt! ${won ? `+${fmtMoney(pay)} 🎉` : 'Wette verloren 💸'}</div>
-      <button class="casino-btn" data-mbnew="1">⚔️ Nächster Kampf</button>`;
-  };
-  setTimeout(step, 300);
-});
-
 /* ===================== ENDBOSS LEON ===================== */
 const BOSS = {
   id: 'boss_leon', name: 'LEON', boss: true, stars: 25, glow: 9999,
@@ -3286,7 +2839,7 @@ const LB_CATS = [
   { id: 'power',    name: '✨ Glow-Power', show: v => fmt(v) },
   { id: 'money',    name: '💵 Vermögen',   show: v => fmtMoney(v) },
   { id: 'wins',     name: '⚔️ Mog-Siege',  show: v => fmt(v) },
-  { id: 'contacts', name: '💌 Kontakte',   show: v => fmt(v) },
+  { id: 'contacts', name: '⭐ Fans',       show: v => fmt(v) },
 ];
 // Werte der Stadt-Bewohner (die spielen ja nicht wirklich)
 const NPC_STATS = {
@@ -3344,9 +2897,6 @@ function tick() {
   const dt = Math.min(1, (now - lastTick) / 1000);  // vergangene Sekunden (max. 1)
   lastTick = now;
   if (!S.created) return;
-
-  // Glow-Abzug durch Laster erholt sich langsam
-  if (S.vice > 0) S.vice = Math.max(0, S.vice - dt * VICE_DECAY);
 
   // passive Aura
   gainAura(totalAps() * dt);

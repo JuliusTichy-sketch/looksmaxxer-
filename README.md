@@ -33,9 +33,8 @@ Die App hat dann ein eigenes Symbol, startet im Vollbild und funktioniert auch o
 ## So spielst du
 - **🪞 Glow-Up:** *Daily Routine* klicken, Upgrades kaufen, Titel freischalten, Glow Up (Prestige) machen.
 - **💼 Jobs:** Mit einem Timing-Minispiel Geld verdienen. Je höher dein Glow-Score, desto bessere Jobs und mehr Lohn. Im Luxus-Shop gibt es Boosts.
-- **🏙️ Stadt:** Herumlaufen (antippen oder Pfeiltasten/WASD), Frauen ansprechen, Rivalen und Freunde zum **Mog Battle** herausfordern. Endboss **LEON** besiegen. Im Späti gibt es Zigaretten & Alkohol – die senken aber deinen Glow-Score.
-- **🎰 Casino:** Slots, Roulette, Blackjack und Mog-Wetten (nur Spielgeld).
+- **🏙️ Stadt:** Herumlaufen (antippen oder Pfeiltasten/WASD), Leute als **Fans** gewinnen, Rivalen und Freunde zum **Mog Battle** herausfordern. Endboss **LEON** besiegen.
 - **👥 Freunde:** Freundescode verschicken, Codes von Freunden einfügen, Charaktere vergleichen.
-- **🏆 Leaderboard:** Glow-Power, Vermögen, Mog-Siege und Kontakte im Vergleich.
+- **🏆 Leaderboard:** Glow-Power, Vermögen, Mog-Siege und Fans im Vergleich.
 
 Der Spielstand wird automatisch im Browser gespeichert.
