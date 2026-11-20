@@ -1,0 +1,4350 @@
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
+<Item class="ReplicatedStorage" referent="RBX00000005"><Properties><string name="Name">ReplicatedStorage</string></Properties><Item class="Folder" referent="RBX00000004"><Properties><string name="Name">Shared</string></Properties><Item class="ModuleScript" referent="RBX00000001"><Properties><string name="Name">Config</string><ProtectedString name="Source"><![CDATA[--[[
+	==========================================================================
+	CONFIG – alle Spieldaten von Looksmaxxer 3000 (Roblox-Version)
+	Hier kannst du Preise, Texte, Welten, Pets usw. ganz einfach ändern.
+	Diese Datei wird von Server UND Client benutzt.
+	==========================================================================
+]]
+
+local Config = {}
+
+-- Allgemeine Einstellungen
+Config.MAX_LEVEL = 50               -- höchste Stufe pro Upgrade
+Config.COST_GROWTH = 1.3            -- jede Stufe ist 30 % teurer
+Config.SAVE_KEY = "LooksmaxxerData_v1"        -- Name des Speichers (DataStore)
+Config.LEADERBOARD_KEY = "GlowPower_v1"       -- Name der globalen Rangliste
+Config.LEADERBOARD_SIZE = 500                 -- so viele Plätze zeigt die Rangliste
+Config.WORLD_SPACING = 1500                   -- Abstand der Welten auf der Karte (Studs)
+Config.WORLD_SIZE = 500                       -- Größe einer Welt (Studs)
+Config.OFFLINE_HOURS = 8                      -- maximaler Offline-Verdienst (Stunden)
+Config.OFFLINE_RATE = 0.3                     -- offline gibt es 30 % der Aura/s
+
+----------------------------------------------------------------------------
+-- UPGRADE-KATEGORIEN
+----------------------------------------------------------------------------
+Config.Categories = {
+	{ id = "skin",    name = "Skincare",           emoji = "🧴" },
+	{ id = "hair",    name = "Haare",              emoji = "💇" },
+	{ id = "fit",     name = "Fitness",            emoji = "💪" },
+	{ id = "sleep",   name = "Schlaf & Ernährung", emoji = "😴" },
+	{ id = "posture", name = "Haltung & Mewing",   emoji = "🗿" },
+	{ id = "style",   name = "Style",              emoji = "👔" },
+	{ id = "teeth",   name = "Zähne",              emoji = "🦷" },
+	{ id = "conf",    name = "Selbstbewusstsein",  emoji = "😎" },
+}
+
+-- Name der Kategorie im Mog Battle
+Config.BattleNames = {
+	skin = "Hautbild", hair = "Frisur", fit = "Physique", sleep = "Ausgeschlafenheit",
+	posture = "Kieferlinie", style = "Drip", teeth = "Lächeln", conf = "Ausstrahlung",
+}
+
+----------------------------------------------------------------------------
+-- UPGRADES
+-- base  = Startpreis (Aura)
+-- aps   = Aura pro Sekunde je Stufe
+-- click = extra Aura pro Klick je Stufe
+-- glow  = Glow-Score je Stufe
+----------------------------------------------------------------------------
+Config.Upgrades = {
+	-- Skincare
+	{ id = "reinigung",    cat = "skin", emoji = "🧼", name = "Gesichtsreinigung",     base = 15,      aps = 0.2,  click = 0, glow = 1,  desc = "Wasser ins Gesicht. Revolutionär." },
+	{ id = "feuchtigkeit", cat = "skin", emoji = "💧", name = "Feuchtigkeitscreme",    base = 120,     aps = 1.2,  click = 0, glow = 2,  desc = "Deine Haut sagt endlich Danke statt Hilfe." },
+	{ id = "sonnencreme",  cat = "skin", emoji = "☀️", name = "Sonnencreme LSF 50",    base = 900,     aps = 6,    click = 0, glow = 4,  desc = "Auch im Winter. Auch drinnen. Sicher ist sicher." },
+	{ id = "retinol",      cat = "skin", emoji = "🧪", name = "Retinol",               base = 7000,    aps = 30,   click = 0, glow = 8,  desc = "Klingt wie ein Endgegner, ist aber ein Serum." },
+	{ id = "goldmaske",    cat = "skin", emoji = "✨", name = "Goldene Gesichtsmaske", base = 60000,   aps = 150,  click = 0, glow = 15, desc = "24 Karat im Gesicht. Dein Spiegel braucht eine Sonnenbrille." },
+	-- Haare
+	{ id = "friseur",      cat = "hair", emoji = "✂️", name = "Friseurbesuch",         base = 50,      aps = 0.5,  click = 0, glow = 1,  desc = "Nur die Spitzen – und er hält sich dran." },
+	{ id = "styling",      cat = "hair", emoji = "🫙", name = "Styling-Produkte",      base = 600,     aps = 4,    click = 0, glow = 3,  desc = "Wachs, Gel, Paste, Clay. Du kennst den Unterschied." },
+	{ id = "signature",    cat = "hair", emoji = "👑", name = "Signature-Haarschnitt", base = 12000,   aps = 50,   click = 0, glow = 10, desc = "So ikonisch, er hat eigene Follower." },
+	{ id = "haarkur",      cat = "hair", emoji = "🌸", name = "Seiden-Haarkur",        base = 90000,   aps = 300,  click = 0, glow = 18, desc = "Deine Haare glänzen heller als deine Zukunft." },
+	{ id = "promifriseur", cat = "hair", emoji = "💈", name = "Promi-Friseur",         base = 600000,  aps = 1500, click = 0, glow = 30, desc = "Hat schon Gigachad Sven geschnitten." },
+	-- Fitness
+	{ id = "liegestuetze", cat = "fit", emoji = "🤸", name = "Liegestütze",            base = 30,      aps = 0.3,  click = 0.5, glow = 1, desc = "Drei Stück. Am Stück. Fast." },
+	{ id = "gym",          cat = "fit", emoji = "🏋️", name = "Gym-Abo",                base = 2500,    aps = 15,   click = 0, glow = 5,  desc = "Diesmal gehst du auch hin. Versprochen." },
+	{ id = "trainer",      cat = "fit", emoji = "📣", name = "Personal Trainer",       base = 40000,   aps = 150,  click = 0, glow = 15, desc = "Schreit dich motivierend an. Du zahlst dafür." },
+	{ id = "proteinplan",  cat = "fit", emoji = "🥛", name = "Protein-Plan",           base = 250000,  aps = 900,  click = 0, glow = 25, desc = "Hähnchen, Reis, Brokkoli. Für immer." },
+	{ id = "wettkampf",    cat = "fit", emoji = "🏆", name = "Wettkampf-Vorbereitung", base = 2000000, aps = 6000, click = 0, glow = 45, desc = "Du posierst jetzt auch beim Zähneputzen." },
+	-- Schlaf & Ernährung
+	{ id = "schlaf",       cat = "sleep", emoji = "🛌", name = "8 Stunden Schlaf",     base = 80,      aps = 0.8,  click = 0, glow = 1,  desc = "Augenringe kündigen fristlos." },
+	{ id = "wasser",       cat = "sleep", emoji = "🚰", name = "Wasser trinken",       base = 400,     aps = 3,    click = 0, glow = 2,  desc = "Ein Liter Wasser statt drei Energy-Drinks. Wild." },
+	{ id = "kochen",       cat = "sleep", emoji = "🥗", name = "Gesund kochen",        base = 5000,    aps = 25,   click = 0, glow = 6,  desc = "Brokkoli ist jetzt dein Freund." },
+	{ id = "mealprep",     cat = "sleep", emoji = "🍱", name = "Meal-Prep-Profi",      base = 80000,   aps = 260,  click = 0, glow = 14, desc = "21 Dosen im Kühlschrank. Alle beschriftet." },
+	{ id = "schlaftracker", cat = "sleep", emoji = "⌚", name = "Schlaf-Tracking",     base = 900000,  aps = 2500, click = 0, glow = 32, desc = "Deine Uhr lobt dich jeden Morgen." },
+	-- Haltung & Mewing
+	{ id = "haltung",      cat = "posture", emoji = "🧍", name = "Gerade Haltung",     base = 200,     aps = 1.5,  click = 0, glow = 2,  desc = "Schultern zurück, Brust raus, Handy runter." },
+	{ id = "mewing",       cat = "posture", emoji = "👅", name = "Mewing",             base = 1500,    aps = 8,    click = 0, glow = 4,  desc = "Zunge an den Gaumen. Für immer." },
+	{ id = "yoga",         cat = "posture", emoji = "🧘", name = "Haltungs-Yoga",      base = 30000,   aps = 120,  click = 0, glow = 12, desc = "Der herabschauende Gigachad." },
+	{ id = "meisterklasse", cat = "posture", emoji = "🗿", name = "Mewing-Meisterklasse", base = 100000, aps = 400, click = 0, glow = 25, desc = "Dein Kiefer kann jetzt Glas schneiden." },
+	{ id = "moaimeditation", cat = "posture", emoji = "🌋", name = "Moai-Meditation",  base = 3000000, aps = 9000, click = 0, glow = 55, desc = "Du hast 3 Tage nicht geblinzelt." },
+	-- Style
+	{ id = "basics",       cat = "style", emoji = "👕", name = "Saubere Basics",       base = 100,     aps = 1,    click = 0, glow = 1,  desc = "Ein T-Shirt ohne Ketchup-Fleck. Ein Anfang." },
+	{ id = "kleidung",     cat = "style", emoji = "🧥", name = "Passende Kleidung",    base = 3000,    aps = 18,   click = 0, glow = 5,  desc = "Klamotten in deiner Größe statt wird schon passen." },
+	{ id = "parfum",       cat = "style", emoji = "🌺", name = "Parfum",               base = 20000,   aps = 90,   click = 0, glow = 10, desc = "Zwei Sprüher. Nicht zwölf. ZWEI." },
+	{ id = "accessoires",  cat = "style", emoji = "⌚", name = "Accessoires",          base = 80000,   aps = 300,  click = 0, glow = 20, desc = "Uhr, Kette, Sonnenbrille im Haar." },
+	{ id = "designer",     cat = "style", emoji = "👔", name = "Designer-Garderobe",   base = 1500000, aps = 4500, click = 0, glow = 40, desc = "Dein Kleiderschrank hat einen eigenen Türsteher." },
+	-- Zähne
+	{ id = "zahnseide",    cat = "teeth", emoji = "🧵", name = "Zahnseide",            base = 60,      aps = 0.4,  click = 0, glow = 1,  desc = "Dein Zahnarzt weint vor Freude." },
+	{ id = "bleaching",    cat = "teeth", emoji = "💎", name = "Bleaching",            base = 8000,    aps = 40,   click = 0, glow = 7,  desc = "Weißer als dein Kontostand danach." },
+	{ id = "zahnspange",   cat = "teeth", emoji = "😬", name = "Zahnspange",           base = 50000,   aps = 200,  click = 0, glow = 15, desc = "Kurz peinlich, dann perfekt." },
+	{ id = "zahnreinigung", cat = "teeth", emoji = "🪥", name = "Profi-Zahnreinigung", base = 400000,  aps = 1200, click = 0, glow = 22, desc = "Es quietscht. Vor Sauberkeit." },
+	{ id = "hollywoodsmile", cat = "teeth", emoji = "😁", name = "Hollywood-Lächeln",  base = 4000000, aps = 11000, click = 0, glow = 60, desc = "Wenn du lächelst, geht irgendwo ein Licht an." },
+	-- Selbstbewusstsein (stärkt vor allem Klicks)
+	{ id = "augenkontakt", cat = "conf", emoji = "👀", name = "Augenkontakt",          base = 25,      aps = 0,    click = 1,   glow = 1,  desc = "Drei Sekunden halten. Nicht starren." },
+	{ id = "smalltalk",    cat = "conf", emoji = "💬", name = "Smalltalk",             base = 1000,    aps = 5,    click = 5,   glow = 3,  desc = "Du kannst jetzt übers Wetter reden. Fließend." },
+	{ id = "laecheln",     cat = "conf", emoji = "🙂", name = "Lächeln",               base = 15000,   aps = 60,   click = 25,  glow = 8,  desc = "Mit den Augen lächeln. Smizing." },
+	{ id = "rhetorik",     cat = "conf", emoji = "🎤", name = "Rhetorik-Kurs",         base = 200000,  aps = 500,  click = 120, glow = 20, desc = "Du sagst jetzt Synergie und meinst es ernst." },
+	{ id = "buehne",       cat = "conf", emoji = "🎭", name = "Bühnen-Präsenz",        base = 2500000, aps = 7000, click = 900, glow = 50, desc = "Wenn du einen Raum betrittst, dreht sich das Licht zu dir." },
+}
+
+----------------------------------------------------------------------------
+-- TITEL (ab welchem Glow-Score)
+----------------------------------------------------------------------------
+Config.Titles = {
+	{ glow = 0,     title = "NPC",                           text = "Du bist ein Hintergrund-Charakter. Noch." },
+	{ glow = 10,    title = "Statist mit Sprechrolle",       text = "Jemand hat Hallo zu dir gesagt. Absichtlich!" },
+	{ glow = 40,    title = "Hat sich mal gekämmt",          text = "Deine Mutter ist stolz auf dich." },
+	{ glow = 100,   title = "Gym-Anfänger mit Ambitionen",   text = "Du postest jetzt Spiegel-Selfies aus der Umkleide." },
+	{ glow = 200,   title = "Side Character",                text = "Du hast jetzt eine eigene Nebenhandlung." },
+	{ glow = 400,   title = "Main Character",                text = "Die Kamera folgt jetzt DIR." },
+	{ glow = 800,   title = "Sigma im Praktikum",            text = "Du trinkst Kaffee schwarz und schaust nachdenklich aus dem Fenster." },
+	{ glow = 1500,  title = "Model-Scout schaut zweimal",    text = "Er hat sich umgedreht. Zweimal." },
+	{ glow = 2500,  title = "Chad",                          text = "Türen öffnen sich für dich. Auch die ohne Sensor." },
+	{ glow = 4000,  title = "Gigachad",                      text = "Dein Kinn hat eine eigene Postleitzahl." },
+	{ glow = 6500,  title = "Gigachad Ultra HD",             text = "Kameras schalten auf 4K, wenn du vorbeiläufst." },
+	{ glow = 10000, title = "Kosmisches Glow-Wesen",         text = "Die Sonne benutzt DICH als Lichtquelle." },
+	{ glow = 15000, title = "Mewing-Gottheit",               text = "Moai-Statuen verneigen sich vor dir." },
+	{ glow = 22000, title = "Legende der Kieferlinie",       text = "Geologen untersuchen deinen Kiefer." },
+	{ glow = 29000, title = "Das Universum ist neidisch",    text = "Mehr geht nicht. Wirklich nicht." },
+}
+
+----------------------------------------------------------------------------
+-- WELTEN
+-- mult     = Aura-Multiplikator, solange du in dieser Welt bist
+-- cost     = Preis zum Freischalten (Aura)
+-- rebirths = nötige Rebirths
+-- theme    = welche Deko die Karte bekommt
+----------------------------------------------------------------------------
+Config.Worlds = {
+	{ id = "glowcity",  name = "Glow City",          emoji = "🏙️", mult = 1,     cost = 0,     rebirths = 0,  theme = "city",
+	  ground = Color3.fromRGB(205, 198, 215), accent = Color3.fromRGB(255, 79, 216),
+	  light = { ClockTime = 14, Ambient = Color3.fromRGB(120, 110, 140), Fog = Color3.fromRGB(200, 190, 225), FogEnd = 1400 } },
+	{ id = "miami",     name = "Miami Beach",        emoji = "🏖️", mult = 2,     cost = 5e4,  rebirths = 1,  theme = "beach",
+	  ground = Color3.fromRGB(238, 214, 160), accent = Color3.fromRGB(0, 200, 220),
+	  light = { ClockTime = 13, Ambient = Color3.fromRGB(160, 140, 110), Fog = Color3.fromRGB(255, 232, 200), FogEnd = 1400 } },
+	{ id = "mountain",  name = "Iron Mountain",      emoji = "🏔️", mult = 3.5,    cost = 5e7,   rebirths = 2,  theme = "mountain",
+	  ground = Color3.fromRGB(110, 140, 100), accent = Color3.fromRGB(180, 220, 255),
+	  light = { ClockTime = 10, Ambient = Color3.fromRGB(130, 140, 160), Fog = Color3.fromRGB(220, 230, 245), FogEnd = 900 } },
+	{ id = "tempel",    name = "Mewing-Tempel",      emoji = "🗿", mult = 5,    cost = 5e9,   rebirths = 4,  theme = "temple",
+	  ground = Color3.fromRGB(120, 160, 90), accent = Color3.fromRGB(255, 160, 60),
+	  light = { ClockTime = 17.6, Ambient = Color3.fromRGB(160, 110, 90), Fog = Color3.fromRGB(255, 180, 140), FogEnd = 1100 } },
+	{ id = "mailand",   name = "Mailand Fashion District", emoji = "👔", mult = 7, cost = 3e11, rebirths = 6, theme = "fashion",
+	  ground = Color3.fromRGB(60, 55, 70), accent = Color3.fromRGB(255, 120, 200),
+	  light = { ClockTime = 19.5, Ambient = Color3.fromRGB(120, 100, 140), Fog = Color3.fromRGB(90, 70, 110), FogEnd = 1200 } },
+	{ id = "hollywood", name = "Hollywood Hills",    emoji = "🎬", mult = 10,  cost = 1e13,  rebirths = 8,  theme = "hollywood",
+	  ground = Color3.fromRGB(190, 160, 110), accent = Color3.fromRGB(255, 50, 60),
+	  light = { ClockTime = 18, Ambient = Color3.fromRGB(170, 120, 100), Fog = Color3.fromRGB(255, 160, 120), FogEnd = 1400 } },
+	{ id = "dubai",     name = "Dubai Skyline",      emoji = "🌇", mult = 14,  cost = 3e14,  rebirths = 10,  theme = "dubai",
+	  ground = Color3.fromRGB(230, 200, 140), accent = Color3.fromRGB(212, 175, 55),
+	  light = { ClockTime = 12, Ambient = Color3.fromRGB(180, 160, 120), Fog = Color3.fromRGB(255, 220, 160), FogEnd = 1600 } },
+	{ id = "galaxie",   name = "Aura-Galaxie",       emoji = "🌌", mult = 20, cost = 5e15,  rebirths = 13, theme = "galaxy",
+	  ground = Color3.fromRGB(35, 20, 60), accent = Color3.fromRGB(160, 90, 255),
+	  light = { ClockTime = 0, Ambient = Color3.fromRGB(110, 80, 170), Fog = Color3.fromRGB(40, 10, 70), FogEnd = 1000 } },
+}
+
+----------------------------------------------------------------------------
+-- REBIRTH
+----------------------------------------------------------------------------
+Config.Rebirth = {
+	baseCost = 1000000,  -- erster Rebirth kostet 1 Mio. Aura
+	growth = 4,          -- jeder weitere ist 4x so teuer
+	multPer = 0.5,       -- jeder Rebirth = +50 % auf alle Aura
+}
+
+-- Rebirth-Shop (bezahlt mit Rebirth-Punkten)
+Config.RebirthShop = {
+	{ id = "petslot",   emoji = "🐾", name = "+1 Pet-Platz",         desc = "Ein Pet mehr gleichzeitig ausrüsten.",       max = 5,  baseCost = 1, costStep = 1 },
+	{ id = "luck",      emoji = "🍀", name = "Glück +10 %",          desc = "Seltenere Pets aus Geschenkboxen.",          max = 10, baseCost = 1, costStep = 1 },
+	{ id = "speed",     emoji = "👟", name = "Schneller laufen",     desc = "+2 Laufgeschwindigkeit pro Stufe.",          max = 5,  baseCost = 1, costStep = 0 },
+	{ id = "autoclick", emoji = "🤖", name = "Auto-Routine",         desc = "Macht automatisch 2 Daily Routines pro Sekunde.", max = 1, baseCost = 3, costStep = 0 },
+	{ id = "triple",    emoji = "🎁", name = "3er-Öffnen",           desc = "Öffne 3 Geschenkboxen auf einmal.",          max = 1,  baseCost = 4, costStep = 0 },
+	{ id = "offline",   emoji = "😴", name = "Längerer Beauty Sleep", desc = "+2 Stunden Offline-Verdienst pro Stufe.",   max = 4,  baseCost = 2, costStep = 1 },
+}
+
+----------------------------------------------------------------------------
+-- PETS & GESCHENKBOXEN
+----------------------------------------------------------------------------
+-- Seltenheiten: weight = Chance (relativ), mult = Stärke-Faktor
+Config.Rarities = {
+	common    = { order = 1, name = "Gewöhnlich",   color = Color3.fromRGB(200, 200, 210), weight = 55,  mult = 1 },
+	uncommon  = { order = 2, name = "Ungewöhnlich", color = Color3.fromRGB(78, 240, 120),  weight = 27,  mult = 2 },
+	rare      = { order = 3, name = "Selten",       color = Color3.fromRGB(70, 150, 255),  weight = 12,  mult = 4 },
+	epic      = { order = 4, name = "Episch",       color = Color3.fromRGB(170, 90, 255),  weight = 5,   mult = 9 },
+	legendary = { order = 5, name = "Legendär",     color = Color3.fromRGB(255, 200, 40),  weight = 0.9, mult = 25 },
+	mythic    = { order = 6, name = "Mythisch",     color = Color3.fromRGB(255, 60, 90),   weight = 0.1, mult = 80 },
+	secret    = { order = 7, name = "GEHEIM",       color = Color3.fromRGB(255, 255, 255), weight = 0,   mult = 300 },
+}
+
+-- Stufen durch Fusionieren (5 gleiche = 1 bessere)
+Config.PetTiers = {
+	{ name = "Normal",     mult = 1,  color = nil },
+	{ name = "Gold",       mult = 3,  color = Color3.fromRGB(255, 205, 60) },
+	{ name = "Regenbogen", mult = 10, color = Color3.fromRGB(255, 120, 220) },
+	{ name = "Diamant",    mult = 30, color = Color3.fromRGB(150, 240, 255) },
+}
+Config.FUSE_COUNT = 5
+Config.BASE_PET_SLOTS = 3
+Config.MAX_PET_INVENTORY = 60
+Config.PITY = 150                 -- spätestens nach so vielen Boxen ohne Legendär kommt eins
+Config.PET_BASE_BOOST = 0.05      -- Gewöhnliches Pet in Welt 1 = +5 % Aura
+Config.PET_WORLD_GROWTH = 1.5     -- jede Welt: Pets 1,5x stärker
+
+-- Pets pro Welt: { Name, Emoji, Seltenheit }
+local PET_DATA = {
+	{ -- 1 Glow City
+		{ "Gym-Hamster", "🐹", "common" }, { "Skincare-Katze", "🐱", "common" }, { "Mewing-Mops", "🐶", "uncommon" },
+		{ "Protein-Pinguin", "🐧", "rare" }, { "Sigma-Wolf", "🐺", "epic" }, { "Golden Retriever Chad", "🐕", "legendary" },
+		{ "Mini-Moai", "🗿", "mythic" },
+	},
+	{ -- 2 Miami Beach
+		{ "Pinch-Krabbe", "🦀", "common" }, { "Strand-Möwe", "🐦", "common" }, { "Flex-Delfin", "🐬", "uncommon" },
+		{ "Glow-Mingo", "🦩", "rare" }, { "Jaw-Hai", "🦈", "epic" }, { "Bronze-Schildkröte", "🐢", "legendary" },
+		{ "Sonnengott-Krake", "🐙", "mythic" },
+	},
+	{ -- 3 Iron Mountain
+		{ "Hantel-Hase", "🐰", "common" }, { "Bergziege", "🐐", "common" }, { "Eiweiß-Eule", "🦉", "uncommon" },
+		{ "Eisbär-Bro", "🐻", "rare" }, { "Titan-Gorilla", "🦍", "epic" }, { "Gains-Drache", "🐉", "legendary" },
+		{ "Ur-Mammut", "🐘", "mythic" },
+	},
+	{ -- 4 Mewing-Tempel
+		{ "Meditations-Frosch", "🐸", "common" }, { "Tempel-Affe", "🐒", "common" }, { "Jade-Schlange", "🐍", "uncommon" },
+		{ "Zen-Kranich", "🦢", "rare" }, { "Mönch-Panda", "🐼", "epic" }, { "Kiefer-Tiger", "🐯", "legendary" },
+		{ "Ur-Moai-Geist", "👻", "mythic" },
+	},
+	{ -- 5 Mailand
+		{ "Laufsteg-Pudel", "🐩", "common" }, { "Designer-Maus", "🐭", "common" }, { "Pfau Paolo", "🦚", "uncommon" },
+		{ "Drip-Zebra", "🦓", "rare" }, { "Fashion-Fuchs", "🦊", "epic" }, { "Couture-Schwan", "🦢", "legendary" },
+		{ "Il-Drippo-Einhorn", "🦄", "mythic" },
+	},
+	{ -- 6 Hollywood
+		{ "Paparazzi-Papagei", "🦜", "common" }, { "Popcorn-Waschbär", "🦝", "common" }, { "Oscar-Otter", "🦦", "uncommon" },
+		{ "Stunt-Känguru", "🦘", "rare" }, { "Red-Carpet-Löwe", "🦁", "epic" }, { "Blockbuster-Bär", "🐻", "legendary" },
+		{ "Walk-of-Fame-Phönix", "🔥", "mythic" },
+	},
+	{ -- 7 Dubai
+		{ "Gold-Kamel", "🐫", "common" }, { "Wüsten-Skorpion", "🦂", "common" }, { "Falke Faisal", "🦅", "uncommon" },
+		{ "Luxus-Leopard", "🐆", "rare" }, { "Yacht-Wal", "🐋", "epic" }, { "Diamant-Drache", "🐲", "legendary" },
+		{ "Scheich-Phönix", "✨", "mythic" },
+	},
+	{ -- 8 Aura-Galaxie
+		{ "Mond-Hamster", "🌙", "common" }, { "Sternen-Katze", "⭐", "common" }, { "Komet-Hund", "💫", "uncommon" },
+		{ "Alien-Bro", "👽", "rare" }, { "Nebula-Wal", "🌌", "epic" }, { "Schwarzes-Loch-Mops", "⚫", "legendary" },
+		{ "Aura-Gott", "🌈", "mythic" },
+	},
+}
+
+local EGG_NAMES = { "Glow-City-Box", "Strand-Box", "Gym-Box", "Tempel-Box", "Couture-Box", "Blockbuster-Box", "Gold-Box", "Galaxie-Box" }
+local EGG_COSTS = { 150, 2500, 1.5e6, 1.5e8, 1e10, 3e11, 1e13, 1.5e14 }
+
+-- Pets und Boxen werden hier automatisch aus den Listen oben erzeugt
+Config.Pets = {}
+Config.Eggs = {}
+for w, list in ipairs(PET_DATA) do
+	local egg = { index = w, world = w, name = EGG_NAMES[w], cost = EGG_COSTS[w], pets = {} }
+	local counts = {}
+	for _, p in ipairs(list) do
+		counts[p[3]] = (counts[p[3]] or 0) + 1
+	end
+	local base = Config.PET_BASE_BOOST * Config.PET_WORLD_GROWTH ^ (w - 1)
+	for i, p in ipairs(list) do
+		local rarity = Config.Rarities[p[3]]
+		local pet = {
+			id = "w" .. w .. "_" .. i, name = p[1], emoji = p[2], rarity = p[3], world = w,
+			boost = base * rarity.mult,
+		}
+		table.insert(Config.Pets, pet)
+		table.insert(egg.pets, { id = pet.id, weight = rarity.weight / counts[p[3]] })
+	end
+	table.insert(Config.Eggs, egg)
+end
+-- Das geheime Pet gibt es nur, wenn man Endboss Leon besiegt
+Config.SECRET_PET = "secret_goldfisch"
+table.insert(Config.Pets, {
+	id = Config.SECRET_PET, name = "Leons Goldfisch", emoji = "🐠", rarity = "secret", world = 8,
+	boost = Config.PET_BASE_BOOST * Config.PET_WORLD_GROWTH ^ 7 * Config.Rarities.secret.mult,
+})
+Config.SECRET_CHANCE = 0.05   -- 5 % Chance bei einem Sieg gegen Leon
+
+----------------------------------------------------------------------------
+-- MOG-BATTLE-GEGNER: ein Rivale und ein Boss pro Welt
+-- level = Stufe aller Upgrades, rebirths = Rebirths
+----------------------------------------------------------------------------
+Config.Rivals = {
+	{ name = "Gym-Bro Dennis",    level = 1,  rebirths = 0,  shirt = Color3.fromRGB(230, 57, 70),  pants = Color3.fromRGB(40, 50, 80),  skin = Color3.fromRGB(224, 172, 105) },
+	{ name = "Influencer Luca",   level = 8, rebirths = 0,  shirt = Color3.fromRGB(30, 30, 30),   pants = Color3.fromRGB(60, 60, 80),  skin = Color3.fromRGB(255, 224, 196) },
+	{ name = "Hantel-Horst",      level = 25, rebirths = 5,  shirt = Color3.fromRGB(90, 90, 150),  pants = Color3.fromRGB(30, 30, 40),  skin = Color3.fromRGB(198, 134, 66) },
+	{ name = "Mewing-Meister Kai", level = 35, rebirths = 7, shirt = Color3.fromRGB(240, 240, 240), pants = Color3.fromRGB(80, 60, 40), skin = Color3.fromRGB(141, 85, 36) },
+	{ name = "Model Marco",       level = 42, rebirths = 10,  shirt = Color3.fromRGB(255, 120, 200), pants = Color3.fromRGB(20, 20, 20), skin = Color3.fromRGB(241, 194, 125) },
+	{ name = "Stuntman Steve",    level = 46, rebirths = 13,  shirt = Color3.fromRGB(200, 120, 40), pants = Color3.fromRGB(60, 40, 30),  skin = Color3.fromRGB(224, 172, 105) },
+	{ name = "Yacht-Yannick",     level = 48, rebirths = 15, shirt = Color3.fromRGB(255, 255, 255), pants = Color3.fromRGB(30, 60, 120), skin = Color3.fromRGB(255, 224, 196) },
+	{ name = "Astro-Ali",         level = 49, rebirths = 16, shirt = Color3.fromRGB(200, 200, 220), pants = Color3.fromRGB(200, 200, 220), skin = Color3.fromRGB(141, 85, 36) },
+}
+Config.Bosses = {
+	{ name = "Gigachad Sven",        level = 4, rebirths = 0,  shirt = Color3.fromRGB(29, 53, 87),   pants = Color3.fromRGB(29, 53, 87),   skin = Color3.fromRGB(241, 194, 125), scale = 1.25 },
+	{ name = "Bronzer Brad",         level = 15, rebirths = 1,  shirt = Color3.fromRGB(255, 80, 60),  pants = Color3.fromRGB(255, 200, 0),  skin = Color3.fromRGB(198, 134, 66),  scale = 1.3 },
+	{ name = "Der Hantel-Yeti",      level = 30, rebirths = 7,  shirt = Color3.fromRGB(240, 240, 255), pants = Color3.fromRGB(240, 240, 255), skin = Color3.fromRGB(230, 235, 255), scale = 1.45 },
+	{ name = "Der Ur-Moai",          level = 40, rebirths = 9,  shirt = Color3.fromRGB(120, 120, 120), pants = Color3.fromRGB(100, 100, 100), skin = Color3.fromRGB(140, 140, 140), scale = 1.5 },
+	{ name = "Il Drippo",            level = 45, rebirths = 12,  shirt = Color3.fromRGB(180, 40, 160), pants = Color3.fromRGB(20, 20, 20),  skin = Color3.fromRGB(255, 224, 196), scale = 1.3 },
+	{ name = "Der Casting-Direktor", level = 48, rebirths = 14, shirt = Color3.fromRGB(20, 20, 20),   pants = Color3.fromRGB(20, 20, 20),   skin = Color3.fromRGB(224, 172, 105), scale = 1.3 },
+	{ name = "Scheich Glowmed",      level = 50, rebirths = 16, shirt = Color3.fromRGB(255, 255, 255), pants = Color3.fromRGB(255, 255, 255), skin = Color3.fromRGB(198, 134, 66), scale = 1.35 },
+	{ name = "LEON",                 level = 50, rebirths = 20, shirt = Color3.fromRGB(201, 162, 39), pants = Color3.fromRGB(201, 162, 39), skin = Color3.fromRGB(241, 194, 125), scale = 1.6, final = true },
+}
+Config.RIVAL_COOLDOWN = 30   -- Sekunden
+Config.BOSS_COOLDOWN = 120
+Config.PVP_COOLDOWN = 20
+
+Config.BossTaunts = {
+	"Du bist nicht mal auf meinem Radar.",
+	"Ich mewe seit 2009.",
+	"Mein Spiegelbild fragt MICH nach Autogrammen.",
+	"Komm wieder, wenn du ein Kinn hast.",
+}
+
+Config.MogWin = {
+	"%s wurde komplett gemoggt und überlegt jetzt, sich einen Bart wachsen zu lassen.",
+	"%s schaut ab heute Skincare-Tutorials. Wegen dir.",
+	"Totaler Mog! Die Zuschauer klatschen.",
+	"%s hat kurz in den Spiegel geschaut und still gg gesagt.",
+}
+Config.MogLose = {
+	"Du wurdest gemoggt. Ab ins Gym.",
+	"%s hat dich mit einem einzigen Seitenprofil besiegt.",
+	"Autsch. Selbst dein Spiegelbild schaut weg.",
+}
+
+----------------------------------------------------------------------------
+-- TRÄNKE (kosten Geld)
+----------------------------------------------------------------------------
+Config.Potions = {
+	{ id = "aura2",  emoji = "🧪", name = "Aura-Trank",  desc = "Doppelte Aura für 10 Minuten.",                 price = 300, duration = 600, aura = 2 },
+	{ id = "luck2",  emoji = "🍀", name = "Glücks-Trank", desc = "Doppeltes Glück beim Öffnen für 10 Minuten.",  price = 500, duration = 600, luck = 2 },
+	{ id = "click3", emoji = "🥤", name = "Klick-Shake", desc = "Dreifacher Klick-Wert für 5 Minuten.",          price = 150, duration = 300, click = 3 },
+}
+
+----------------------------------------------------------------------------
+-- TÄGLICHE BELOHNUNGEN (7-Tage-Serie)
+-- auraSeconds = so viele Sekunden deiner Aura/s als Bonus
+----------------------------------------------------------------------------
+Config.Daily = {
+	{ cash = 50,   auraSeconds = 60 },
+	{ cash = 100,  auraSeconds = 120 },
+	{ cash = 150,  potion = "aura2" },
+	{ cash = 250,  auraSeconds = 300 },
+	{ cash = 400,  potion = "luck2" },
+	{ cash = 600,  auraSeconds = 600 },
+	{ cash = 1000, potion = "aura2", freeEgg = true },
+}
+
+----------------------------------------------------------------------------
+-- PROMO-CODES (Groß-/Kleinschreibung egal, jeder Code nur einmal)
+----------------------------------------------------------------------------
+Config.Codes = {
+	MEWING2026 = { text = "Mewing-Starterpaket", cash = 500, auraSeconds = 120 },
+	GIGACHAD   = { text = "Glücks-Trank",       potion = "luck2" },
+	GLOWUP     = { text = "Aura-Trank",         potion = "aura2" },
+	LEON       = { text = "Leons Taschengeld",  cash = 2000 },
+}
+
+----------------------------------------------------------------------------
+-- SOUNDS
+-- Trage hier Sound-IDs aus der Roblox-Bibliothek ein (siehe ANLEITUNG.md),
+-- z. B. "rbxassetid://123456789". Leer = kein Sound.
+----------------------------------------------------------------------------
+Config.Sounds = {
+	Click       = "rbxasset://sounds/electronicpingshort.wav",
+	Buy         = "",   -- Suchbegriff: "cash register" / "ka-ching"
+	TitleUp     = "",   -- "phonk cowbell" / "level up"
+	BattleStart = "",   -- "vine boom" / "bass boom"
+	BattleWin   = "",   -- "phonk drop" / "victory"
+	BattleLose  = "",   -- "sad trombone" / "fail"
+	Hatch       = "",   -- "drum roll"
+	HatchRare   = "",   -- "anime wow" / "choir"
+	Rebirth     = "",   -- "power up"
+	Error       = "",   -- "error" / "bruh"
+	Notify      = "",   -- "notification" / "pop"
+}
+-- Hintergrundmusik pro Welt (1–8). Leer = keine Musik.
+Config.Music = { "", "", "", "", "", "", "", "" }
+
+-- Farben der Glitzer-Aura um den Spieler (wechselt mit jedem Rebirth)
+Config.AuraColors = {
+	Color3.fromRGB(255, 79, 216), Color3.fromRGB(62, 242, 255), Color3.fromRGB(255, 209, 102),
+	Color3.fromRGB(78, 240, 160), Color3.fromRGB(255, 140, 66), Color3.fromRGB(179, 136, 255),
+}
+
+return Config
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX00000002"><Properties><string name="Name">Logic</string><ProtectedString name="Source"><![CDATA[--[[
+	LOGIC – alle Spielformeln an einem Ort (Server & Client)
+	Der Server rechnet damit wirklich, der Client nur zum Anzeigen.
+]]
+
+local Config = require(script.Parent:WaitForChild("Config"))
+
+local Logic = {}
+
+-- Schnelle Nachschlage-Tabellen
+Logic.upgradeById = {}
+for _, u in ipairs(Config.Upgrades) do
+	Logic.upgradeById[u.id] = u
+end
+Logic.petById = {}
+for _, p in ipairs(Config.Pets) do
+	Logic.petById[p.id] = p
+end
+Logic.potionById = {}
+for _, p in ipairs(Config.Potions) do
+	Logic.potionById[p.id] = p
+end
+Logic.perkById = {}
+for _, p in ipairs(Config.RebirthShop) do
+	Logic.perkById[p.id] = p
+end
+
+----------------------------------------------------------------------------
+-- Upgrades
+----------------------------------------------------------------------------
+function Logic.level(data, id)
+	return (data.levels and data.levels[id]) or 0
+end
+
+function Logic.costAt(u, level)
+	return math.floor(u.base * Config.COST_GROWTH ^ level + 0.5)
+end
+
+-- Wie viele Stufen kaufen wir (amount = Zahl oder "max") und was kostet das?
+function Logic.bulk(u, level, amount, money)
+	local remaining = Config.MAX_LEVEL - level
+	if remaining <= 0 then
+		return 0, 0
+	end
+	if amount == "max" then
+		local count, cost = 0, 0
+		while count < remaining do
+			local nextCost = Logic.costAt(u, level + count)
+			if cost + nextCost > money then
+				break
+			end
+			cost = cost + nextCost
+			count = count + 1
+		end
+		if count == 0 then
+			return 1, Logic.costAt(u, level)
+		end
+		return count, cost
+	end
+	local count = math.min(amount, remaining)
+	local cost = 0
+	for i = 0, count - 1 do
+		cost = cost + Logic.costAt(u, level + i)
+	end
+	return count, cost
+end
+
+-- Summe über alle Upgrades
+local function sumLevels(levels, field)
+	local total = 0
+	for _, u in ipairs(Config.Upgrades) do
+		total = total + ((levels and levels[u.id]) or 0) * u[field]
+	end
+	return total
+end
+
+function Logic.baseGlow(levels) return sumLevels(levels, "glow") end
+function Logic.baseAps(levels) return sumLevels(levels, "aps") end
+function Logic.clickBonus(levels) return sumLevels(levels, "click") end
+
+-- Summe der Stufen einer Kategorie (z. B. Fitness für breitere Schultern)
+function Logic.catLevels(levels, cat)
+	local total = 0
+	for _, u in ipairs(Config.Upgrades) do
+		if u.cat == cat then
+			total = total + ((levels and levels[u.id]) or 0)
+		end
+	end
+	return total
+end
+
+-- Punkte in einer Kategorie für Mog Battles
+function Logic.catScore(levels, cat, rebirths)
+	local total = 0
+	for _, u in ipairs(Config.Upgrades) do
+		if u.cat == cat then
+			total = total + ((levels and levels[u.id]) or 0) * u.glow
+		end
+	end
+	return total * (1 + (rebirths or 0) * 0.2)
+end
+
+-- Titel-Index zum Glow-Score
+function Logic.titleIndex(glow)
+	local idx = 1
+	for i, t in ipairs(Config.Titles) do
+		if glow >= t.glow then
+			idx = i
+		end
+	end
+	return idx
+end
+
+----------------------------------------------------------------------------
+-- Rebirth & Perks
+----------------------------------------------------------------------------
+function Logic.rebirthCost(r)
+	return Config.Rebirth.baseCost * Config.Rebirth.growth ^ r
+end
+function Logic.rebirthMult(r)
+	return 1 + r * Config.Rebirth.multPer
+end
+function Logic.rebirthPointsFor(newRebirthCount)
+	return 1 + math.floor(newRebirthCount / 5)
+end
+function Logic.perkLevel(data, id)
+	return (data.perks and data.perks[id]) or 0
+end
+function Logic.perkCost(perk, level)
+	return perk.baseCost + perk.costStep * level
+end
+
+----------------------------------------------------------------------------
+-- Pets
+----------------------------------------------------------------------------
+function Logic.petBoost(pet)
+	local def = Logic.petById[pet.id]
+	if not def then return 0 end
+	local tier = Config.PetTiers[pet.tier or 1] or Config.PetTiers[1]
+	return def.boost * tier.mult
+end
+
+function Logic.petMult(data)
+	local total = 0
+	for _, pet in ipairs(data.pets or {}) do
+		if pet.eq then
+			total = total + Logic.petBoost(pet)
+		end
+	end
+	return 1 + total
+end
+
+function Logic.petSlots(data)
+	return Config.BASE_PET_SLOTS + Logic.perkLevel(data, "petslot")
+end
+
+function Logic.equippedCount(data)
+	local n = 0
+	for _, pet in ipairs(data.pets or {}) do
+		if pet.eq then n = n + 1 end
+	end
+	return n
+end
+
+----------------------------------------------------------------------------
+-- Tränke
+----------------------------------------------------------------------------
+function Logic.potionActive(data, id, now)
+	local untilTime = data.potions and data.potions[id]
+	return untilTime and untilTime > now
+end
+
+function Logic.potionFactor(data, field, now)
+	local f = 1
+	for _, p in ipairs(Config.Potions) do
+		if p[field] and Logic.potionActive(data, p.id, now) then
+			f = f * p[field]
+		end
+	end
+	return f
+end
+
+function Logic.luck(data, now)
+	return (1 + Logic.perkLevel(data, "luck") * 0.1) * Logic.potionFactor(data, "luck", now)
+end
+
+----------------------------------------------------------------------------
+-- Gesamtwerte
+----------------------------------------------------------------------------
+function Logic.worldMult(index)
+	local w = Config.Worlds[index] or Config.Worlds[1]
+	return w.mult
+end
+
+-- Multiplikator auf alle Aura
+function Logic.multiplier(data, worldIndex, now)
+	return Logic.worldMult(worldIndex) * Logic.rebirthMult(data.rebirths or 0) * Logic.petMult(data)
+		* Logic.potionFactor(data, "aura", now)
+end
+
+function Logic.aps(data, worldIndex, now)
+	return Logic.baseAps(data.levels) * Logic.multiplier(data, worldIndex, now)
+end
+
+function Logic.clickValue(data, worldIndex, now)
+	local base = 1 + Logic.clickBonus(data.levels) + Logic.baseAps(data.levels) * 0.05
+	return base * Logic.multiplier(data, worldIndex, now) * Logic.potionFactor(data, "click", now)
+end
+
+-- Glow-Power = Wert für die globale Rangliste
+function Logic.glowPower(data)
+	return math.floor(Logic.baseGlow(data.levels) * (1 + (data.rebirths or 0) * 0.25) * Logic.petMult(data))
+end
+
+function Logic.worldUnlocked(data, index)
+	return index == 1 or (data.worlds and data.worlds[tostring(index)] == true)
+end
+
+return Logic
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX00000003"><Properties><string name="Name">Util</string><ProtectedString name="Source"><![CDATA[--[[
+	UTIL – kleine Hilfsfunktionen (Server & Client)
+]]
+
+local Util = {}
+
+local SUFFIXES = { "", " Tsd.", " Mio.", " Mrd.", " Bio.", " Brd.", " Trill.", " Trd.", " Quadr.", " Quadrd.",
+	" Quint.", " Quintd.", " Sext.", " Sextd.", " Sept.", " Septd.", " Okt.", " Oktd.", " Non.", " Nond.", " Dez." }
+
+-- 12345 -> "12.345"
+local function withDots(n)
+	local s = tostring(math.floor(n))
+	local out = string.reverse((string.gsub(string.reverse(s), "(%d%d%d)", "%1.")))
+	if string.sub(out, 1, 1) == "." then
+		out = string.sub(out, 2)
+	end
+	return out
+end
+
+-- "12,50" -> "12,5" ; "3,00" -> "3"
+local function trimDecimals(s)
+	if string.find(s, ",", 1, true) then
+		s = string.gsub(s, "0+$", "")
+		s = string.gsub(s, ",$", "")
+	end
+	return s
+end
+
+-- Große Zahlen hübsch formatieren (deutsche Schreibweise)
+function Util.format(n)
+	n = tonumber(n) or 0
+	if n ~= n then return "0" end
+	if n == math.huge then return "∞" end
+	if n < 0 then return "-" .. Util.format(-n) end
+	if n < 10 then
+		return trimDecimals((string.gsub(string.format("%.1f", n), "%.", ",")))
+	end
+	if n < 100000 then
+		return withDots(n)
+	end
+	local i = 1
+	while n >= 1000 and i < #SUFFIXES do
+		n = n / 1000
+		i = i + 1
+	end
+	local s
+	if n < 100 then
+		s = string.format("%.2f", n)
+	else
+		s = string.format("%.1f", n)
+	end
+	s = string.gsub(s, "%.", ",")
+	return trimDecimals(s) .. SUFFIXES[i]
+end
+
+-- Sekunden -> "1 Std. 5 Min." / "45 s"
+function Util.formatTime(sec)
+	sec = math.max(0, math.floor(sec))
+	if sec < 60 then return sec .. " s" end
+	local m = math.floor(sec / 60)
+	if m < 60 then return m .. " Min. " .. (sec % 60) .. " s" end
+	local h = math.floor(m / 60)
+	return h .. " Std. " .. (m % 60) .. " Min."
+end
+
+-- Multiplikator schön: 2.5 -> "x2,5"
+function Util.formatMult(n)
+	return "x" .. Util.format(n)
+end
+
+-- Prozent: 0.25 -> "+25 %"
+function Util.formatPercent(n)
+	return "+" .. Util.format(n * 100) .. " %"
+end
+
+-- flache Kopie einer Liste
+function Util.copy(list)
+	local out = {}
+	for i, v in ipairs(list) do
+		out[i] = v
+	end
+	return out
+end
+
+-- Liste zufällig mischen
+function Util.shuffle(list, rng)
+	for i = #list, 2, -1 do
+		local j = rng and rng:NextInteger(1, i) or math.random(1, i)
+		list[i], list[j] = list[j], list[i]
+	end
+	return list
+end
+
+return Util
+]]></ProtectedString></Properties></Item>
+</Item>
+</Item>
+<Item class="ServerScriptService" referent="RBX00000010"><Properties><string name="Name">ServerScriptService</string></Properties><Item class="Script" referent="RBX00000006"><Properties><string name="Name">Main</string><ProtectedString name="Source"><![CDATA[--[[
+	MAIN – startet das Spiel auf dem Server.
+	Reihenfolge: Remotes → Karte bauen → Systeme starten → Spieler laden.
+]]
+
+local Players = game:GetService("Players")
+
+local Modules = script.Parent:WaitForChild("Modules")
+local Remotes = require(Modules.Remotes)
+local DataService = require(Modules.DataService)
+local MapBuilder = require(Modules.MapBuilder)
+local GameService = require(Modules.GameService)
+local PetService = require(Modules.PetService)
+local BattleService = require(Modules.BattleService)
+local LeaderboardService = require(Modules.LeaderboardService)
+require(Modules.RewardService)
+
+-- 1) Karte mit allen 8 Welten bauen
+MapBuilder.build()
+
+-- 2) Geschenkbox-Stände verbinden
+for _, entry in ipairs(MapBuilder.eggPrompts) do
+	entry.prompt.Triggered:Connect(function(player)
+		PetService.hatch(player, entry.egg.index, entry.count, false)
+	end)
+end
+
+-- 3) Portale verbinden: freigeschaltet → reisen, sonst Welten-Menü öffnen
+for _, entry in ipairs(MapBuilder.portals) do
+	entry.prompt.Triggered:Connect(function(player)
+		local data = DataService.get(player)
+		if not data then return end
+		local Logic = require(game:GetService("ReplicatedStorage").Shared.Logic)
+		if Logic.worldUnlocked(data, entry.target) then
+			GameService.teleport(player, entry.target)
+		else
+			Remotes.OpenMenu:FireClient(player, "worlds")
+		end
+	end)
+end
+
+-- 4) Mog Battles & Rangliste starten
+BattleService.init(MapBuilder.npcs)
+LeaderboardService.init(MapBuilder.boardRows)
+
+-- 5) Spieler
+Players.PlayerAdded:Connect(GameService.playerAdded)
+for _, player in ipairs(Players:GetPlayers()) do
+	task.spawn(GameService.playerAdded, player)
+end
+Players.PlayerRemoving:Connect(function(player)
+	DataService.release(player)
+end)
+
+-- 6) Jede Sekunde Aura verteilen
+GameService.start()
+
+print("[Looksmaxxer 3000] Server gestartet – viel Spaß beim Glow-Up! ✨")
+]]></ProtectedString></Properties></Item>
+<Item class="Folder" referent="RBX0000000F"><Properties><string name="Name">Modules</string></Properties><Item class="ModuleScript" referent="RBX00000007"><Properties><string name="Name">BattleService</string><ProtectedString name="Source"><![CDATA[--[[
+	BATTLESERVICE – Mog Battles
+	• gegen andere Spieler (Anfrage → Annehmen/Ablehnen)
+	• gegen den Rivalen und den Boss jeder Welt
+	• gegen Endboss LEON (mit Chance auf das geheime Pet)
+
+	Ablauf: 5 zufällige Kategorien, in jeder werden die Punkte verglichen
+	(mit ±25 % Glück). Wer 3 Runden gewinnt, moggt.
+]]
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local Config = require(Shared:WaitForChild("Config"))
+local Logic = require(Shared:WaitForChild("Logic"))
+local Util = require(Shared:WaitForChild("Util"))
+local Remotes = require(script.Parent.Remotes)
+local DataService = require(script.Parent.DataService)
+local GameService = require(script.Parent.GameService)
+local PetService = require(script.Parent.PetService)
+
+local BattleService = {}
+local rng = Random.new()
+local cooldowns = {}   -- [player] = { [key] = Zeitpunkt }
+local pending = {}     -- [Herausgeforderter] = { from = Spieler, t = Zeit }
+
+local function onCooldown(player, key, seconds)
+	cooldowns[player] = cooldowns[player] or {}
+	local last = cooldowns[player][key]
+	local now = os.clock()
+	if last and now - last < seconds then
+		return math.ceil(seconds - (now - last))
+	end
+	return nil
+end
+local function setCooldown(player, key)
+	cooldowns[player] = cooldowns[player] or {}
+	cooldowns[player][key] = os.clock()
+end
+
+-- Kämpfer-Daten
+local function playerFighter(player)
+	local data = DataService.get(player)
+	if not data then return nil end
+	return { name = player.DisplayName, levels = data.levels, rebirths = data.rebirths }
+end
+
+local function npcFighter(def)
+	local levels = {}
+	for _, u in ipairs(Config.Upgrades) do
+		levels[u.id] = def.level
+	end
+	return { name = def.name, levels = levels, rebirths = def.rebirths }
+end
+
+-- Den Kampf ausrechnen
+function BattleService.simulate(A, B)
+	local cats = Util.shuffle(Util.copy(Config.Categories), rng)
+	local rounds, wins = {}, 0
+	for i = 1, 5 do
+		local c = cats[i]
+		local a = Logic.catScore(A.levels, c.id, A.rebirths) * rng:NextNumber(0.75, 1.25) + rng:NextNumber(0, 4)
+		local b = Logic.catScore(B.levels, c.id, B.rebirths) * rng:NextNumber(0.75, 1.25) + rng:NextNumber(0, 4)
+		if a > b then wins = wins + 1 end
+		table.insert(rounds, { cat = c.id, a = a, b = b })
+	end
+	return rounds, wins, wins >= 3
+end
+
+-- Runden aus Sicht des Gegners umdrehen
+local function flip(rounds)
+	local out = {}
+	for i, r in ipairs(rounds) do
+		out[i] = { cat = r.cat, a = r.b, b = r.a }
+	end
+	return out
+end
+
+----------------------------------------------------------------------------
+-- Kampf gegen NPCs (Rivalen & Bosse)
+----------------------------------------------------------------------------
+function BattleService.fightNPC(player, entry)
+	local data = DataService.get(player)
+	if not data then return end
+	local def, world, isBoss = entry.def, entry.world, entry.isBoss
+	if not Logic.worldUnlocked(data, world) then return end
+	local key = (isBoss and "boss" or "rival") .. world
+	local wait = onCooldown(player, key, isBoss and Config.BOSS_COOLDOWN or Config.RIVAL_COOLDOWN)
+	if wait then
+		GameService.notify(player, "⏳ Verschnaufpause", def.name .. " erholt sich noch " .. wait .. " s.", "")
+		return
+	end
+	setCooldown(player, key)
+
+	local me = playerFighter(player)
+	local rounds, wins, won = BattleService.simulate(me, npcFighter(def))
+	local now = os.time()
+	local aps = math.max(Logic.aps(data, GameService.currentWorld(player), now), 1)
+	local reward = { aura = 0, cash = 0 }
+	local special = nil
+	local text
+
+	if won then
+		data.mogWins = data.mogWins + 1
+		if isBoss then
+			data.bossWins = data.bossWins + 1
+			reward.aura = math.max(500, aps * 300)
+			reward.cash = def.final and 100000 or 200 * world * world
+			text = def.final and "Die ganze Stadt rastet aus. Leon setzt wortlos seine Sonnenbrille auf und geht."
+				or string.format(Config.MogWin[rng:NextInteger(1, #Config.MogWin)], def.name)
+		else
+			reward.aura = math.max(100, aps * 60)
+			reward.cash = 25 * world * world
+			text = string.format(Config.MogWin[rng:NextInteger(1, #Config.MogWin)], def.name)
+		end
+		GameService.addAura(data, reward.aura)
+		data.cash = data.cash + reward.cash
+	else
+		data.mogLosses = data.mogLosses + 1
+		text = def.final and "Leon hat dich nicht mal angeschaut – und trotzdem gewonnen."
+			or string.format(Config.MogLose[rng:NextInteger(1, #Config.MogLose)], def.name)
+	end
+
+	Remotes.BattleResult:FireClient(player, {
+		opponent = def.name, isBoss = isBoss, final = def.final == true,
+		taunt = isBoss and Config.BossTaunts[rng:NextInteger(1, #Config.BossTaunts)] or nil,
+		rounds = rounds, wins = wins, won = won, reward = reward, text = text,
+	})
+
+	-- Belohnungen für Boss-Siege: eine kostenlose Box der Welt (+ Chance auf Leons Goldfisch)
+	if won and isBoss then
+		task.delay(6, function()
+			if not player.Parent then return end
+			if def.final and rng:NextNumber() < Config.SECRET_CHANCE then
+				PetService.givePet(player, Config.SECRET_PET)
+				PetService.announce(player.DisplayName .. " hat LEON besiegt und das GEHEIME Pet 🐠 Leons Goldfisch erbeutet!")
+			else
+				PetService.hatch(player, world, 1, true)
+			end
+		end)
+	end
+	GameService.sendFull(player)
+end
+
+----------------------------------------------------------------------------
+-- Spieler gegen Spieler
+----------------------------------------------------------------------------
+local function addPrompt(player, char)
+	local hrp = char:WaitForChild("HumanoidRootPart", 10)
+	if not hrp then return end
+	local old = hrp:FindFirstChild("MogPrompt")
+	if old then old:Destroy() end
+	local pr = Instance.new("ProximityPrompt")
+	pr.Name = "MogPrompt"
+	pr.ActionText = "Mog Battle"
+	pr.ObjectText = player.DisplayName
+	pr.HoldDuration = 0.5
+	pr.MaxActivationDistance = 12
+	pr.RequiresLineOfSight = false
+	pr.Parent = hrp
+	pr.Triggered:Connect(function(challenger)
+		if challenger == player then return end
+		BattleService.challenge(challenger, player)
+	end)
+end
+
+function BattleService.challenge(challenger, target)
+	if not DataService.get(challenger) or not DataService.get(target) then return end
+	local wait = onCooldown(challenger, "pvp" .. target.UserId, Config.PVP_COOLDOWN)
+	if wait then
+		GameService.notify(challenger, "⏳ Kurz warten", "Du kannst " .. target.DisplayName .. " in " .. wait .. " s wieder herausfordern.", "")
+		return
+	end
+	setCooldown(challenger, "pvp" .. target.UserId)
+	pending[target] = { from = challenger, t = os.clock() }
+	Remotes.BattleRequest:FireClient(target, challenger.DisplayName, challenger.UserId)
+	GameService.notify(challenger, "⚔️ Herausforderung gesendet", target.DisplayName .. " muss noch annehmen …", "")
+end
+
+Remotes.BattleRespond.OnServerEvent:Connect(function(target, accept, fromUserId)
+	local req = pending[target]
+	pending[target] = nil
+	if not req or not req.from.Parent or req.from.UserId ~= fromUserId then return end
+	if os.clock() - req.t > 20 then return end
+	local challenger = req.from
+	if not accept then
+		GameService.notify(challenger, "🙅 Abgelehnt", target.DisplayName .. " hat sich nicht getraut.", "bad")
+		return
+	end
+	local A, B = playerFighter(challenger), playerFighter(target)
+	if not A or not B then return end
+	local rounds, wins, won = BattleService.simulate(A, B)
+	local winner = won and challenger or target
+	local loser = won and target or challenger
+	local wd, ld = DataService.get(winner), DataService.get(loser)
+	local reward = { aura = math.max(100, Logic.aps(wd, GameService.currentWorld(winner), os.time()) * 60), cash = 50 }
+	GameService.addAura(wd, reward.aura)
+	wd.cash = wd.cash + reward.cash
+	wd.mogWins = wd.mogWins + 1
+	ld.mogLosses = ld.mogLosses + 1
+
+	Remotes.BattleResult:FireClient(challenger, {
+		opponent = target.DisplayName, rounds = rounds, wins = wins, won = won,
+		reward = won and reward or { aura = 0, cash = 0 },
+		text = won and string.format(Config.MogWin[1], target.DisplayName) or string.format(Config.MogLose[2], target.DisplayName),
+	})
+	Remotes.BattleResult:FireClient(target, {
+		opponent = challenger.DisplayName, rounds = flip(rounds), wins = 5 - wins, won = not won,
+		reward = (not won) and reward or { aura = 0, cash = 0 },
+		text = (not won) and string.format(Config.MogWin[1], challenger.DisplayName) or string.format(Config.MogLose[2], challenger.DisplayName),
+	})
+	if wins == 5 or wins == 0 then
+		PetService.announce(winner.DisplayName .. " hat " .. loser.DisplayName .. " mit 5:0 komplett gemoggt! 💀")
+	end
+	GameService.sendFull(challenger)
+	GameService.sendFull(target)
+end)
+
+----------------------------------------------------------------------------
+-- Start
+----------------------------------------------------------------------------
+function BattleService.init(npcEntries)
+	for _, entry in ipairs(npcEntries) do
+		entry.prompt.Triggered:Connect(function(player)
+			BattleService.fightNPC(player, entry)
+		end)
+	end
+	table.insert(GameService.characterHooks, addPrompt)
+end
+
+Players.PlayerRemoving:Connect(function(player)
+	cooldowns[player] = nil
+	pending[player] = nil
+end)
+
+return BattleService
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX00000008"><Properties><string name="Name">DataService</string><ProtectedString name="Source"><![CDATA[--[[
+	DATASERVICE – lädt und speichert den Spielstand jedes Spielers (DataStore).
+
+	Wichtig: Damit das Speichern in Roblox Studio funktioniert, muss das Spiel
+	veröffentlicht sein und unter Game Settings > Security
+	"Enable Studio Access to API Services" eingeschaltet sein.
+]]
+
+local DataStoreService = game:GetService("DataStoreService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Config = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Config"))
+
+local DataService = {}
+
+local store = nil
+local okStore, errStore = pcall(function()
+	store = DataStoreService:GetDataStore(Config.SAVE_KEY)
+end)
+if not okStore then
+	warn("[Looksmaxxer] DataStore nicht verfügbar – es wird NICHT gespeichert:", errStore)
+end
+
+local profiles = {}   -- [player] = Spielstand
+local loadedOk = {}   -- [player] = true, wenn erfolgreich geladen (nur dann speichern!)
+
+-- So sieht ein neuer Spielstand aus
+local function defaultData()
+	return {
+		version = 1,
+		aura = 0, totalAura = 0, cash = 0, clicks = 0,
+		levels = {},                 -- [upgradeId] = Stufe
+		rebirths = 0, rebirthPoints = 0,
+		perks = {},                  -- [perkId] = Stufe
+		worlds = { ["1"] = true },   -- freigeschaltete Welten
+		pets = {},                   -- Liste: { uid, id, tier, eq }
+		nextPetId = 1,
+		index = {},                  -- Sammelbuch: [petId] = true
+		eggsOpened = 0, pity = 0,
+		mogWins = 0, mogLosses = 0, bossWins = 0,
+		bestTitle = 1,
+		daily = { last = 0, streak = 0 },
+		codes = {},                  -- eingelöste Codes
+		potions = {},                -- [potionId] = Ende (os.time)
+		settings = { music = true, sfx = true },
+		lastOnline = 0,
+	}
+end
+DataService.defaultData = defaultData
+
+-- Fehlende Felder ergänzen (wenn das Spiel neue Funktionen bekommt)
+local function reconcile(data)
+	local def = defaultData()
+	for k, v in pairs(def) do
+		if data[k] == nil then
+			data[k] = v
+		elseif type(v) == "table" and type(data[k]) == "table" then
+			for k2, v2 in pairs(v) do
+				if data[k][k2] == nil then
+					data[k][k2] = v2
+				end
+			end
+		end
+	end
+	return data
+end
+
+function DataService.load(player)
+	local data = nil
+	local key = "u_" .. player.UserId
+	if store then
+		for attempt = 1, 3 do
+			local ok, result = pcall(function()
+				return store:GetAsync(key)
+			end)
+			if ok then
+				data = result
+				loadedOk[player] = true
+				break
+			end
+			warn("[Looksmaxxer] Laden fehlgeschlagen (Versuch " .. attempt .. "):", result)
+			task.wait(2)
+		end
+	end
+	if type(data) ~= "table" then
+		data = defaultData()
+	end
+	profiles[player] = reconcile(data)
+	return profiles[player], loadedOk[player] == true
+end
+
+function DataService.get(player)
+	return profiles[player]
+end
+
+function DataService.isSaving(player)
+	return store ~= nil and loadedOk[player] == true
+end
+
+function DataService.save(player)
+	local data = profiles[player]
+	if not data or not store or not loadedOk[player] then
+		return
+	end
+	data.lastOnline = os.time()
+	local ok, err = pcall(function()
+		store:UpdateAsync("u_" .. player.UserId, function()
+			return data
+		end)
+	end)
+	if not ok then
+		warn("[Looksmaxxer] Speichern fehlgeschlagen:", err)
+	end
+end
+
+function DataService.release(player)
+	DataService.save(player)
+	profiles[player] = nil
+	loadedOk[player] = nil
+end
+
+function DataService.all()
+	return profiles
+end
+
+-- Automatisch alle 2 Minuten speichern
+task.spawn(function()
+	while true do
+		task.wait(120)
+		for player in pairs(profiles) do
+			task.spawn(DataService.save, player)
+		end
+	end
+end)
+
+-- Beim Herunterfahren des Servers alles speichern
+game:BindToClose(function()
+	local pending = 0
+	for player in pairs(profiles) do
+		pending = pending + 1
+		task.spawn(function()
+			DataService.save(player)
+			pending = pending - 1
+		end)
+	end
+	local start = os.clock()
+	while pending > 0 and os.clock() - start < 25 do
+		task.wait(0.2)
+	end
+end)
+
+return DataService
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX00000009"><Properties><string name="Name">GameService</string><ProtectedString name="Source"><![CDATA[--[[
+	GAMESERVICE – das Herzstück auf dem Server:
+	Klicks, Upgrades, Aura pro Sekunde, Rebirth, Welten, Titel,
+	Namensschild & Aussehen des Avatars, Offline-Verdienst.
+]]
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local Config = require(Shared:WaitForChild("Config"))
+local Logic = require(Shared:WaitForChild("Logic"))
+local Util = require(Shared:WaitForChild("Util"))
+local Remotes = require(script.Parent.Remotes)
+local DataService = require(script.Parent.DataService)
+
+local GameService = {}
+GameService.characterHooks = {}   -- andere Module können sich hier für "Charakter erschienen" eintragen
+
+----------------------------------------------------------------------------
+-- Hilfsfunktionen
+----------------------------------------------------------------------------
+function GameService.worldOrigin(index)
+	return Vector3.new((index - 1) * Config.WORLD_SPACING, 0, 0)
+end
+
+function GameService.worldIndexAt(x)
+	local i = math.floor((x + Config.WORLD_SPACING / 2) / Config.WORLD_SPACING) + 1
+	return math.clamp(i, 1, #Config.Worlds)
+end
+
+function GameService.currentWorld(player)
+	return player:GetAttribute("World") or 1
+end
+
+function GameService.notify(player, title, text, kind)
+	Remotes.Notify:FireClient(player, title, text, kind or "")
+end
+
+function GameService.addAura(data, amount)
+	data.aura = data.aura + amount
+	data.totalAura = data.totalAura + amount
+end
+
+-- Alles, was der Spieler zum Anzeigen braucht
+function GameService.snapshot(player, data)
+	local now = os.time()
+	local w = GameService.currentWorld(player)
+	return {
+		data = data,
+		world = w,
+		aps = Logic.aps(data, w, now),
+		click = Logic.clickValue(data, w, now),
+		glow = Logic.baseGlow(data.levels),
+		glowPower = Logic.glowPower(data),
+		mult = Logic.multiplier(data, w, now),
+		petMult = Logic.petMult(data),
+		petSlots = Logic.petSlots(data),
+		luck = Logic.luck(data, now),
+		rebirthCost = Logic.rebirthCost(data.rebirths),
+		serverTime = now,
+		saving = DataService.isSaving(player),
+	}
+end
+
+function GameService.sendFull(player)
+	local data = DataService.get(player)
+	if data then
+		Remotes.Data:FireClient(player, "full", GameService.snapshot(player, data))
+	end
+end
+
+function GameService.sendLight(player)
+	local data = DataService.get(player)
+	if not data then return end
+	local now = os.time()
+	local w = GameService.currentWorld(player)
+	Remotes.Data:FireClient(player, "light", {
+		aura = data.aura, cash = data.cash, totalAura = data.totalAura,
+		aps = Logic.aps(data, w, now), click = Logic.clickValue(data, w, now),
+		mult = Logic.multiplier(data, w, now), world = w, serverTime = now,
+	})
+end
+
+----------------------------------------------------------------------------
+-- Leaderstats (Spielerliste oben rechts)
+----------------------------------------------------------------------------
+local function setupLeaderstats(player, data)
+	local ls = Instance.new("Folder")
+	ls.Name = "leaderstats"
+	local glow = Instance.new("IntValue")
+	glow.Name = "✨ Glow"
+	glow.Parent = ls
+	local reb = Instance.new("IntValue")
+	reb.Name = "♻️ Rebirths"
+	reb.Parent = ls
+	ls.Parent = player
+end
+
+local function updateLeaderstats(player, data)
+	local ls = player:FindFirstChild("leaderstats")
+	if not ls then return end
+	local glow = ls:FindFirstChild("✨ Glow")
+	local reb = ls:FindFirstChild("♻️ Rebirths")
+	if glow then glow.Value = math.floor(Logic.baseGlow(data.levels)) end
+	if reb then reb.Value = data.rebirths end
+end
+
+----------------------------------------------------------------------------
+-- Aussehen: Namensschild, Glitzer-Aura, breitere Schultern
+----------------------------------------------------------------------------
+local function makeLabel(parent, name, posY, height, color, bold)
+	local l = Instance.new("TextLabel")
+	l.Name = name
+	l.BackgroundTransparency = 1
+	l.Size = UDim2.new(1, 0, height, 0)
+	l.Position = UDim2.new(0, 0, posY, 0)
+	l.TextScaled = true
+	l.Font = bold and Enum.Font.FredokaOne or Enum.Font.GothamBold
+	l.TextColor3 = color
+	l.TextStrokeTransparency = 0.4
+	l.Text = ""
+	l.Parent = parent
+	return l
+end
+
+local function ensureNametag(head)
+	local tag = head:FindFirstChild("Nametag")
+	if tag then return tag end
+	tag = Instance.new("BillboardGui")
+	tag.Name = "Nametag"
+	tag.Size = UDim2.new(7, 0, 2.2, 0)
+	tag.StudsOffset = Vector3.new(0, 2.8, 0)
+	tag.MaxDistance = 120
+	tag.AlwaysOnTop = false
+	tag.Parent = head
+	makeLabel(tag, "TitleLabel", 0, 0.32, Color3.fromRGB(255, 120, 220), false)
+	makeLabel(tag, "NameLabel", 0.32, 0.4, Color3.new(1, 1, 1), true)
+	makeLabel(tag, "InfoLabel", 0.72, 0.28, Color3.fromRGB(255, 209, 102), false)
+	return tag
+end
+
+function GameService.refreshCharacter(player)
+	local data = DataService.get(player)
+	local char = player.Character
+	if not data or not char then return end
+	local hum = char:FindFirstChildOfClass("Humanoid")
+	local head = char:FindFirstChild("Head")
+	local hrp = char:FindFirstChild("HumanoidRootPart")
+	if not hum or not head or not hrp then return end
+
+	local glow = Logic.baseGlow(data.levels)
+	hum.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+	hum.WalkSpeed = 16 + 2 * Logic.perkLevel(data, "speed")
+
+	-- Namensschild mit Titel
+	local tag = ensureNametag(head)
+	tag.TitleLabel.Text = Config.Titles[Logic.titleIndex(glow)].title
+	tag.NameLabel.Text = player.DisplayName
+	tag.InfoLabel.Text = "✨ " .. Util.format(glow) .. " Glow  ·  ♻️ " .. data.rebirths
+
+	-- Breitere Schultern durch Fitness (funktioniert nur mit R15-Avataren)
+	local fit = Logic.catLevels(data.levels, "fit")
+	local width = 1 + math.min(0.45, fit / 250)
+	pcall(function()
+		local ws = hum:FindFirstChild("BodyWidthScale")
+		local ds = hum:FindFirstChild("BodyDepthScale")
+		if ws then ws.Value = width end
+		if ds then ds.Value = 1 + (width - 1) * 0.7 end
+	end)
+
+	-- Glitzer-Aura (stärker mit Glow, Farbe wechselt mit Rebirths)
+	local aura = hrp:FindFirstChild("GlowAura")
+	if not aura then
+		aura = Instance.new("ParticleEmitter")
+		aura.Name = "GlowAura"
+		aura.LightEmission = 1
+		aura.Lifetime = NumberRange.new(0.8, 1.6)
+		aura.Speed = NumberRange.new(1, 3)
+		aura.SpreadAngle = Vector2.new(180, 180)
+		aura.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.5), NumberSequenceKeypoint.new(1, 0) })
+		aura.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.1), NumberSequenceKeypoint.new(1, 1) })
+		aura.Parent = hrp
+	end
+	local colorIndex = (data.rebirths % #Config.AuraColors) + 1
+	aura.Color = ColorSequence.new(Config.AuraColors[colorIndex])
+	aura.Rate = math.clamp(glow / 80, 0, 45)
+	aura.Enabled = glow >= 40
+end
+
+-- Nach Änderungen an den Upgrades: Titel prüfen, alles aktualisieren
+function GameService.afterLevelsChanged(player, data)
+	local glow = Logic.baseGlow(data.levels)
+	local idx = Logic.titleIndex(glow)
+	if idx > data.bestTitle then
+		data.bestTitle = idx
+		local t = Config.Titles[idx]
+		GameService.notify(player, "🏆 Neuer Titel: " .. t.title .. "!", t.text, "title")
+	end
+	updateLeaderstats(player, data)
+	GameService.refreshCharacter(player)
+	GameService.sendFull(player)
+end
+
+----------------------------------------------------------------------------
+-- Welten & Teleport
+----------------------------------------------------------------------------
+function GameService.teleport(player, index)
+	local char = player.Character
+	if not char then return end
+	local origin = GameService.worldOrigin(index)
+	char:PivotTo(CFrame.new(origin + Vector3.new(0, 5, 22)))
+	player:SetAttribute("World", index)
+	local w = Config.Worlds[index]
+	GameService.notify(player, w.emoji .. " " .. w.name, "Aura-Multiplikator dieser Welt: x" .. Util.format(w.mult), "world")
+	GameService.sendFull(player)
+end
+
+-- Welt freischalten (Aura bezahlen) oder hinreisen
+function GameService.tryWorld(player, index)
+	local data = DataService.get(player)
+	local w = Config.Worlds[index]
+	if not data or not w then return end
+	if Logic.worldUnlocked(data, index) then
+		GameService.teleport(player, index)
+		return
+	end
+	if not Logic.worldUnlocked(data, index - 1) then
+		GameService.notify(player, "🔒 Gesperrt", "Schalte zuerst " .. Config.Worlds[index - 1].name .. " frei.", "bad")
+		return
+	end
+	if data.rebirths < w.rebirths then
+		GameService.notify(player, "🔒 Mehr Rebirths nötig", w.name .. " braucht " .. w.rebirths .. " Rebirths.", "bad")
+		return
+	end
+	if data.aura < w.cost then
+		GameService.notify(player, "💸 Zu wenig Aura", w.name .. " kostet " .. Util.format(w.cost) .. " Aura.", "bad")
+		return
+	end
+	data.aura = data.aura - w.cost
+	data.worlds[tostring(index)] = true
+	GameService.notify(player, "🌍 Neue Welt freigeschaltet!", w.emoji .. " " .. w.name .. " – x" .. Util.format(w.mult) .. " Aura!", "title")
+	GameService.teleport(player, index)
+end
+
+----------------------------------------------------------------------------
+-- Spieler betritt / verlässt das Spiel
+----------------------------------------------------------------------------
+local function onCharacterAdded(player, char)
+	local hum = char:WaitForChild("Humanoid", 10)
+	char:WaitForChild("HumanoidRootPart", 10)
+	char:WaitForChild("Head", 10)
+	if not hum then return end
+	player:SetAttribute("World", 1)
+	GameService.refreshCharacter(player)
+	for _, hook in ipairs(GameService.characterHooks) do
+		task.spawn(hook, player, char)
+	end
+end
+
+local function offlineEarnings(player, data)
+	if data.lastOnline <= 0 then return end
+	local hours = Config.OFFLINE_HOURS + 2 * Logic.perkLevel(data, "offline")
+	local secs = math.min(hours * 3600, os.time() - data.lastOnline)
+	local aps = Logic.aps(data, 1, os.time())
+	if secs < 60 or aps <= 0 then return end
+	local gain = aps * secs * Config.OFFLINE_RATE
+	GameService.addAura(data, gain)
+	GameService.notify(player, "😴 Beauty Sleep",
+		"Du warst " .. Util.formatTime(secs) .. " weg und hast im Schlaf " .. Util.format(gain) .. " Aura gesammelt!", "offline")
+end
+
+function GameService.playerAdded(player)
+	local data, saving = DataService.load(player)
+	if not player.Parent then return end   -- schon wieder weg
+	setupLeaderstats(player, data)
+	updateLeaderstats(player, data)
+	player:SetAttribute("World", 1)
+	player:SetAttribute("Loaded", true)
+
+	player.CharacterAdded:Connect(function(char)
+		onCharacterAdded(player, char)
+	end)
+	player.CharacterAppearanceLoaded:Connect(function()
+		task.wait(0.5)
+		GameService.refreshCharacter(player)
+	end)
+	if player.Character then
+		task.spawn(onCharacterAdded, player, player.Character)
+	end
+
+	GameService.sendFull(player)
+	task.delay(3, function()
+		if not player.Parent then return end
+		if not saving then
+			GameService.notify(player, "⚠️ Speichern aus",
+				"Der Spielstand kann gerade nicht gespeichert werden (in Studio: API-Zugriff aktivieren).", "bad")
+		end
+		offlineEarnings(player, data)
+		GameService.sendFull(player)
+	end)
+end
+
+----------------------------------------------------------------------------
+-- Remotes: Klicks, Upgrades, Rebirth, Perks, Welten
+----------------------------------------------------------------------------
+local clickWindow = {}   -- Schutz gegen Auto-Klicker-Programme
+
+Remotes.Click.OnServerEvent:Connect(function(player)
+	local data = DataService.get(player)
+	if not data then return end
+	local now = os.clock()
+	local w = clickWindow[player]
+	if not w or now - w.start >= 1 then
+		w = { start = now, n = 0 }
+		clickWindow[player] = w
+	end
+	w.n = w.n + 1
+	if w.n > 15 then return end   -- mehr als 15 Klicks pro Sekunde wird ignoriert
+	GameService.addAura(data, Logic.clickValue(data, GameService.currentWorld(player), os.time()))
+	data.clicks = data.clicks + 1
+end)
+
+Remotes.BuyUpgrade.OnServerEvent:Connect(function(player, id, amount)
+	local data = DataService.get(player)
+	local u = Logic.upgradeById[id]
+	if not data or not u then return end
+	if amount ~= "max" then
+		amount = math.clamp(math.floor(tonumber(amount) or 1), 1, 100)
+	end
+	local level = Logic.level(data, id)
+	local count, cost = Logic.bulk(u, level, amount, data.aura)
+	if count <= 0 then
+		GameService.notify(player, "✅ Maximal", u.name .. " ist schon auf der höchsten Stufe.", "")
+		return
+	end
+	if cost > data.aura then
+		GameService.notify(player, "💸 Zu wenig Aura", "Dir fehlen noch " .. Util.format(cost - data.aura) .. " Aura.", "bad")
+		return
+	end
+	data.aura = data.aura - cost
+	data.levels[id] = level + count
+	if data.levels[id] >= Config.MAX_LEVEL then
+		GameService.notify(player, u.emoji .. " " .. u.name .. " gemeistert!", "Maximale Stufe erreicht.", "good")
+	end
+	GameService.afterLevelsChanged(player, data)
+end)
+
+Remotes.Rebirth.OnServerEvent:Connect(function(player)
+	local data = DataService.get(player)
+	if not data then return end
+	local cost = Logic.rebirthCost(data.rebirths)
+	if data.aura < cost then
+		GameService.notify(player, "💸 Noch nicht", "Rebirth kostet " .. Util.format(cost) .. " Aura.", "bad")
+		return
+	end
+	data.aura = 0
+	data.levels = {}
+	data.rebirths = data.rebirths + 1
+	local points = Logic.rebirthPointsFor(data.rebirths)
+	data.rebirthPoints = data.rebirthPoints + points
+	GameService.notify(player, "♻️ REBIRTH #" .. data.rebirths .. "!",
+		"Neuer Multiplikator: x" .. Util.format(Logic.rebirthMult(data.rebirths)) .. " · +" .. points .. " Rebirth-Punkte", "rebirth")
+	GameService.afterLevelsChanged(player, data)
+end)
+
+Remotes.BuyPerk.OnServerEvent:Connect(function(player, id)
+	local data = DataService.get(player)
+	local perk = Logic.perkById[id]
+	if not data or not perk then return end
+	local level = Logic.perkLevel(data, id)
+	if level >= perk.max then return end
+	local cost = Logic.perkCost(perk, level)
+	if data.rebirthPoints < cost then
+		GameService.notify(player, "💸 Zu wenig Rebirth-Punkte", "Du brauchst " .. cost .. " Punkte.", "bad")
+		return
+	end
+	data.rebirthPoints = data.rebirthPoints - cost
+	data.perks[id] = level + 1
+	GameService.notify(player, perk.emoji .. " " .. perk.name, "Gekauft! (Stufe " .. (level + 1) .. ")", "good")
+	GameService.refreshCharacter(player)
+	GameService.sendFull(player)
+end)
+
+Remotes.Teleport.OnServerEvent:Connect(function(player, index)
+	index = tonumber(index)
+	if index then GameService.tryWorld(player, index) end
+end)
+Remotes.UnlockWorld.OnServerEvent:Connect(function(player, index)
+	index = tonumber(index)
+	if index then GameService.tryWorld(player, index) end
+end)
+
+Remotes.Setting.OnServerEvent:Connect(function(player, key, value)
+	local data = DataService.get(player)
+	if not data or (key ~= "music" and key ~= "sfx") then return end
+	data.settings[key] = value == true
+end)
+
+----------------------------------------------------------------------------
+-- Die Schleife: jede Sekunde Aura gutschreiben
+----------------------------------------------------------------------------
+function GameService.start()
+	task.spawn(function()
+		while true do
+			task.wait(1)
+			local now = os.time()
+			for _, player in ipairs(Players:GetPlayers()) do
+				local data = DataService.get(player)
+				local char = player.Character
+				local hrp = char and char:FindFirstChild("HumanoidRootPart")
+				if data then
+					-- In welcher Welt steht der Spieler? (Schutz: nur freigeschaltete Welten zählen)
+					if hrp then
+						local idx = GameService.worldIndexAt(hrp.Position.X)
+						if not Logic.worldUnlocked(data, idx) then
+							idx = 1
+							GameService.teleport(player, 1)
+						end
+						player:SetAttribute("World", idx)
+					end
+					local w = GameService.currentWorld(player)
+					GameService.addAura(data, Logic.aps(data, w, now))
+					if Logic.perkLevel(data, "autoclick") > 0 then
+						GameService.addAura(data, Logic.clickValue(data, w, now) * 2)
+					end
+					GameService.sendLight(player)
+				end
+			end
+		end
+	end)
+end
+
+Players.PlayerRemoving:Connect(function(player)
+	clickWindow[player] = nil
+end)
+
+return GameService
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX0000000A"><Properties><string name="Name">LeaderboardService</string><ProtectedString name="Source"><![CDATA[--[[
+	LEADERBOARDSERVICE – globale Rangliste (Top 500) über ALLE Server.
+	Gespeichert wird die "Glow-Power" jedes Spielers in einem OrderedDataStore.
+	Alle 2 Minuten: eigene Werte hochladen, Top 500 neu laden.
+]]
+
+local DataStoreService = game:GetService("DataStoreService")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserService = game:GetService("UserService")
+
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local Config = require(Shared:WaitForChild("Config"))
+local Logic = require(Shared:WaitForChild("Logic"))
+local Util = require(Shared:WaitForChild("Util"))
+local Remotes = require(script.Parent.Remotes)
+local DataService = require(script.Parent.DataService)
+
+local LeaderboardService = {}
+local store = nil
+pcall(function()
+	store = DataStoreService:GetOrderedDataStore(Config.LEADERBOARD_KEY)
+end)
+
+local cache = {}          -- { { rank, userId, name, value } }
+local lastRefresh = 0
+local nameCache = {}
+local boardRows = {}
+
+local function uploadAll()
+	if not store then return end
+	for _, player in ipairs(Players:GetPlayers()) do
+		local data = DataService.get(player)
+		if data and DataService.isSaving(player) then
+			local value = Logic.glowPower(data)
+			if value > 0 then
+				pcall(function()
+					store:SetAsync(tostring(player.UserId), value)
+				end)
+			end
+		end
+	end
+end
+
+local function resolveNames(ids)
+	local missing = {}
+	for _, id in ipairs(ids) do
+		if not nameCache[id] then table.insert(missing, id) end
+	end
+	-- in Paketen von 100 nachschlagen
+	for i = 1, #missing, 100 do
+		local chunk = {}
+		for j = i, math.min(i + 99, #missing) do table.insert(chunk, missing[j]) end
+		local ok, infos = pcall(function()
+			return UserService:GetUserInfosByUserIdsAsync(chunk)
+		end)
+		if ok and infos then
+			for _, info in ipairs(infos) do
+				nameCache[info.Id] = info.DisplayName or info.Username
+			end
+		end
+	end
+end
+
+local function refresh()
+	if not store then return end
+	local ok, pages = pcall(function()
+		return store:GetSortedAsync(false, 100)
+	end)
+	if not ok or not pages then return end
+	local list = {}
+	while true do
+		for _, entry in ipairs(pages:GetCurrentPage()) do
+			table.insert(list, { userId = tonumber(entry.key), value = entry.value })
+			if #list >= Config.LEADERBOARD_SIZE then break end
+		end
+		if #list >= Config.LEADERBOARD_SIZE or pages.IsFinished then break end
+		local okNext = pcall(function() pages:AdvanceToNextPageAsync() end)
+		if not okNext then break end
+	end
+	local ids = {}
+	for _, e in ipairs(list) do table.insert(ids, e.userId) end
+	resolveNames(ids)
+	for i, e in ipairs(list) do
+		e.rank = i
+		e.name = nameCache[e.userId] or ("Spieler " .. tostring(e.userId))
+	end
+	cache = list
+	lastRefresh = os.time()
+
+	-- Tafel in Glow City aktualisieren
+	for r = 1, 10 do
+		local row = boardRows[r]
+		if row then
+			local e = cache[r]
+			local medal = ({ "🥇", "🥈", "🥉" })[r] or (r .. ".")
+			row.Text = e and ("  " .. medal .. "  " .. e.name .. "  <font color='#ffd166'>" .. Util.format(e.value) .. "</font>") or ("  " .. r .. ". –")
+		end
+	end
+end
+
+Remotes.GetLeaderboard.OnServerInvoke = function(player)
+	return { list = cache, updated = lastRefresh, available = store ~= nil }
+end
+
+function LeaderboardService.init(rows)
+	boardRows = rows or {}
+	task.spawn(function()
+		task.wait(10)
+		while true do
+			uploadAll()
+			refresh()
+			task.wait(120)
+		end
+	end)
+end
+
+return LeaderboardService
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX0000000B"><Properties><string name="Name">MapBuilder</string><ProtectedString name="Source"><![CDATA[--[[
+	MAPBUILDER – baut beim Serverstart alle 8 Welten automatisch auf:
+	Boden, Deko je nach Thema, Geschenkbox-Stand, Rivale, Boss, Portale,
+	Ranglisten-Tafel und Info-Tafel.
+
+	Tipp: Du kannst die Karte später in Studio von Hand verschönern.
+	Starte dazu das Spiel (Play), kopiere Workspace > Map, stoppe,
+	füge sie ein und lösche dann den Aufruf von MapBuilder in "Main".
+]]
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local Config = require(Shared:WaitForChild("Config"))
+local Util = require(Shared:WaitForChild("Util"))
+
+local MapBuilder = {}
+MapBuilder.eggPrompts = {}    -- { prompt, egg, count }
+MapBuilder.npcs = {}          -- { prompt, def, world, isBoss }
+MapBuilder.portals = {}       -- { prompt, target }
+MapBuilder.boardRows = {}     -- Textzeilen der Ranglisten-Tafel
+
+local S = Config.WORLD_SIZE
+local HALF = S / 2
+local WHITE = Color3.new(1, 1, 1)
+local currentFolder = nil
+
+----------------------------------------------------------------------------
+-- Bau-Helfer
+----------------------------------------------------------------------------
+local function part(props)
+	local p = Instance.new(props.Class or "Part")
+	p.Anchored = true
+	p.TopSurface = Enum.SurfaceType.Smooth
+	p.BottomSurface = Enum.SurfaceType.Smooth
+	if props.Shape then p.Shape = props.Shape end
+	if props.Size then p.Size = props.Size end
+	for k, v in pairs(props) do
+		if k ~= "Class" and k ~= "Parent" and k ~= "Shape" and k ~= "Size" then
+			p[k] = v
+		end
+	end
+	p.Parent = props.Parent or currentFolder
+	return p
+end
+
+local function textLabel(parent, text, color, font)
+	local l = Instance.new("TextLabel")
+	l.Size = UDim2.new(1, 0, 1, 0)
+	l.BackgroundTransparency = 1
+	l.TextScaled = true
+	l.RichText = true
+	l.Font = font or Enum.Font.FredokaOne
+	l.TextColor3 = color or WHITE
+	l.TextStrokeTransparency = 0.3
+	l.Text = text
+	l.Parent = parent
+	return l
+end
+
+local function billboard(parent, text, w, h, offsetY, color)
+	local bb = Instance.new("BillboardGui")
+	bb.Size = UDim2.new(w, 0, h, 0)
+	bb.StudsOffset = Vector3.new(0, offsetY, 0)
+	bb.MaxDistance = 220
+	bb.LightInfluence = 0
+	bb.Parent = parent
+	local l = textLabel(bb, text, color)
+	return bb, l
+end
+
+local function surfaceSign(p, face, text, bg, fg)
+	local sg = Instance.new("SurfaceGui")
+	sg.Face = face
+	sg.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
+	sg.PixelsPerStud = 30
+	sg.LightInfluence = 0
+	sg.Parent = p
+	local frame = Instance.new("Frame")
+	frame.Size = UDim2.new(1, 0, 1, 0)
+	frame.BackgroundColor3 = bg or Color3.fromRGB(20, 5, 35)
+	frame.BackgroundTransparency = bg and 0 or 1
+	frame.Parent = sg
+	local l = textLabel(frame, text, fg)
+	return sg, l
+end
+
+local function prompt(parent, action, object, hold, key)
+	local pr = Instance.new("ProximityPrompt")
+	pr.ActionText = action
+	pr.ObjectText = object or ""
+	pr.HoldDuration = hold or 0
+	pr.MaxActivationDistance = 14
+	pr.RequiresLineOfSight = false
+	if key then pr.KeyboardKeyCode = key end
+	pr.Parent = parent
+	return pr
+end
+
+-- Plätze, an denen keine Deko stehen soll (relativ zur Weltmitte)
+local RESERVED = {
+	{ 0, 0, 55 }, { 55, -40, 22 }, { -55, -40, 22 }, { 0, -160, 40 },
+	{ 200, 0, 30 }, { -200, 0, 30 }, { 0, 100, 30 }, { -45, 60, 18 }, { 95, -40, 16 },
+}
+local function isFree(x, z, radius)
+	for _, r in ipairs(RESERVED) do
+		local dx, dz = x - r[1], z - r[2]
+		if math.sqrt(dx * dx + dz * dz) < r[3] + radius then
+			return false
+		end
+	end
+	return true
+end
+local function freeSpot(rng, radius, minDist, maxDist)
+	for _ = 1, 60 do
+		local x = rng:NextNumber(-HALF + radius + 5, HALF - radius - 5)
+		local z = rng:NextNumber(-HALF + radius + 5, HALF - radius - 5)
+		local d = math.sqrt(x * x + z * z)
+		if d >= (minDist or 0) and d <= (maxDist or 9999) and isFree(x, z, radius) then
+			return x, z
+		end
+	end
+	return nil
+end
+
+----------------------------------------------------------------------------
+-- Deko-Bausteine
+----------------------------------------------------------------------------
+local function tree(O, x, z, color, scale)
+	scale = scale or 1
+	part({ Size = Vector3.new(2, 10, 2) * scale, CFrame = CFrame.new(O + Vector3.new(x, 5 * scale, z)), Color = Color3.fromRGB(122, 78, 45), Material = Enum.Material.Wood })
+	part({ Shape = Enum.PartType.Ball, Size = Vector3.new(11, 11, 11) * scale, CFrame = CFrame.new(O + Vector3.new(x, 12 * scale, z)), Color = color or Color3.fromRGB(63, 143, 69), Material = Enum.Material.Grass })
+end
+
+local function palm(O, x, z, rng)
+	local tilt = math.rad(rng:NextNumber(-12, 12))
+	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(16, 1.6, 1.6),
+		CFrame = CFrame.new(O + Vector3.new(x, 8, z)) * CFrame.Angles(0, 0, math.rad(90) + tilt), Color = Color3.fromRGB(150, 105, 60), Material = Enum.Material.Wood })
+	for k = 0, 4 do
+		local a = math.rad(k * 72)
+		part({ Size = Vector3.new(1, 0.5, 8), CFrame = CFrame.new(O + Vector3.new(x, 16, z)) * CFrame.Angles(0, a, 0) * CFrame.new(0, 0, -4) * CFrame.Angles(math.rad(-20), 0, 0),
+			Color = Color3.fromRGB(60, 170, 70), Material = Enum.Material.Grass })
+	end
+end
+
+local function lamp(O, x, z)
+	part({ Size = Vector3.new(0.8, 14, 0.8), CFrame = CFrame.new(O + Vector3.new(x, 7, z)), Color = Color3.fromRGB(60, 60, 70), Material = Enum.Material.Metal })
+	local bulb = part({ Shape = Enum.PartType.Ball, Size = Vector3.new(2.2, 2.2, 2.2), CFrame = CFrame.new(O + Vector3.new(x, 14.5, z)), Color = Color3.fromRGB(255, 225, 140), Material = Enum.Material.Neon })
+	local light = Instance.new("PointLight")
+	light.Range = 18
+	light.Brightness = 1.2
+	light.Color = Color3.fromRGB(255, 220, 160)
+	light.Parent = bulb
+end
+
+local BUILDING_COLORS = {
+	Color3.fromRGB(91, 95, 151), Color3.fromRGB(242, 132, 130), Color3.fromRGB(192, 133, 82), Color3.fromRGB(77, 144, 142),
+	Color3.fromRGB(127, 200, 216), Color3.fromRGB(179, 136, 255), Color3.fromRGB(233, 196, 106), Color3.fromRGB(110, 110, 130),
+}
+
+local function building(O, x, z, w, d, h, color, material, signText, accent)
+	part({ Size = Vector3.new(w, h, d), CFrame = CFrame.new(O + Vector3.new(x, h / 2, z)), Color = color, Material = material or Enum.Material.SmoothPlastic })
+	part({ Size = Vector3.new(w + 1, 1.5, d + 1), CFrame = CFrame.new(O + Vector3.new(x, h + 0.75, z)), Color = color:Lerp(Color3.new(0, 0, 0), 0.35) })
+	-- Fensterreihen auf allen vier Seiten
+	local floors = math.floor(h / 10)
+	for f = 1, floors do
+		local y = f * 10 - 4
+		part({ Size = Vector3.new(w * 0.8, 3, d + 0.4), CFrame = CFrame.new(O + Vector3.new(x, y, z)), Color = accent or Color3.fromRGB(255, 240, 190), Material = Enum.Material.Neon, Transparency = 0.25 })
+		part({ Size = Vector3.new(w + 0.4, 3, d * 0.8), CFrame = CFrame.new(O + Vector3.new(x, y, z)), Color = accent or Color3.fromRGB(255, 240, 190), Material = Enum.Material.Neon, Transparency = 0.25 })
+	end
+	if signText then
+		-- Schild auf der Seite, die zur Weltmitte zeigt
+		local face, offset
+		if math.abs(x) > math.abs(z) then
+			if x > 0 then face, offset = Enum.NormalId.Left, Vector3.new(-w / 2 - 0.6, 0, 0)
+			else face, offset = Enum.NormalId.Right, Vector3.new(w / 2 + 0.6, 0, 0) end
+		else
+			if z > 0 then face, offset = Enum.NormalId.Front, Vector3.new(0, 0, -d / 2 - 0.6)
+			else face, offset = Enum.NormalId.Back, Vector3.new(0, 0, d / 2 + 0.6) end
+		end
+		local signPart = part({ Size = Vector3.new(math.abs(offset.Z) > 0 and w * 0.8 or 1, 6, math.abs(offset.X) > 0 and d * 0.8 or 1),
+			CFrame = CFrame.new(O + Vector3.new(x, math.min(h - 4, 14), z) + offset), Color = Color3.fromRGB(20, 5, 35) })
+		surfaceSign(signPart, face, signText, Color3.fromRGB(20, 5, 35), WHITE)
+	end
+end
+
+local function rock(O, x, z, size, color)
+	part({ Shape = Enum.PartType.Ball, Size = Vector3.new(size, size * 0.7, size), CFrame = CFrame.new(O + Vector3.new(x, size * 0.2, z)),
+		Color = color or Color3.fromRGB(120, 120, 125), Material = Enum.Material.Slate })
+end
+
+----------------------------------------------------------------------------
+-- Themen der Welten
+----------------------------------------------------------------------------
+local THEMES = {}
+
+THEMES.city = function(O, w, rng)
+	part({ Size = Vector3.new(S, 0.2, 26), CFrame = CFrame.new(O + Vector3.new(0, 0.1, 0)), Color = Color3.fromRGB(60, 58, 74) })
+	part({ Size = Vector3.new(26, 0.2, S), CFrame = CFrame.new(O + Vector3.new(0, 0.12, 0)), Color = Color3.fromRGB(60, 58, 74) })
+	local names = { "💪 IRON GYM", "✂️ SALON GLOW", "☕ CAFÉ MEWING", "🛍️ DRIP MALL", "🦷 DR. STRAHLEWEISS", "🪞 SELFIE-STUDIO", "🏋️ PROTEIN-BAR", "💈 BARBER" }
+	for i = 1, 16 do
+		local wdt, dep = rng:NextNumber(26, 40), rng:NextNumber(26, 40)
+		local x, z = freeSpot(rng, math.max(wdt, dep) / 2 + 4, 90)
+		if x and math.abs(x) > 20 and math.abs(z) > 20 then
+			building(O, x, z, wdt, dep, rng:NextNumber(28, 90), BUILDING_COLORS[rng:NextInteger(1, #BUILDING_COLORS)], nil, names[i])
+		end
+	end
+	for i = 1, 18 do
+		local x, z = freeSpot(rng, 2, 40)
+		if x then lamp(O, x, z) end
+	end
+	for _ = 1, 16 do
+		local x, z = freeSpot(rng, 6, 60)
+		if x then tree(O, x, z) end
+	end
+end
+
+THEMES.beach = function(O, w, rng)
+	-- Meer (man kann ein Stück hineinlaufen)
+	part({ Size = Vector3.new(S, 1, 120), CFrame = CFrame.new(O + Vector3.new(0, 0.35, 190)), Color = Color3.fromRGB(0, 170, 220),
+		Material = Enum.Material.Glass, Transparency = 0.35, CanCollide = false })
+	part({ Size = Vector3.new(S, 0.3, 8), CFrame = CFrame.new(O + Vector3.new(0, 0.2, 128)), Color = Color3.fromRGB(255, 255, 255), Transparency = 0.3, CanCollide = false })
+	for _ = 1, 26 do
+		local x, z = freeSpot(rng, 5, 60)
+		if x and z < 120 then palm(O, x, z, rng) end
+	end
+	local umbrellaColors = { Color3.fromRGB(255, 80, 120), Color3.fromRGB(255, 200, 0), Color3.fromRGB(0, 200, 220), Color3.fromRGB(120, 220, 90) }
+	for _ = 1, 12 do
+		local x, z = freeSpot(rng, 6, 60)
+		if x and z < 120 then
+			part({ Size = Vector3.new(0.5, 9, 0.5), CFrame = CFrame.new(O + Vector3.new(x, 4.5, z)), Color = WHITE })
+			part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.6, 12, 12), CFrame = CFrame.new(O + Vector3.new(x, 9, z)) * CFrame.Angles(0, 0, math.rad(90)),
+				Color = umbrellaColors[rng:NextInteger(1, #umbrellaColors)] })
+			part({ Size = Vector3.new(4, 0.2, 7), CFrame = CFrame.new(O + Vector3.new(x + 3, 0.15, z + 2)), Color = umbrellaColors[rng:NextInteger(1, #umbrellaColors)] })
+		end
+	end
+	-- Muscle Beach: Hantel-Deko
+	for k = -2, 2 do
+		local x, z = 130 + k * 12, -110
+		part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(8, 0.6, 0.6), CFrame = CFrame.new(O + Vector3.new(x, 1.2, z)), Color = Color3.fromRGB(80, 80, 80), Material = Enum.Material.Metal })
+		part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(1, 2.6, 2.6), CFrame = CFrame.new(O + Vector3.new(x - 3.5, 1.3, z)), Color = Color3.fromRGB(30, 30, 30) })
+		part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(1, 2.6, 2.6), CFrame = CFrame.new(O + Vector3.new(x + 3.5, 1.3, z)), Color = Color3.fromRGB(30, 30, 30) })
+	end
+	local signPart = part({ Size = Vector3.new(30, 6, 1), CFrame = CFrame.new(O + Vector3.new(130, 9, -125)), Color = Color3.fromRGB(20, 5, 35) })
+	part({ Size = Vector3.new(1, 9, 1), CFrame = CFrame.new(O + Vector3.new(118, 4.5, -125)), Color = Color3.fromRGB(150, 105, 60) })
+	part({ Size = Vector3.new(1, 9, 1), CFrame = CFrame.new(O + Vector3.new(142, 4.5, -125)), Color = Color3.fromRGB(150, 105, 60) })
+	surfaceSign(signPart, Enum.NormalId.Back, "🏋️ MUSCLE BEACH", Color3.fromRGB(20, 5, 35), WHITE)
+end
+
+THEMES.mountain = function(O, w, rng)
+	-- Berge am Rand mit Schneekappen
+	for k = 1, 14 do
+		local a = (k / 14) * math.pi * 2
+		local r = HALF - 30
+		local size = rng:NextNumber(70, 130)
+		local x, z = math.cos(a) * r, math.sin(a) * r
+		if isFree(x, z, 20) then
+			local cf = CFrame.new(O + Vector3.new(x, size / 2, z)) * CFrame.Angles(0, -a + math.rad(90), 0)
+			part({ Class = "WedgePart", Size = Vector3.new(size, size, size * 0.6), CFrame = cf, Color = Color3.fromRGB(110, 110, 118), Material = Enum.Material.Slate })
+			part({ Class = "WedgePart", Size = Vector3.new(size * 0.4, size * 0.3, size * 0.25), CFrame = cf * CFrame.new(0, size * 0.36, size * 0.17), Color = Color3.fromRGB(245, 248, 255), Material = Enum.Material.Snow })
+		end
+	end
+	for _ = 1, 30 do
+		local x, z = freeSpot(rng, 5, 60, HALF - 60)
+		if x then
+			part({ Size = Vector3.new(1.6, 6, 1.6), CFrame = CFrame.new(O + Vector3.new(x, 3, z)), Color = Color3.fromRGB(110, 70, 40), Material = Enum.Material.Wood })
+			for t = 0, 2 do
+				local s = 9 - t * 2.5
+				part({ Shape = Enum.PartType.Ball, Size = Vector3.new(s, s, s), CFrame = CFrame.new(O + Vector3.new(x, 6 + t * 4, z)), Color = Color3.fromRGB(35, 100, 55), Material = Enum.Material.Grass })
+			end
+		end
+	end
+	for _ = 1, 18 do
+		local x, z = freeSpot(rng, 5, 60)
+		if x then rock(O, x, z, rng:NextNumber(4, 10)) end
+	end
+	-- Protein-Wasserfall (Deko)
+	part({ Size = Vector3.new(14, 60, 2), CFrame = CFrame.new(O + Vector3.new(-120, 30, -215)), Color = Color3.fromRGB(240, 235, 225), Material = Enum.Material.Neon, Transparency = 0.3 })
+	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(1, 30, 30), CFrame = CFrame.new(O + Vector3.new(-120, 0.4, -200)) * CFrame.Angles(0, 0, math.rad(90)),
+		Color = Color3.fromRGB(240, 235, 225), Material = Enum.Material.Glass, Transparency = 0.2, CanCollide = false })
+end
+
+THEMES.temple = function(O, w, rng)
+	-- Moai-Statuen im Kreis
+	for k = 1, 10 do
+		local a = (k / 10) * math.pi * 2
+		local x, z = math.cos(a) * 150, math.sin(a) * 150
+		if isFree(x, z, 8) then
+			local cf = CFrame.new(O + Vector3.new(x, 0, z)) * CFrame.Angles(0, math.atan2(x, z), 0)
+			part({ Size = Vector3.new(8, 12, 6), CFrame = cf * CFrame.new(0, 6, 0), Color = Color3.fromRGB(110, 105, 100), Material = Enum.Material.Slate })
+			part({ Size = Vector3.new(7, 11, 7), CFrame = cf * CFrame.new(0, 17.5, 0), Color = Color3.fromRGB(120, 115, 108), Material = Enum.Material.Slate })
+			part({ Size = Vector3.new(7.2, 2, 7.6), CFrame = cf * CFrame.new(0, 20, 0), Color = Color3.fromRGB(100, 95, 90), Material = Enum.Material.Slate })
+			part({ Class = "WedgePart", Size = Vector3.new(2, 4, 2), CFrame = cf * CFrame.new(0, 17, -4.4) * CFrame.Angles(0, math.rad(180), 0), Color = Color3.fromRGB(110, 105, 100), Material = Enum.Material.Slate })
+		end
+	end
+	-- Tempeltreppe hinter dem Boss
+	for step = 0, 6 do
+		part({ Size = Vector3.new(90 - step * 10, 3, 14), CFrame = CFrame.new(O + Vector3.new(0, 1.5 + step * 3, -205 - step * 4)), Color = Color3.fromRGB(190, 175, 140), Material = Enum.Material.Sandstone })
+	end
+	-- Fackeln
+	for _ = 1, 16 do
+		local x, z = freeSpot(rng, 2, 50)
+		if x then
+			part({ Size = Vector3.new(1, 7, 1), CFrame = CFrame.new(O + Vector3.new(x, 3.5, z)), Color = Color3.fromRGB(90, 60, 40), Material = Enum.Material.Wood })
+			local fire = part({ Shape = Enum.PartType.Ball, Size = Vector3.new(2, 2, 2), CFrame = CFrame.new(O + Vector3.new(x, 7.5, z)), Color = Color3.fromRGB(255, 140, 30), Material = Enum.Material.Neon })
+			local f = Instance.new("Fire")
+			f.Size = 3
+			f.Heat = 5
+			f.Parent = fire
+		end
+	end
+	for _ = 1, 14 do
+		local x, z = freeSpot(rng, 6, 60)
+		if x then tree(O, x, z, Color3.fromRGB(80, 160, 70)) end
+	end
+end
+
+THEMES.fashion = function(O, w, rng)
+	-- Laufsteg
+	part({ Size = Vector3.new(14, 2, 90), CFrame = CFrame.new(O + Vector3.new(0, 1, -95)), Color = WHITE, Material = Enum.Material.Marble })
+	part({ Size = Vector3.new(0.6, 0.3, 90), CFrame = CFrame.new(O + Vector3.new(-6.8, 2.1, -95)), Color = w.accent, Material = Enum.Material.Neon })
+	part({ Size = Vector3.new(0.6, 0.3, 90), CFrame = CFrame.new(O + Vector3.new(6.8, 2.1, -95)), Color = w.accent, Material = Enum.Material.Neon })
+	local names = { "👗 COUTURE", "👠 SCHUHE", "🕶️ BRILLEN", "👜 TASCHEN", "💍 SCHMUCK", "🧥 MÄNTEL", "🎩 HÜTE", "💄 BEAUTY" }
+	for i = 1, 14 do
+		local wdt = rng:NextNumber(26, 36)
+		local x, z = freeSpot(rng, wdt / 2 + 4, 90)
+		if x then
+			building(O, x, z, wdt, wdt, rng:NextNumber(26, 60), Color3.fromRGB(35, 30, 45), Enum.Material.SmoothPlastic, names[i], w.accent)
+		end
+	end
+	for _ = 1, 14 do
+		local x, z = freeSpot(rng, 2, 40)
+		if x then
+			part({ Size = Vector3.new(0.8, 16, 0.8), CFrame = CFrame.new(O + Vector3.new(x, 8, z)), Color = Color3.fromRGB(30, 30, 30) })
+			local spot = part({ Shape = Enum.PartType.Ball, Size = Vector3.new(2.5, 2.5, 2.5), CFrame = CFrame.new(O + Vector3.new(x, 16.5, z)), Color = w.accent, Material = Enum.Material.Neon })
+			local l = Instance.new("PointLight")
+			l.Color = w.accent
+			l.Range = 22
+			l.Parent = spot
+		end
+	end
+end
+
+THEMES.hollywood = function(O, w, rng)
+	for k = -3, 3 do
+		local r = rng:NextNumber(60, 95)
+		part({ Shape = Enum.PartType.Ball, Size = Vector3.new(r * 2, r * 2, r * 2), CFrame = CFrame.new(O + Vector3.new(k * 70, -r * 0.4, -300)),
+			Color = Color3.fromRGB(120, 140, 70), Material = Enum.Material.Grass, CanCollide = false })
+	end
+	local signPart = part({ Size = Vector3.new(130, 20, 1), CFrame = CFrame.new(O + Vector3.new(0, 45, -255)), Transparency = 1, CanCollide = false })
+	surfaceSign(signPart, Enum.NormalId.Back, "G L O W Y W O O D", nil, WHITE)
+	-- Roter Teppich zum Boss
+	part({ Size = Vector3.new(10, 0.3, 100), CFrame = CFrame.new(O + Vector3.new(0, 0.15, -90)), Color = Color3.fromRGB(200, 20, 40), Material = Enum.Material.Fabric })
+	for z = -45, -135, -15 do
+		for _, x in ipairs({ -8, 8 }) do
+			part({ Size = Vector3.new(0.6, 3, 0.6), CFrame = CFrame.new(O + Vector3.new(x, 1.5, z)), Color = Color3.fromRGB(212, 175, 55), Material = Enum.Material.Metal })
+		end
+	end
+	-- Walk of Fame Sterne
+	for _ = 1, 36 do
+		local x, z = freeSpot(rng, 2, 50)
+		if x then
+			part({ Size = Vector3.new(4, 0.2, 4), CFrame = CFrame.new(O + Vector3.new(x, 0.12, z)) * CFrame.Angles(0, math.rad(45), 0), Color = Color3.fromRGB(255, 120, 160), Material = Enum.Material.Neon, Transparency = 0.3 })
+		end
+	end
+	for i = 1, 10 do
+		local wdt = rng:NextNumber(24, 34)
+		local x, z = freeSpot(rng, wdt / 2 + 4, 90)
+		if x then building(O, x, z, wdt, wdt, rng:NextNumber(24, 50), BUILDING_COLORS[rng:NextInteger(1, #BUILDING_COLORS)], nil, i <= 4 and ({ "🎬 STUDIO 1", "🍿 KINO", "📸 PAPARAZZI", "⭐ STAR-HOTEL" })[i] or nil) end
+	end
+	for _ = 1, 12 do
+		local x, z = freeSpot(rng, 5, 60)
+		if x then palm(O, x, z, rng) end
+	end
+end
+
+THEMES.dubai = function(O, w, rng)
+	-- Wolkenkratzer aus Gold und Glas
+	for i = 1, 14 do
+		local wdt = rng:NextNumber(18, 30)
+		local x, z = freeSpot(rng, wdt / 2 + 4, 110)
+		if x then
+			local h = rng:NextNumber(110, 240)
+			local gold = rng:NextNumber() < 0.5
+			building(O, x, z, wdt, wdt, h, gold and Color3.fromRGB(212, 175, 55) or Color3.fromRGB(120, 170, 210),
+				gold and Enum.Material.Foil or Enum.Material.Glass, nil, Color3.fromRGB(255, 240, 200))
+		end
+	end
+	-- Der höchste Turm hinter dem Boss
+	part({ Size = Vector3.new(24, 330, 24), CFrame = CFrame.new(O + Vector3.new(0, 165, -225)), Color = Color3.fromRGB(200, 210, 225), Material = Enum.Material.Glass })
+	part({ Size = Vector3.new(4, 60, 4), CFrame = CFrame.new(O + Vector3.new(0, 360, -225)), Color = Color3.fromRGB(212, 175, 55), Material = Enum.Material.Neon })
+	for _ = 1, 16 do
+		local x, z = freeSpot(rng, 5, 60)
+		if x then palm(O, x, z, rng) end
+	end
+end
+
+THEMES.galaxy = function(O, w, rng)
+	-- Leuchtendes Gitter im Boden
+	for k = -4, 4 do
+		part({ Size = Vector3.new(S, 0.2, 0.6), CFrame = CFrame.new(O + Vector3.new(0, 0.1, k * 55)), Color = w.accent, Material = Enum.Material.Neon, Transparency = 0.4 })
+		part({ Size = Vector3.new(0.6, 0.2, S), CFrame = CFrame.new(O + Vector3.new(k * 55, 0.1, 0)), Color = w.accent, Material = Enum.Material.Neon, Transparency = 0.4 })
+	end
+	-- Schwebende Planeten
+	local planetColors = { Color3.fromRGB(255, 120, 200), Color3.fromRGB(90, 200, 255), Color3.fromRGB(255, 200, 80), Color3.fromRGB(150, 255, 160), Color3.fromRGB(200, 120, 255) }
+	for k = 1, 10 do
+		local r = rng:NextNumber(10, 38)
+		local a = rng:NextNumber(0, math.pi * 2)
+		local dist = rng:NextNumber(120, 240)
+		local pos = O + Vector3.new(math.cos(a) * dist, rng:NextNumber(70, 170), math.sin(a) * dist)
+		part({ Shape = Enum.PartType.Ball, Size = Vector3.new(r, r, r), CFrame = CFrame.new(pos), Color = planetColors[(k % #planetColors) + 1], Material = Enum.Material.Neon, CanCollide = false })
+		if k % 3 == 0 then
+			part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.6, r * 1.9, r * 1.9), CFrame = CFrame.new(pos) * CFrame.Angles(math.rad(20), 0, math.rad(90)),
+				Color = WHITE, Material = Enum.Material.Neon, Transparency = 0.5, CanCollide = false })
+		end
+	end
+	-- Sterne
+	for _ = 1, 90 do
+		local s = rng:NextNumber(0.6, 1.8)
+		part({ Size = Vector3.new(s, s, s), CFrame = CFrame.new(O + Vector3.new(rng:NextNumber(-HALF, HALF), rng:NextNumber(80, 260), rng:NextNumber(-HALF, HALF))),
+			Color = WHITE, Material = Enum.Material.Neon, CanCollide = false })
+	end
+	-- Kristalle
+	for _ = 1, 18 do
+		local x, z = freeSpot(rng, 4, 60)
+		if x then
+			local h = rng:NextNumber(6, 18)
+			part({ Class = "WedgePart", Size = Vector3.new(3, h, 3), CFrame = CFrame.new(O + Vector3.new(x, h / 2, z)) * CFrame.Angles(0, rng:NextNumber(0, 6), 0),
+				Color = planetColors[rng:NextInteger(1, #planetColors)], Material = Enum.Material.Neon, Transparency = 0.2 })
+		end
+	end
+end
+
+local GROUND_MATERIAL = {
+	city = Enum.Material.SmoothPlastic, beach = Enum.Material.Sand, mountain = Enum.Material.Grass, temple = Enum.Material.Grass,
+	fashion = Enum.Material.SmoothPlastic, hollywood = Enum.Material.Sandstone, dubai = Enum.Material.Sand, galaxy = Enum.Material.Slate,
+}
+
+----------------------------------------------------------------------------
+-- NPCs (Rivalen & Bosse)
+----------------------------------------------------------------------------
+local npcFolder = nil
+
+local function makeNPC(def, position, isBoss)
+	local scale = def.scale or 1
+	local model = nil
+	local ok = pcall(function()
+		local desc = Instance.new("HumanoidDescription")
+		desc.HeadColor = def.skin
+		desc.LeftArmColor = def.skin
+		desc.RightArmColor = def.skin
+		desc.TorsoColor = def.shirt
+		desc.LeftLegColor = def.pants
+		desc.RightLegColor = def.pants
+		desc.HeightScale = scale
+		desc.WidthScale = scale * (isBoss and 1.15 or 1)
+		desc.DepthScale = scale
+		desc.HeadScale = scale
+		model = Players:CreateHumanoidModelFromDescription(desc, Enum.HumanoidRigType.R15)
+	end)
+	if not ok or not model then
+		-- Notlösung: einfache Figur aus Blöcken
+		model = Instance.new("Model")
+		local body = Instance.new("Part")
+		body.Name = "HumanoidRootPart"
+		body.Size = Vector3.new(2, 5, 1) * scale
+		body.Color = def.shirt
+		body.Anchored = true
+		body.Parent = model
+		local head = Instance.new("Part")
+		head.Name = "Head"
+		head.Size = Vector3.new(1.6, 1.6, 1.6) * scale
+		head.Color = def.skin
+		head.Anchored = true
+		head.CFrame = body.CFrame * CFrame.new(0, 3.3 * scale, 0)
+		head.Parent = model
+		model.PrimaryPart = body
+	end
+	model.Name = def.name
+	local hrp = model:FindFirstChild("HumanoidRootPart")
+	local hum = model:FindFirstChildOfClass("Humanoid")
+	if hum then
+		hum.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+	end
+	model:PivotTo(CFrame.new(position + Vector3.new(0, 3 * scale, 0)) * CFrame.Angles(0, math.rad(180), 0))
+	if hrp then hrp.Anchored = true end
+	model.Parent = npcFolder
+
+	local head = model:FindFirstChild("Head") or hrp
+	local title
+	if def.final then
+		title = "<font color='#ffd166'>💀 LEON · ENDBOSS</font>"
+	elseif isBoss then
+		title = "<font color='#ff5d73'>👑 BOSS</font>"
+	else
+		title = "<font color='#ffb36b'>⚔️ RIVALE</font>"
+	end
+	billboard(head, title .. "\n" .. def.name .. "\n<font size='14' color='#ffd166'>Stufe " .. def.level .. " · ♻️ " .. def.rebirths .. "</font>",
+		8, 3.2, 3 * scale, WHITE)
+
+	if isBoss and hrp then
+		local sparkle = Instance.new("ParticleEmitter")
+		sparkle.Rate = def.final and 40 or 15
+		sparkle.LightEmission = 1
+		sparkle.Lifetime = NumberRange.new(1, 2)
+		sparkle.Speed = NumberRange.new(2, 4)
+		sparkle.SpreadAngle = Vector2.new(180, 180)
+		sparkle.Color = ColorSequence.new(def.final and Color3.fromRGB(255, 209, 102) or Color3.fromRGB(255, 93, 115))
+		sparkle.Parent = hrp
+	end
+
+	local pr = prompt(hrp or head, isBoss and "Boss herausfordern" or "Mog Battle", def.name, isBoss and 1 or 0.4)
+	return pr
+end
+
+----------------------------------------------------------------------------
+-- Eine Welt bauen
+----------------------------------------------------------------------------
+local function buildWorld(index, mapFolder)
+	local w = Config.Worlds[index]
+	local O = Vector3.new((index - 1) * Config.WORLD_SPACING, 0, 0)
+	local rng = Random.new(index * 7919)
+	currentFolder = Instance.new("Folder")
+	currentFolder.Name = index .. "_" .. w.id
+	currentFolder.Parent = mapFolder
+
+	-- Boden & unsichtbare Wände
+	part({ Name = "Ground", Size = Vector3.new(S, 4, S), CFrame = CFrame.new(O + Vector3.new(0, -2, 0)), Color = w.ground, Material = GROUND_MATERIAL[w.theme] })
+	for _, side in ipairs({ { HALF, 0, 2, S }, { -HALF, 0, 2, S }, { 0, HALF, S, 2 }, { 0, -HALF, S, 2 } }) do
+		part({ Name = "Wall", Size = Vector3.new(side[3], 120, side[4]), CFrame = CFrame.new(O + Vector3.new(side[1], 60, side[2])), Transparency = 1 })
+	end
+
+	-- Spawn-Platz
+	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.4, 40, 40), CFrame = CFrame.new(O + Vector3.new(0, 0.2, 0)) * CFrame.Angles(0, 0, math.rad(90)),
+		Color = w.accent, Material = Enum.Material.SmoothPlastic, Transparency = 0.25 })
+	if index == 1 then
+		local spawn = Instance.new("SpawnLocation")
+		spawn.Name = "Spawn"
+		spawn.Anchored = true
+		spawn.Size = Vector3.new(10, 1, 10)
+		spawn.CFrame = CFrame.new(O + Vector3.new(0, 0.5, 22))
+		spawn.Transparency = 1
+		spawn.CanCollide = false
+		spawn.Duration = 0
+		spawn.Neutral = true
+		spawn.Parent = currentFolder
+	end
+	local nameAnchor = part({ Size = Vector3.new(1, 1, 1), CFrame = CFrame.new(O + Vector3.new(0, 26, -30)), Transparency = 1, CanCollide = false })
+	billboard(nameAnchor, w.emoji .. " " .. string.upper(w.name) .. "\n<font size='20' color='#ffd166'>Aura x" .. Util.format(w.mult) .. "</font>", 40, 10, 0, WHITE)
+
+	-- Deko
+	local theme = THEMES[w.theme]
+	if theme then theme(O, w, rng) end
+
+	-- Geschenkbox-Stand
+	local egg = Config.Eggs[index]
+	local ep = O + Vector3.new(55, 0, -40)
+	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(2, 14, 14), CFrame = CFrame.new(ep + Vector3.new(0, 1, 0)) * CFrame.Angles(0, 0, math.rad(90)), Color = Color3.fromRGB(40, 20, 60) })
+	local box = part({ Name = "Geschenkbox", Size = Vector3.new(6, 6, 6), CFrame = CFrame.new(ep + Vector3.new(0, 5, 0)) * CFrame.Angles(0, math.rad(20), 0), Color = w.accent })
+	part({ Size = Vector3.new(6.2, 6.2, 1), CFrame = box.CFrame, Color = Color3.fromRGB(255, 209, 102), Material = Enum.Material.Neon })
+	part({ Size = Vector3.new(1, 6.2, 6.2), CFrame = box.CFrame, Color = Color3.fromRGB(255, 209, 102), Material = Enum.Material.Neon })
+	billboard(box, "🎁 " .. egg.name .. "\n<font color='#ffd166'>" .. Util.format(egg.cost) .. " Aura</font>", 12, 4, 6.5, WHITE)
+	table.insert(MapBuilder.eggPrompts, { prompt = prompt(box, "Öffnen", egg.name, 0.25), egg = egg, count = 1 })
+	table.insert(MapBuilder.eggPrompts, { prompt = prompt(box, "3x öffnen", "Rebirth-Shop: 3er-Öffnen", 0.25, Enum.KeyCode.F), egg = egg, count = 3 })
+
+	-- Tafel mit den Chancen der Box
+	local total = 0
+	for _, e in ipairs(egg.pets) do total = total + e.weight end
+	local lines = { "<b>Inhalt der " .. egg.name .. "</b>" }
+	for _, e in ipairs(egg.pets) do
+		local def
+		for _, p in ipairs(Config.Pets) do
+			if p.id == e.id then def = p end
+		end
+		local r = Config.Rarities[def.rarity]
+		local hex = string.format("#%02x%02x%02x", math.floor(r.color.R * 255 + 0.5), math.floor(r.color.G * 255 + 0.5), math.floor(r.color.B * 255 + 0.5))
+		table.insert(lines, def.emoji .. " " .. def.name .. "  <font color='" .. hex .. "'>" .. Util.format(e.weight / total * 100) .. " %</font>")
+	end
+	local chanceBoard = part({ Size = Vector3.new(14, 16, 0.6), CFrame = CFrame.new(O + Vector3.new(95, 9, -40)) * CFrame.Angles(0, math.rad(115), 0), Color = Color3.fromRGB(20, 5, 35) })
+	local _, chanceLabel = surfaceSign(chanceBoard, Enum.NormalId.Front, table.concat(lines, "\n"), Color3.fromRGB(20, 5, 35), WHITE)
+	chanceLabel.Font = Enum.Font.GothamBold
+	part({ Size = Vector3.new(1, 9, 1), CFrame = CFrame.new(O + Vector3.new(95, 0.5, -40)), Color = Color3.fromRGB(60, 60, 70) })
+
+	-- Rivale & Boss
+	local rival = Config.Rivals[index]
+	table.insert(MapBuilder.npcs, { prompt = makeNPC(rival, O + Vector3.new(-55, 0, -40), false), def = rival, world = index, isBoss = false })
+	local boss = Config.Bosses[index]
+	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(4, 30, 30), CFrame = CFrame.new(O + Vector3.new(0, 2, -160)) * CFrame.Angles(0, 0, math.rad(90)),
+		Color = boss.final and Color3.fromRGB(212, 175, 55) or Color3.fromRGB(60, 20, 40), Material = boss.final and Enum.Material.Foil or Enum.Material.Slate })
+	table.insert(MapBuilder.npcs, { prompt = makeNPC(boss, O + Vector3.new(0, 4, -160), true), def = boss, world = index, isBoss = true })
+
+	-- Portale zur nächsten / vorherigen Welt
+	local function portal(x, target, arrow)
+		local tw = Config.Worlds[target]
+		local P = O + Vector3.new(x, 0, 0)
+		part({ Size = Vector3.new(4, 24, 4), CFrame = CFrame.new(P + Vector3.new(0, 12, -11)), Color = Color3.fromRGB(40, 20, 60) })
+		part({ Size = Vector3.new(4, 24, 4), CFrame = CFrame.new(P + Vector3.new(0, 12, 11)), Color = Color3.fromRGB(40, 20, 60) })
+		part({ Size = Vector3.new(4, 4, 26), CFrame = CFrame.new(P + Vector3.new(0, 26, 0)), Color = Color3.fromRGB(40, 20, 60) })
+		local gate = part({ Name = "Portal", Size = Vector3.new(1, 22, 18), CFrame = CFrame.new(P + Vector3.new(0, 12, 0)), Color = tw.accent, Material = Enum.Material.Neon, Transparency = 0.35, CanCollide = false })
+		local info = arrow .. " " .. tw.emoji .. " " .. tw.name .. "\n<font size='18' color='#ffd166'>Aura x" .. Util.format(tw.mult)
+		if target > index and tw.cost > 0 then
+			info = info .. " · " .. Util.format(tw.cost) .. " Aura"
+			if tw.rebirths > 0 then info = info .. " · ♻️ " .. tw.rebirths end
+		end
+		billboard(gate, info .. "</font>", 16, 5, 15, WHITE)
+		table.insert(MapBuilder.portals, { prompt = prompt(gate, "Reisen", tw.name, 0.5), target = target })
+	end
+	if index < #Config.Worlds then portal(200, index + 1, "➡️") end
+	if index > 1 then portal(-200, index - 1, "⬅️") end
+
+	-- Nur in Glow City: Ranglisten-Tafel & Info-Tafel
+	if index == 1 then
+		local board = part({ Name = "Rangliste", Size = Vector3.new(40, 26, 1), CFrame = CFrame.new(O + Vector3.new(0, 15, 100)), Color = Color3.fromRGB(20, 5, 35) })
+		part({ Size = Vector3.new(2, 15, 2), CFrame = CFrame.new(O + Vector3.new(-15, 1, 100)), Color = Color3.fromRGB(60, 60, 70) })
+		part({ Size = Vector3.new(2, 15, 2), CFrame = CFrame.new(O + Vector3.new(15, 1, 100)), Color = Color3.fromRGB(60, 60, 70) })
+		local sg = Instance.new("SurfaceGui")
+		sg.Face = Enum.NormalId.Front
+		sg.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
+		sg.PixelsPerStud = 25
+		sg.LightInfluence = 0
+		sg.Parent = board
+		local header = Instance.new("TextLabel")
+		header.Size = UDim2.new(1, 0, 0.16, 0)
+		header.BackgroundColor3 = Color3.fromRGB(255, 79, 216)
+		header.TextScaled = true
+		header.Font = Enum.Font.FredokaOne
+		header.TextColor3 = WHITE
+		header.Text = "🏆 GLOBALE TOP 10 – GLOW-POWER"
+		header.Parent = sg
+		for r = 1, 10 do
+			local row = Instance.new("TextLabel")
+			row.Size = UDim2.new(0.96, 0, 0.078, 0)
+			row.Position = UDim2.new(0.02, 0, 0.17 + (r - 1) * 0.082, 0)
+			row.BackgroundTransparency = r % 2 == 0 and 1 or 0.85
+			row.BackgroundColor3 = WHITE
+			row.TextScaled = true
+			row.RichText = true
+			row.Font = Enum.Font.GothamBold
+			row.TextColor3 = WHITE
+			row.TextXAlignment = Enum.TextXAlignment.Left
+			row.Text = r .. ". …"
+			row.Parent = sg
+			MapBuilder.boardRows[r] = row
+		end
+
+		local infoBoard = part({ Size = Vector3.new(22, 16, 0.6), CFrame = CFrame.new(O + Vector3.new(-45, 9, 60)) * CFrame.Angles(0, math.rad(-37), 0), Color = Color3.fromRGB(20, 5, 35) })
+		local _, infoLabel = surfaceSign(infoBoard, Enum.NormalId.Front,
+			"<b>📖 SO GEHT'S</b>\n🪞 Daily Routine klicken = Aura\n💪 Upgrades kaufen = mehr Aura & Glow\n🎁 Geschenkboxen = Pets mit Boosts\n⚔️ Rivalen & Bosse = Mog Battles\n🌍 Portale = neue Welten\n♻️ Rebirth = dauerhafter Bonus",
+			Color3.fromRGB(20, 5, 35), WHITE)
+		infoLabel.Font = Enum.Font.GothamBold
+	end
+end
+
+function MapBuilder.build()
+	local mapFolder = workspace:FindFirstChild("Map")
+	if mapFolder then mapFolder:Destroy() end
+	mapFolder = Instance.new("Folder")
+	mapFolder.Name = "Map"
+	mapFolder.Parent = workspace
+
+	npcFolder = Instance.new("Folder")
+	npcFolder.Name = "NPCs"
+	npcFolder.Parent = workspace
+
+	local pets = workspace:FindFirstChild("Pets") or Instance.new("Folder")
+	pets.Name = "Pets"
+	pets.Parent = workspace
+
+	for i = 1, #Config.Worlds do
+		local ok, err = pcall(buildWorld, i, mapFolder)
+		if not ok then
+			warn("[Looksmaxxer] Fehler beim Bauen von Welt " .. i .. ":", err)
+		end
+	end
+end
+
+return MapBuilder
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX0000000C"><Properties><string name="Name">PetService</string><ProtectedString name="Source"><![CDATA[--[[
+	PETSERVICE – Geschenkboxen öffnen, Pets ausrüsten, fusionieren, löschen.
+	Die Pet-Figuren in der Welt werden hier erstellt; bewegt werden sie
+	auf jedem Gerät vom Client-Skript "PetFollow".
+]]
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local MessagingService = game:GetService("MessagingService")
+
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local Config = require(Shared:WaitForChild("Config"))
+local Logic = require(Shared:WaitForChild("Logic"))
+local Util = require(Shared:WaitForChild("Util"))
+local Remotes = require(script.Parent.Remotes)
+local DataService = require(script.Parent.DataService)
+local GameService = require(script.Parent.GameService)
+
+local PetService = {}
+local rng = Random.new()
+local ANNOUNCE_TOPIC = "LooksmaxxerAnnounce"
+
+----------------------------------------------------------------------------
+-- Pet-Figuren in der Welt
+----------------------------------------------------------------------------
+local function petsFolder()
+	local f = workspace:FindFirstChild("Pets")
+	if not f then
+		f = Instance.new("Folder")
+		f.Name = "Pets"
+		f.Parent = workspace
+	end
+	return f
+end
+
+function PetService.rebuildModels(player)
+	local data = DataService.get(player)
+	if not data then return end
+	local folder = petsFolder():FindFirstChild(tostring(player.UserId))
+	if not folder then
+		folder = Instance.new("Folder")
+		folder.Name = tostring(player.UserId)
+		folder.Parent = petsFolder()
+	end
+	folder:ClearAllChildren()
+	local char = player.Character
+	local hrp = char and char:FindFirstChild("HumanoidRootPart")
+	local slot = 0
+	for _, pet in ipairs(data.pets) do
+		if pet.eq then
+			slot = slot + 1
+			local def = Logic.petById[pet.id]
+			if def then
+				local rarity = Config.Rarities[def.rarity]
+				local tier = Config.PetTiers[pet.tier or 1]
+				local p = Instance.new("Part")
+				p.Name = def.name
+				p.Shape = Enum.PartType.Ball
+				p.Size = Vector3.new(2, 2, 2) * (1 + (pet.tier - 1) * 0.15)
+				p.Color = tier.color or rarity.color
+				p.Material = rarity.order >= 5 and Enum.Material.Neon or Enum.Material.SmoothPlastic
+				p.Transparency = 0.15
+				p.Anchored = true
+				p.CanCollide = false
+				p.CanTouch = false
+				p.CanQuery = false
+				p.CastShadow = false
+				p:SetAttribute("Owner", player.UserId)
+				p:SetAttribute("Slot", slot)
+				p:SetAttribute("Tier", pet.tier or 1)
+				if hrp then
+					p.CFrame = hrp.CFrame * CFrame.new(slot * 2, 0, 4)
+				end
+				local bb = Instance.new("BillboardGui")
+				bb.Size = UDim2.new(3.2, 0, 3.2, 0)
+				bb.LightInfluence = 0
+				bb.MaxDistance = 90
+				bb.Parent = p
+				local l = Instance.new("TextLabel")
+				l.Size = UDim2.new(1, 0, 1, 0)
+				l.BackgroundTransparency = 1
+				l.TextScaled = true
+				l.Text = def.emoji
+				l.Parent = bb
+				p.Parent = folder
+			end
+		end
+	end
+end
+
+----------------------------------------------------------------------------
+-- Pets im Spielstand
+----------------------------------------------------------------------------
+local function findPet(data, uid)
+	for i, pet in ipairs(data.pets) do
+		if pet.uid == uid then
+			return pet, i
+		end
+	end
+	return nil
+end
+
+local function addPet(data, id, tier)
+	local pet = { uid = data.nextPetId, id = id, tier = tier or 1, eq = false }
+	data.nextPetId = data.nextPetId + 1
+	table.insert(data.pets, pet)
+	local isNew = not data.index[id]
+	data.index[id] = true
+	-- automatisch ausrüsten, wenn noch ein Platz frei ist
+	if Logic.equippedCount(data) < Logic.petSlots(data) then
+		pet.eq = true
+	end
+	return pet, isNew
+end
+
+local function equipBest(data)
+	for _, pet in ipairs(data.pets) do
+		pet.eq = false
+	end
+	local sorted = Util.copy(data.pets)
+	table.sort(sorted, function(a, b)
+		return Logic.petBoost(a) > Logic.petBoost(b)
+	end)
+	for i = 1, math.min(Logic.petSlots(data), #sorted) do
+		sorted[i].eq = true
+	end
+end
+
+local function changed(player)
+	PetService.rebuildModels(player)
+	GameService.sendFull(player)
+end
+
+----------------------------------------------------------------------------
+-- Weltweite Ansagen bei seltenen Funden
+----------------------------------------------------------------------------
+local function announceLocal(text)
+	for _, p in ipairs(Players:GetPlayers()) do
+		GameService.notify(p, "📢 Seltener Fund!", text, "global")
+	end
+end
+
+function PetService.announce(text)
+	local ok = pcall(function()
+		MessagingService:PublishAsync(ANNOUNCE_TOPIC, text)
+	end)
+	if not ok then
+		announceLocal(text)
+	end
+end
+
+task.spawn(function()
+	local ok = pcall(function()
+		MessagingService:SubscribeAsync(ANNOUNCE_TOPIC, function(message)
+			if type(message.Data) == "string" then
+				announceLocal(message.Data)
+			end
+		end)
+	end)
+	if not ok then
+		warn("[Looksmaxxer] MessagingService nicht verfügbar (in Studio normal).")
+	end
+end)
+
+----------------------------------------------------------------------------
+-- Box öffnen
+----------------------------------------------------------------------------
+local function roll(egg, luck, forceLegendary)
+	local entries, total = {}, 0
+	for _, e in ipairs(egg.pets) do
+		local def = Logic.petById[e.id]
+		local r = Config.Rarities[def.rarity]
+		local w = e.weight
+		if r.order >= 3 then
+			w = w * luck
+		end
+		if forceLegendary and r.order < 5 then
+			w = 0
+		end
+		if w > 0 then
+			total = total + w
+			table.insert(entries, { id = e.id, w = w })
+		end
+	end
+	local x = rng:NextNumber() * total
+	for _, e in ipairs(entries) do
+		x = x - e.w
+		if x <= 0 then
+			return e.id
+		end
+	end
+	return entries[#entries].id
+end
+
+-- free = true: kostenlos (Belohnung)
+function PetService.hatch(player, eggIndex, count, free)
+	local data = DataService.get(player)
+	local egg = Config.Eggs[eggIndex]
+	if not data or not egg then return end
+	count = (count == 3) and 3 or 1
+	if count == 3 and Logic.perkLevel(data, "triple") < 1 then
+		GameService.notify(player, "🎁 3er-Öffnen gesperrt", "Kaufe 3er-Öffnen im Rebirth-Shop.", "bad")
+		return
+	end
+	if not Logic.worldUnlocked(data, egg.world) then
+		GameService.notify(player, "🔒 Gesperrt", "Diese Welt ist noch nicht freigeschaltet.", "bad")
+		return
+	end
+	if #data.pets + count > Config.MAX_PET_INVENTORY then
+		GameService.notify(player, "🎒 Inventar voll", "Lösche oder fusioniere Pets (max. " .. Config.MAX_PET_INVENTORY .. ").", "bad")
+		return
+	end
+	local cost = egg.cost * count
+	if not free then
+		if data.aura < cost then
+			GameService.notify(player, "💸 Zu wenig Aura", egg.name .. " kostet " .. Util.format(cost) .. " Aura.", "bad")
+			return
+		end
+		data.aura = data.aura - cost
+	end
+
+	local luck = Logic.luck(data, os.time())
+	local results = {}
+	for _ = 1, count do
+		data.eggsOpened = data.eggsOpened + 1
+		data.pity = data.pity + 1
+		local id = roll(egg, luck, data.pity >= Config.PITY)
+		local def = Logic.petById[id]
+		local rarity = Config.Rarities[def.rarity]
+		if rarity.order >= 5 then
+			data.pity = 0
+			PetService.announce(player.DisplayName .. " hat " .. (rarity.order >= 6 and "ein MYTHISCHES" or "ein legendäres") .. " Pet gezogen: " .. def.emoji .. " " .. def.name .. "!")
+		end
+		local pet, isNew = addPet(data, id, 1)
+		table.insert(results, { id = id, uid = pet.uid, new = isNew })
+	end
+	Remotes.HatchResult:FireClient(player, results)
+	changed(player)
+end
+
+-- Ein bestimmtes Pet schenken (z. B. Leons Goldfisch)
+function PetService.givePet(player, id)
+	local data = DataService.get(player)
+	if not data or not Logic.petById[id] then return end
+	local pet, isNew = addPet(data, id, 1)
+	Remotes.HatchResult:FireClient(player, { { id = id, uid = pet.uid, new = isNew } })
+	changed(player)
+end
+
+----------------------------------------------------------------------------
+-- Remotes
+----------------------------------------------------------------------------
+Remotes.HatchEgg.OnServerEvent:Connect(function(player, eggIndex, count)
+	PetService.hatch(player, tonumber(eggIndex), tonumber(count), false)
+end)
+
+Remotes.EquipPet.OnServerEvent:Connect(function(player, uid, equip)
+	local data = DataService.get(player)
+	if not data then return end
+	local pet = findPet(data, uid)
+	if not pet then return end
+	if equip and not pet.eq then
+		if Logic.equippedCount(data) >= Logic.petSlots(data) then
+			GameService.notify(player, "🐾 Alle Plätze voll", "Lege zuerst ein anderes Pet ab (Plätze: " .. Logic.petSlots(data) .. ").", "bad")
+			return
+		end
+		pet.eq = true
+	elseif not equip then
+		pet.eq = false
+	end
+	changed(player)
+end)
+
+Remotes.EquipBest.OnServerEvent:Connect(function(player)
+	local data = DataService.get(player)
+	if not data then return end
+	equipBest(data)
+	changed(player)
+end)
+
+Remotes.FusePet.OnServerEvent:Connect(function(player, uid)
+	local data = DataService.get(player)
+	if not data then return end
+	local pet = findPet(data, uid)
+	if not pet then return end
+	if pet.tier >= #Config.PetTiers then
+		GameService.notify(player, "💎 Maximum", "Dieses Pet ist schon Diamant.", "")
+		return
+	end
+	-- 5 gleiche Pets (gleiche Art & Stufe) sammeln, das gewählte zuerst
+	local group = { pet }
+	for _, other in ipairs(data.pets) do
+		if #group >= Config.FUSE_COUNT then break end
+		if other ~= pet and other.id == pet.id and other.tier == pet.tier and not other.eq then
+			table.insert(group, other)
+		end
+	end
+	for _, other in ipairs(data.pets) do
+		if #group >= Config.FUSE_COUNT then break end
+		if other ~= pet and other.id == pet.id and other.tier == pet.tier and other.eq then
+			local already = false
+			for _, g in ipairs(group) do
+				if g == other then already = true end
+			end
+			if not already then table.insert(group, other) end
+		end
+	end
+	if #group < Config.FUSE_COUNT then
+		GameService.notify(player, "🔮 Zu wenige", "Du brauchst " .. Config.FUSE_COUNT .. " gleiche Pets derselben Stufe.", "bad")
+		return
+	end
+	local wasEquipped = false
+	for _, g in ipairs(group) do
+		if g.eq then wasEquipped = true end
+		local _, i = findPet(data, g.uid)
+		if i then table.remove(data.pets, i) end
+	end
+	local newTier = pet.tier + 1
+	local newPet = { uid = data.nextPetId, id = pet.id, tier = newTier, eq = wasEquipped }
+	data.nextPetId = data.nextPetId + 1
+	table.insert(data.pets, newPet)
+	local def = Logic.petById[pet.id]
+	GameService.notify(player, "🔮 Fusioniert!", def.emoji .. " " .. def.name .. " ist jetzt " .. Config.PetTiers[newTier].name .. "!", "good")
+	changed(player)
+end)
+
+Remotes.DeletePet.OnServerEvent:Connect(function(player, uid)
+	local data = DataService.get(player)
+	if not data then return end
+	local _, i = findPet(data, uid)
+	if i then
+		table.remove(data.pets, i)
+		changed(player)
+	end
+end)
+
+-- Pets erscheinen, wenn der Charakter erscheint
+table.insert(GameService.characterHooks, function(player)
+	task.wait(1)
+	PetService.rebuildModels(player)
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+	local f = petsFolder():FindFirstChild(tostring(player.UserId))
+	if f then f:Destroy() end
+end)
+
+return PetService
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX0000000D"><Properties><string name="Name">Remotes</string><ProtectedString name="Source"><![CDATA[--[[
+	REMOTES – die "Leitungen" zwischen Server und Spieler.
+	Der Server erstellt sie beim Start in ReplicatedStorage/Remotes.
+]]
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Remotes = {}
+
+local EVENTS = {
+	-- Server -> Spieler
+	"Data",           -- Spielstand senden ("full" oder "light")
+	"Notify",         -- Nachricht anzeigen (titel, text, art)
+	"HatchResult",    -- Ergebnis beim Box-Öffnen
+	"BattleResult",   -- Ergebnis eines Mog Battles
+	"BattleRequest",  -- jemand fordert dich heraus
+	"OpenMenu",       -- Menü öffnen (z. B. Welten am Portal)
+	-- Spieler -> Server
+	"Click", "BuyUpgrade", "Rebirth", "BuyPerk",
+	"EquipPet", "EquipBest", "FusePet", "DeletePet", "HatchEgg",
+	"Teleport", "UnlockWorld",
+	"BattleRespond",
+	"ClaimDaily", "RedeemCode", "BuyPotion", "Setting",
+}
+
+-- Erst alle Leitungen anlegen, dann den Ordner sichtbar machen
+local folder = Instance.new("Folder")
+folder.Name = "Remotes"
+
+for _, name in ipairs(EVENTS) do
+	local ev = Instance.new("RemoteEvent")
+	ev.Name = name
+	ev.Parent = folder
+	Remotes[name] = ev
+end
+
+local lb = Instance.new("RemoteFunction")
+lb.Name = "GetLeaderboard"
+lb.Parent = folder
+Remotes.GetLeaderboard = lb
+
+folder.Parent = ReplicatedStorage
+
+return Remotes
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX0000000E"><Properties><string name="Name">RewardService</string><ProtectedString name="Source"><![CDATA[--[[
+	REWARDSERVICE – tägliche Belohnungen (7-Tage-Serie), Promo-Codes und Tränke.
+]]
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local Config = require(Shared:WaitForChild("Config"))
+local Logic = require(Shared:WaitForChild("Logic"))
+local Util = require(Shared:WaitForChild("Util"))
+local Remotes = require(script.Parent.Remotes)
+local DataService = require(script.Parent.DataService)
+local GameService = require(script.Parent.GameService)
+local PetService = require(script.Parent.PetService)
+
+local RewardService = {}
+local DAY = 20 * 3600         -- nach 20 Stunden gibt es die nächste Belohnung
+local STREAK_RESET = 48 * 3600
+
+local function addPotion(data, id)
+	local p = Logic.potionById[id]
+	if not p then return end
+	local now = os.time()
+	data.potions[id] = math.max(now, data.potions[id] or 0) + p.duration
+end
+
+-- Belohnung gutschreiben, gibt einen Beschreibungstext zurück
+local function give(player, data, reward)
+	local parts = {}
+	if reward.cash then
+		data.cash = data.cash + reward.cash
+		table.insert(parts, "💵 " .. Util.format(reward.cash) .. " Geld")
+	end
+	if reward.auraSeconds then
+		local aps = math.max(Logic.aps(data, GameService.currentWorld(player), os.time()), 5)
+		local gain = aps * reward.auraSeconds
+		GameService.addAura(data, gain)
+		table.insert(parts, "✨ " .. Util.format(gain) .. " Aura")
+	end
+	if reward.potion then
+		addPotion(data, reward.potion)
+		local p = Logic.potionById[reward.potion]
+		table.insert(parts, p.emoji .. " " .. p.name)
+	end
+	if reward.freeEgg then
+		-- Box der besten freigeschalteten Welt
+		local best = 1
+		for i = 1, #Config.Worlds do
+			if Logic.worldUnlocked(data, i) then best = i end
+		end
+		task.delay(1, function()
+			if player.Parent then PetService.hatch(player, best, 1, true) end
+		end)
+		table.insert(parts, "🎁 gratis Geschenkbox")
+	end
+	return table.concat(parts, " · ")
+end
+
+Remotes.ClaimDaily.OnServerEvent:Connect(function(player)
+	local data = DataService.get(player)
+	if not data then return end
+	local now = os.time()
+	local since = now - data.daily.last
+	if since < DAY then
+		GameService.notify(player, "⏳ Noch nicht", "Nächste Belohnung in " .. Util.formatTime(DAY - since) .. ".", "")
+		return
+	end
+	if since > STREAK_RESET then
+		data.daily.streak = 0
+	end
+	data.daily.streak = (data.daily.streak % #Config.Daily) + 1
+	data.daily.last = now
+	local text = give(player, data, Config.Daily[data.daily.streak])
+	GameService.notify(player, "📅 Tag " .. data.daily.streak .. " von 7!", text, "good")
+	GameService.sendFull(player)
+end)
+
+Remotes.RedeemCode.OnServerEvent:Connect(function(player, code)
+	local data = DataService.get(player)
+	if not data or type(code) ~= "string" then return end
+	code = string.upper((string.gsub(code, "%s", "")))
+	local reward = Config.Codes[code]
+	if not reward then
+		GameService.notify(player, "❌ Ungültiger Code", "Diesen Code gibt es nicht (mehr).", "bad")
+		return
+	end
+	if data.codes[code] then
+		GameService.notify(player, "✅ Schon eingelöst", "Diesen Code hast du bereits benutzt.", "")
+		return
+	end
+	data.codes[code] = true
+	local text = give(player, data, reward)
+	GameService.notify(player, "🎟️ " .. reward.text, text, "good")
+	GameService.sendFull(player)
+end)
+
+Remotes.BuyPotion.OnServerEvent:Connect(function(player, id)
+	local data = DataService.get(player)
+	local p = Logic.potionById[id]
+	if not data or not p then return end
+	if data.cash < p.price then
+		GameService.notify(player, "💸 Zu wenig Geld", p.name .. " kostet " .. Util.format(p.price) .. " Geld.", "bad")
+		return
+	end
+	data.cash = data.cash - p.price
+	addPotion(data, id)
+	GameService.notify(player, p.emoji .. " " .. p.name, p.desc, "good")
+	GameService.sendFull(player)
+end)
+
+return RewardService
+]]></ProtectedString></Properties></Item>
+</Item>
+</Item>
+<Item class="StarterPlayer" referent="RBX0000001B"><Properties><string name="Name">StarterPlayer</string></Properties><Item class="StarterPlayerScripts" referent="RBX0000001A"><Properties><string name="Name">StarterPlayerScripts</string></Properties><Item class="LocalScript" referent="RBX00000019"><Properties><string name="Name">Client</string><ProtectedString name="Source"><![CDATA[--[[
+	CLIENT – startet die Oberfläche auf dem Gerät des Spielers
+	und empfängt alle Nachrichten vom Server.
+]]
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local player = Players.LocalPlayer
+local Remotes = ReplicatedStorage:WaitForChild("Remotes")
+
+local UI = require(script:WaitForChild("UI"))
+local State = require(script:WaitForChild("State"))
+local Sounds = require(script:WaitForChild("Sounds"))
+local Effects = require(script:WaitForChild("Effects"))
+local Menus = require(script:WaitForChild("Menus"))
+local Hud = require(script:WaitForChild("Hud"))
+local PetFollow = require(script:WaitForChild("PetFollow"))
+local WorldFx = require(script:WaitForChild("WorldFx"))
+
+-- Haupt-Oberfläche
+local gui = UI.new("ScreenGui", {
+	Name = "LooksmaxxerUI", ResetOnSpawn = false, ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+	Parent = player:WaitForChild("PlayerGui"),
+})
+
+Effects.init(gui)
+Menus.init(gui)
+Hud.init(gui)
+PetFollow.init()
+WorldFx.init()
+
+-- Spielstand vom Server
+local firstData = true
+Remotes:WaitForChild("Data").OnClientEvent:Connect(function(kind, payload)
+	if kind == "full" then
+		State.setFull(payload)
+		if firstData then
+			firstData = false
+			Sounds.setSfx(payload.data.settings.sfx ~= false)
+			Sounds.setMusic(payload.data.settings.music ~= false)
+		end
+	else
+		State.setLight(payload)
+	end
+end)
+
+-- Nachrichten
+Remotes:WaitForChild("Notify").OnClientEvent:Connect(function(title, text, kind)
+	if kind == "title" then
+		Effects.banner(title, text, UI.C.pink)
+	elseif kind == "rebirth" then
+		Effects.banner(title, text, UI.C.green)
+	elseif kind == "offline" then
+		Effects.banner(title, text, UI.C.purple)
+	else
+		Effects.toast(title, text, kind)
+	end
+end)
+
+Remotes:WaitForChild("HatchResult").OnClientEvent:Connect(function(results)
+	Effects.hatch(results)
+end)
+
+Remotes:WaitForChild("BattleResult").OnClientEvent:Connect(function(res)
+	Menus.close()
+	Effects.battle(res)
+end)
+
+Remotes:WaitForChild("BattleRequest").OnClientEvent:Connect(function(name, userId)
+	Effects.battleRequest(name, userId, function(accept, uid)
+		Remotes.BattleRespond:FireServer(accept, uid)
+	end)
+end)
+
+Remotes:WaitForChild("OpenMenu").OnClientEvent:Connect(function(name)
+	Menus.open(name)
+end)
+
+-- Begrüßung
+task.delay(2, function()
+	Effects.toast("✨ Willkommen bei Looksmaxxer 3000!", "Klicke auf Daily Routine, kauf Upgrades und öffne die 🎁 Geschenkbox!", "title")
+end)
+]]></ProtectedString></Properties><Item class="ModuleScript" referent="RBX00000011"><Properties><string name="Name">Effects</string><ProtectedString name="Source"><![CDATA[--[[
+	EFFECTS – alles, was kurz aufpoppt:
+	Nachrichten (Toasts), große Banner, fliegende Zahlen,
+	Box-Öffnen-Animation, Mog-Battle-Ansicht, Herausforderungen, Bestätigungen.
+]]
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local Config = require(Shared:WaitForChild("Config"))
+local Logic = require(Shared:WaitForChild("Logic"))
+local Util = require(Shared:WaitForChild("Util"))
+local UI = require(script.Parent:WaitForChild("UI"))
+local Sounds = require(script.Parent:WaitForChild("Sounds"))
+
+local Effects = {}
+local gui, overlayGui, toastHolder
+
+local function tween(inst, t, props, style)
+	local tw = TweenService:Create(inst, TweenInfo.new(t, style or Enum.EasingStyle.Quad, Enum.EasingDirection.Out), props)
+	tw:Play()
+	return tw
+end
+
+function Effects.init(mainGui)
+	gui = mainGui
+	overlayGui = UI.new("ScreenGui", {
+		Name = "LooksmaxxerOverlay", ResetOnSpawn = false, DisplayOrder = 20,
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling, Parent = Players.LocalPlayer:WaitForChild("PlayerGui"),
+	})
+	toastHolder = UI.new("Frame", {
+		Name = "Toasts", BackgroundTransparency = 1, AnchorPoint = Vector2.new(1, 0),
+		Position = UDim2.new(1, -10, 0, 80), Size = UDim2.new(0.28, 0, 0.6, 0), Parent = overlayGui,
+	})
+	UI.new("UISizeConstraint", { MinSize = Vector2.new(220, 100), MaxSize = Vector2.new(380, 600), Parent = toastHolder })
+	UI.list(toastHolder, false, 6, Enum.HorizontalAlignment.Right)
+end
+
+----------------------------------------------------------------------------
+-- Kleine Nachricht oben rechts
+----------------------------------------------------------------------------
+local KIND_COLORS = {
+	good = UI.C.green, bad = UI.C.red, global = UI.C.gold, title = UI.C.pink, world = UI.C.cyan,
+}
+function Effects.toast(title, text, kind)
+	if not toastHolder then return end
+	local color = KIND_COLORS[kind] or UI.C.purple
+	local f = UI.panel(toastHolder, { Size = UDim2.new(1, 0, 0, 66), Color = UI.C.dark, Transparency = 0.08 })
+	UI.stroke(f, color, 2, 0)
+	UI.padding(f, 8)
+	UI.text(f, "<b>" .. title .. "</b>", { Size = UDim2.new(1, 0, 0.45, 0), Color = color, XAlign = Enum.TextXAlignment.Left, MaxText = 18 })
+	UI.text(f, text or "", { Size = UDim2.new(1, 0, 0.55, 0), Position = UDim2.new(0, 0, 0.45, 0), Font = Enum.Font.GothamBold,
+		XAlign = Enum.TextXAlignment.Left, MaxText = 14 })
+	if kind == "bad" then Sounds.play("Error") else Sounds.play("Notify") end
+	-- höchstens 4 gleichzeitig
+	local frames = {}
+	for _, c in ipairs(toastHolder:GetChildren()) do
+		if c:IsA("Frame") then table.insert(frames, c) end
+	end
+	if #frames > 4 then frames[1]:Destroy() end
+	task.delay(4.5, function()
+		if f.Parent then
+			tween(f, 0.4, { BackgroundTransparency = 1 })
+			task.wait(0.4)
+			f:Destroy()
+		end
+	end)
+end
+
+----------------------------------------------------------------------------
+-- Großes Banner (neuer Titel, Rebirth, Welt, Beauty Sleep)
+----------------------------------------------------------------------------
+function Effects.banner(title, text, color)
+	local f = UI.panel(overlayGui, { AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0.12, 0),
+		Size = UDim2.new(0.5, 0, 0.16, 0), Color = color or UI.C.pink })
+	UI.new("UISizeConstraint", { MinSize = Vector2.new(300, 90), MaxSize = Vector2.new(700, 140), Parent = f })
+	UI.gradient(f, color or UI.C.pink, UI.C.purple, 0)
+	UI.stroke(f, UI.C.gold, 3, 0)
+	UI.padding(f, 10)
+	UI.text(f, "<b>" .. title .. "</b>", { Size = UDim2.new(1, 0, 0.55, 0), MaxText = 34 })
+	UI.text(f, text or "", { Size = UDim2.new(1, 0, 0.45, 0), Position = UDim2.new(0, 0, 0.55, 0), Font = Enum.Font.GothamBold, MaxText = 18 })
+	local scale = UI.new("UIScale", { Scale = 0.4, Parent = f })
+	tween(scale, 0.35, { Scale = 1 }, Enum.EasingStyle.Back)
+	Sounds.play("TitleUp")
+	task.delay(4, function()
+		tween(scale, 0.25, { Scale = 0 })
+		task.wait(0.3)
+		f:Destroy()
+	end)
+end
+
+----------------------------------------------------------------------------
+-- Fliegende "+X" Zahl
+----------------------------------------------------------------------------
+function Effects.floatText(text, position, color)
+	local l = UI.text(overlayGui, text, { Size = UDim2.new(0, 160, 0, 40), Position = position,
+		AnchorPoint = Vector2.new(0.5, 0.5), Color = color or UI.C.gold, MaxText = 30 })
+	l.TextStrokeTransparency = 0.3
+	tween(l, 0.9, { Position = position - UDim2.new(0, 0, 0, 90), TextTransparency = 1, TextStrokeTransparency = 1 })
+	task.delay(1, function() l:Destroy() end)
+end
+
+----------------------------------------------------------------------------
+-- Dunkler Hintergrund für große Fenster
+----------------------------------------------------------------------------
+local function overlay()
+	local o = UI.new("TextButton", {
+		Name = "Overlay", Size = UDim2.new(1, 0, 1, 0), BackgroundColor3 = Color3.new(0, 0, 0),
+		BackgroundTransparency = 0.35, Text = "", AutoButtonColor = false, Parent = overlayGui,
+	})
+	return o
+end
+
+----------------------------------------------------------------------------
+-- Geschenkbox öffnen
+----------------------------------------------------------------------------
+function Effects.hatch(results)
+	local o = overlay()
+	local box = UI.text(o, "🎁", { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.45, 0), Size = UDim2.new(0, 220, 0, 220), MaxText = 200 })
+	Sounds.play("Hatch")
+	-- Wackeln
+	for i = 1, 8 do
+		tween(box, 0.09, { Rotation = (i % 2 == 0) and 18 or -18 })
+		task.wait(0.1)
+	end
+	tween(box, 0.2, { Rotation = 0, Size = UDim2.new(0, 320, 0, 320), TextTransparency = 1 })
+	task.wait(0.2)
+	box:Destroy()
+
+	local row = UI.new("Frame", { BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.45, 0),
+		Size = UDim2.new(0.9, 0, 0.42, 0), Parent = o })
+	UI.list(row, true, 14, Enum.HorizontalAlignment.Center, Enum.VerticalAlignment.Center)
+	local best = 1
+	for _, r in ipairs(results) do
+		local def = Logic.petById[r.id]
+		local rarity = Config.Rarities[def.rarity]
+		if rarity.order > best then best = rarity.order end
+		local card = UI.panel(row, { Size = UDim2.new(0, 170, 0, 220), Color = rarity.color:Lerp(Color3.new(0, 0, 0), 0.55) })
+		UI.stroke(card, rarity.color, 4, 0)
+		UI.padding(card, 8)
+		UI.text(card, def.emoji, { Size = UDim2.new(1, 0, 0.5, 0), MaxText = 90 })
+		UI.text(card, def.name, { Size = UDim2.new(1, 0, 0.18, 0), Position = UDim2.new(0, 0, 0.52, 0), MaxText = 20 })
+		UI.text(card, rarity.name, { Size = UDim2.new(1, 0, 0.14, 0), Position = UDim2.new(0, 0, 0.7, 0), Color = rarity.color, MaxText = 18 })
+		UI.text(card, Util.formatPercent(def.boost) .. " Aura", { Size = UDim2.new(1, 0, 0.13, 0), Position = UDim2.new(0, 0, 0.85, 0),
+			Color = UI.C.green, Font = Enum.Font.GothamBold, MaxText = 15 })
+		if r.new then
+			local badge = UI.panel(card, { Size = UDim2.new(0, 56, 0, 24), Position = UDim2.new(1, -40, 0, -16), Color = UI.C.red, Radius = 8 })
+			UI.text(badge, "NEU!", { MaxText = 16 })
+		end
+		local s = UI.new("UIScale", { Scale = 0.2, Parent = card })
+		tween(s, 0.35, { Scale = 1 }, Enum.EasingStyle.Back)
+	end
+	if best >= 5 then Sounds.play("HatchRare") end
+	UI.text(o, "Tippen zum Schließen", { AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0.72, 0), Size = UDim2.new(0.5, 0, 0.05, 0),
+		Color = UI.C.muted, MaxText = 18 })
+	local closed = false
+	local function close()
+		if closed then return end
+		closed = true
+		o:Destroy()
+	end
+	o.Activated:Connect(close)
+	task.delay(best >= 5 and 6 or 3.5, close)
+end
+
+----------------------------------------------------------------------------
+-- Mog Battle anzeigen
+----------------------------------------------------------------------------
+function Effects.battle(res)
+	local o = overlay()
+	local p = UI.panel(o, { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0.5, 0, 0.78, 0), Color = UI.C.bg })
+	UI.new("UISizeConstraint", { MinSize = Vector2.new(320, 380), MaxSize = Vector2.new(620, 640), Parent = p })
+	UI.stroke(p, res.final and UI.C.gold or UI.C.pink, 3, 0)
+	UI.padding(p, 14)
+	local title = res.final and "💀 ENDBOSS LEON 💀" or (res.isBoss and "👑 BOSS-BATTLE 👑" or "⚔️ MOG BATTLE ⚔️")
+	UI.text(p, "<b>" .. title .. "</b>", { Size = UDim2.new(1, 0, 0.09, 0), Color = res.final and UI.C.gold or UI.C.text, MaxText = 32 })
+	local y = 0.09
+	if res.taunt then
+		UI.text(p, "<i>„" .. res.taunt .. "“</i>", { Size = UDim2.new(1, 0, 0.05, 0), Position = UDim2.new(0, 0, y, 0), Color = UI.C.muted,
+			Font = Enum.Font.GothamBold, MaxText = 16 })
+		y = y + 0.05
+	end
+	UI.text(p, "<font color='" .. UI.hex(UI.C.gold) .. "'>DU</font>   VS   <font color='" .. UI.hex(UI.C.cyan) .. "'>" .. res.opponent .. "</font>",
+		{ Size = UDim2.new(1, 0, 0.08, 0), Position = UDim2.new(0, 0, y, 0), MaxText = 26 })
+	y = y + 0.1
+	local rounds = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0.45, 0), Position = UDim2.new(0, 0, y, 0), Parent = p })
+	UI.list(rounds, false, 5)
+	local verdict = UI.text(p, "", { Size = UDim2.new(1, 0, 0.08, 0), Position = UDim2.new(0, 0, 0.7, 0), MaxText = 30 })
+	local info = UI.text(p, "", { Size = UDim2.new(1, 0, 0.1, 0), Position = UDim2.new(0, 0, 0.78, 0), Font = Enum.Font.GothamBold, MaxText = 16 })
+	Sounds.play("BattleStart")
+
+	local catByName = {}
+	for _, c in ipairs(Config.Categories) do catByName[c.id] = c end
+	for i, r in ipairs(res.rounds) do
+		task.wait(res.isBoss and 0.9 or 0.7)
+		if not p.Parent then return end
+		local win = r.a > r.b
+		local row = UI.panel(rounds, { Size = UDim2.new(1, 0, 0.18, 0), Color = UI.C.panel2, LayoutOrder = i, Radius = 10 })
+		UI.text(row, (win and "✅ " or "") .. Util.format(r.a), { Size = UDim2.new(0.25, 0, 1, 0), Color = win and UI.C.green or UI.C.red, MaxText = 20 })
+		local c = catByName[r.cat]
+		UI.text(row, "Runde " .. i .. " · " .. c.emoji .. " " .. Config.BattleNames[r.cat], { Size = UDim2.new(0.5, 0, 1, 0), Position = UDim2.new(0.25, 0, 0, 0),
+			Color = UI.C.muted, MaxText = 16 })
+		UI.text(row, Util.format(r.b) .. (win and "" or " ✅"), { Size = UDim2.new(0.25, 0, 1, 0), Position = UDim2.new(0.75, 0, 0, 0),
+			Color = win and UI.C.red or UI.C.green, MaxText = 20 })
+	end
+	task.wait(0.6)
+	if not p.Parent then return end
+	if res.won then
+		verdict.Text = "🏆 DU MOGGST! (" .. res.wins .. ":" .. (5 - res.wins) .. ")"
+		verdict.TextColor3 = UI.C.green
+		Sounds.play("BattleWin")
+	else
+		verdict.Text = "💀 GEMOGGT! (" .. res.wins .. ":" .. (5 - res.wins) .. ")"
+		verdict.TextColor3 = UI.C.red
+		Sounds.play("BattleLose")
+	end
+	local rewardText = ""
+	if res.reward and (res.reward.aura > 0 or res.reward.cash > 0) then
+		rewardText = "\n<font color='" .. UI.hex(UI.C.gold) .. "'>+" .. Util.format(res.reward.aura) .. " Aura · +" .. Util.format(res.reward.cash) .. " Geld</font>"
+		if res.isBoss then rewardText = rewardText .. "\n🎁 Gratis-Box kommt gleich!" end
+	end
+	info.Text = (res.text or "") .. rewardText
+	UI.button(p, res.won and "Ehrenrunde 😎" or "Ab ins Gym 💪", UI.C.pink, function() o:Destroy() end,
+		{ AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 1, 0), Size = UDim2.new(0.6, 0, 0.09, 0) })
+end
+
+----------------------------------------------------------------------------
+-- Herausforderung von einem anderen Spieler
+----------------------------------------------------------------------------
+function Effects.battleRequest(name, userId, respond)
+	local f = UI.panel(overlayGui, { AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 0.78, 0), Size = UDim2.new(0.4, 0, 0.14, 0), Color = UI.C.dark })
+	UI.new("UISizeConstraint", { MinSize = Vector2.new(300, 90), MaxSize = Vector2.new(520, 120), Parent = f })
+	UI.stroke(f, UI.C.orange, 3, 0)
+	UI.padding(f, 8)
+	UI.text(f, "⚔️ <b>" .. name .. "</b> fordert dich zum Mog Battle heraus!", { Size = UDim2.new(1, 0, 0.5, 0), MaxText = 20 })
+	local done = false
+	local function answer(ok)
+		if done then return end
+		done = true
+		respond(ok, userId)
+		f:Destroy()
+	end
+	UI.button(f, "✅ Annehmen", UI.C.green, function() answer(true) end, { Size = UDim2.new(0.48, 0, 0.42, 0), Position = UDim2.new(0, 0, 0.56, 0), TextColor = UI.C.dark })
+	UI.button(f, "❌ Ablehnen", UI.C.red, function() answer(false) end, { Size = UDim2.new(0.48, 0, 0.42, 0), Position = UDim2.new(0.52, 0, 0.56, 0) })
+	task.delay(15, function() answer(false) end)
+end
+
+----------------------------------------------------------------------------
+-- Ja/Nein-Abfrage
+----------------------------------------------------------------------------
+function Effects.confirm(title, text, yesLabel, onYes)
+	local o = overlay()
+	local p = UI.panel(o, { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0.4, 0, 0.36, 0), Color = UI.C.bg })
+	UI.new("UISizeConstraint", { MinSize = Vector2.new(300, 200), MaxSize = Vector2.new(520, 300), Parent = p })
+	UI.stroke(p, UI.C.pink, 2, 0)
+	UI.padding(p, 14)
+	UI.text(p, "<b>" .. title .. "</b>", { Size = UDim2.new(1, 0, 0.22, 0), MaxText = 26 })
+	UI.text(p, text, { Size = UDim2.new(1, 0, 0.45, 0), Position = UDim2.new(0, 0, 0.24, 0), Font = Enum.Font.GothamBold, MaxText = 16 })
+	UI.button(p, "Abbrechen", UI.C.grey, function() o:Destroy() end, { Size = UDim2.new(0.48, 0, 0.24, 0), Position = UDim2.new(0, 0, 0.76, 0) })
+	UI.button(p, yesLabel or "Ja", UI.C.pink, function()
+		o:Destroy()
+		onYes()
+	end, { Size = UDim2.new(0.48, 0, 0.24, 0), Position = UDim2.new(0.52, 0, 0.76, 0) })
+end
+
+return Effects
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX00000012"><Properties><string name="Name">Hud</string><ProtectedString name="Source"><![CDATA[--[[
+	HUD – die ständige Anzeige:
+	oben die Werte, links die Menü-Knöpfe, unten der Daily-Routine-Knopf
+	mit Titel und Fortschritt zum nächsten Titel.
+]]
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local Config = require(Shared:WaitForChild("Config"))
+local Logic = require(Shared:WaitForChild("Logic"))
+local Util = require(Shared:WaitForChild("Util"))
+local Remotes = ReplicatedStorage:WaitForChild("Remotes")
+local UI = require(script.Parent:WaitForChild("UI"))
+local State = require(script.Parent:WaitForChild("State"))
+local Sounds = require(script.Parent:WaitForChild("Sounds"))
+local Effects = require(script.Parent:WaitForChild("Effects"))
+local Menus = require(script.Parent:WaitForChild("Menus"))
+
+local Hud = {}
+local C = UI.C
+local chips = {}
+local titleLabel, nextLabel, progressBar, routineSub, routineBtn, rewardsDot
+
+local function chip(parent, key, caption, color, order)
+	local f = UI.panel(parent, { Size = UDim2.new(0.19, 0, 1, 0), Color = C.dark, Transparency = 0.15, LayoutOrder = order })
+	UI.stroke(f, color, 2, 0.3)
+	UI.text(f, caption, { Size = UDim2.new(1, 0, 0.34, 0), Position = UDim2.new(0, 0, 0.04, 0), Color = C.muted, Font = Enum.Font.GothamBold, MaxText = 12 })
+	chips[key] = UI.text(f, "0", { Size = UDim2.new(1, -8, 0.58, 0), Position = UDim2.new(0, 4, 0.38, 0), Color = color, MaxText = 24 })
+end
+
+function Hud.init(gui)
+	-- Werte oben
+	local top = UI.new("Frame", { Name = "TopBar", BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, 6),
+		Size = UDim2.new(0.66, 0, 0.08, 0), Parent = gui })
+	UI.new("UISizeConstraint", { MinSize = Vector2.new(320, 44), MaxSize = Vector2.new(900, 62), Parent = top })
+	UI.list(top, true, 6, Enum.HorizontalAlignment.Center)
+	chip(top, "aura", "✨ AURA", C.gold, 1)
+	chip(top, "aps", "⚡ PRO SEK.", C.green, 2)
+	chip(top, "cash", "💵 GELD", C.money, 3)
+	chip(top, "glow", "💖 GLOW", C.pink, 4)
+	chip(top, "reb", "♻️ REBIRTHS", C.cyan, 5)
+
+	-- Menü-Knöpfe links
+	local side = UI.new("Frame", { Name = "Side", BackgroundTransparency = 1, AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 8, 0.5, 0),
+		Size = UDim2.new(0.075, 0, 0.7, 0), Parent = gui })
+	UI.new("UISizeConstraint", { MinSize = Vector2.new(50, 300), MaxSize = Vector2.new(82, 640), Parent = side })
+	UI.list(side, false, 6, Enum.HorizontalAlignment.Center, Enum.VerticalAlignment.Center)
+	local buttons = {
+		{ "upgrades", "💪", "Upgrades", C.pink }, { "pets", "🐾", "Pets", C.purple }, { "worlds", "🌍", "Welten", C.cyan },
+		{ "rebirth", "♻️", "Rebirth", C.green }, { "leaderboard", "🏆", "Rangliste", C.gold }, { "rewards", "🎁", "Belohnung", C.orange },
+		{ "settings", "⚙️", "Optionen", C.grey },
+	}
+	for i, b in ipairs(buttons) do
+		local btn = UI.new("TextButton", { Text = "", AutoButtonColor = true, BackgroundColor3 = b[4], Size = UDim2.new(1, 0, 1 / 7, -6),
+			LayoutOrder = i, Parent = side })
+		UI.new("UIAspectRatioConstraint", { AspectRatio = 1, Parent = btn })
+		UI.corner(btn, 14)
+		UI.stroke(btn, Color3.new(1, 1, 1), 2, 0.6)
+		UI.text(btn, b[2], { Size = UDim2.new(1, 0, 0.62, 0), MaxText = 34 })
+		UI.text(btn, b[3], { Size = UDim2.new(1, -4, 0.3, 0), Position = UDim2.new(0, 2, 0.66, 0), MaxText = 12 })
+		btn.Activated:Connect(function()
+			Menus.toggle(b[1])
+		end)
+		if b[1] == "rewards" then
+			rewardsDot = UI.panel(btn, { Size = UDim2.new(0, 16, 0, 16), Position = UDim2.new(1, -12, 0, -4), Color = C.red, Radius = 8 })
+			rewardsDot.Visible = false
+		end
+	end
+
+	-- Unten: Titel, Fortschritt, Daily Routine
+	local bottom = UI.new("Frame", { Name = "Bottom", BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 1, -10),
+		Size = UDim2.new(0.3, 0, 0.22, 0), Parent = gui })
+	UI.new("UISizeConstraint", { MinSize = Vector2.new(240, 130), MaxSize = Vector2.new(420, 190), Parent = bottom })
+	titleLabel = UI.text(bottom, "NPC", { Size = UDim2.new(1, 0, 0.18, 0), Color = C.pink, MaxText = 24 })
+	titleLabel.TextStrokeTransparency = 0.4
+	local barBg = UI.panel(bottom, { Size = UDim2.new(1, 0, 0.07, 0), Position = UDim2.new(0, 0, 0.2, 0), Color = C.dark, Radius = 6 })
+	progressBar = UI.panel(barBg, { Size = UDim2.new(0, 0, 1, 0), Color = C.pink, Radius = 6 })
+	UI.gradient(progressBar, C.pink, C.gold, 0)
+	nextLabel = UI.text(bottom, "", { Size = UDim2.new(1, 0, 0.12, 0), Position = UDim2.new(0, 0, 0.28, 0), Color = C.muted, Font = Enum.Font.GothamBold, MaxText = 14 })
+	nextLabel.TextStrokeTransparency = 0.5
+
+	routineBtn = UI.new("TextButton", { Name = "Routine", Text = "", AutoButtonColor = true, BackgroundColor3 = C.pink,
+		Size = UDim2.new(1, 0, 0.56, 0), Position = UDim2.new(0, 0, 0.44, 0), Parent = bottom })
+	UI.corner(routineBtn, 18)
+	UI.gradient(routineBtn, C.pink, C.cyan, 0)
+	UI.stroke(routineBtn, Color3.new(1, 1, 1), 3, 0.3)
+	local scale = UI.new("UIScale", { Parent = routineBtn })
+	UI.text(routineBtn, "🪞 DAILY ROUTINE", { Size = UDim2.new(1, 0, 0.58, 0), Position = UDim2.new(0, 0, 0.06, 0), MaxText = 34 })
+	routineSub = UI.text(routineBtn, "+1 Aura", { Size = UDim2.new(1, 0, 0.32, 0), Position = UDim2.new(0, 0, 0.62, 0), Font = Enum.Font.GothamBold, MaxText = 18 })
+
+	routineBtn.Activated:Connect(function()
+		local s = State.snap
+		if not s then return end
+		Remotes.Click:FireServer()
+		s.data.aura = s.data.aura + s.click      -- sofort anzeigen
+		State.bump()
+		Sounds.play("Click")
+		local pos = routineBtn.AbsolutePosition
+		local size = routineBtn.AbsoluteSize
+		Effects.floatText("+" .. Util.format(s.click), UDim2.new(0, pos.X + size.X * (0.3 + math.random() * 0.4), 0, pos.Y), C.gold)
+		scale.Scale = 0.93
+		TweenService:Create(scale, TweenInfo.new(0.15, Enum.EasingStyle.Back), { Scale = 1 }):Play()
+	end)
+
+	State.onChange(Hud.update)
+end
+
+function Hud.update()
+	local s = State.snap
+	if not s then return end
+	local d = s.data
+	chips.aura.Text = Util.format(d.aura)
+	chips.aps.Text = Util.format(s.aps)
+	chips.cash.Text = Util.format(d.cash)
+	chips.glow.Text = Util.format(s.glow)
+	chips.reb.Text = tostring(d.rebirths)
+	routineSub.Text = "+" .. Util.format(s.click) .. " Aura pro Klick"
+
+	local idx = Logic.titleIndex(s.glow)
+	titleLabel.Text = "🏷️ " .. Config.Titles[idx].title
+	local nextT = Config.Titles[idx + 1]
+	if nextT then
+		local prev = Config.Titles[idx].glow
+		progressBar.Size = UDim2.new(math.clamp((s.glow - prev) / (nextT.glow - prev), 0, 1), 0, 1, 0)
+		nextLabel.Text = "Nächster Titel: " .. nextT.title .. " (" .. Util.format(s.glow) .. "/" .. Util.format(nextT.glow) .. " Glow)"
+	else
+		progressBar.Size = UDim2.new(1, 0, 1, 0)
+		nextLabel.Text = "Höchster Titel erreicht!"
+	end
+	if rewardsDot then
+		rewardsDot.Visible = Menus.dailyReady()
+	end
+end
+
+return Hud
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX00000013"><Properties><string name="Name">Menus</string><ProtectedString name="Source"><![CDATA[--[[
+	MENUS – alle Menüfenster:
+	💪 Upgrades · 🐾 Pets · 🌍 Welten · ♻️ Rebirth · 🏆 Rangliste · 🎁 Belohnungen · ⚙️ Einstellungen
+]]
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local Config = require(Shared:WaitForChild("Config"))
+local Logic = require(Shared:WaitForChild("Logic"))
+local Util = require(Shared:WaitForChild("Util"))
+local Remotes = ReplicatedStorage:WaitForChild("Remotes")
+local UI = require(script.Parent:WaitForChild("UI"))
+local State = require(script.Parent:WaitForChild("State"))
+local Sounds = require(script.Parent:WaitForChild("Sounds"))
+local Effects = require(script.Parent:WaitForChild("Effects"))
+
+local Menus = {}
+local window, titleLabel, content
+local current = nil        -- Name des offenen Menüs
+local refreshFn = nil      -- Aktualisierungsfunktion des offenen Menüs
+local C = UI.C
+
+local function snap() return State.snap end
+local function data() return State.snap and State.snap.data end
+
+----------------------------------------------------------------------------
+-- Fenster
+----------------------------------------------------------------------------
+function Menus.init(gui)
+	window = UI.panel(gui, { Name = "Window", AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.52, 0),
+		Size = UDim2.new(0.62, 0, 0.74, 0), Color = C.bg, Transparency = 0.03 })
+	window.Visible = false
+	UI.new("UISizeConstraint", { MinSize = Vector2.new(330, 300), MaxSize = Vector2.new(880, 620), Parent = window })
+	UI.stroke(window, C.pink, 2, 0.2)
+	local header = UI.panel(window, { Size = UDim2.new(1, 0, 0, 48), Color = C.panel })
+	UI.gradient(header, C.pink, C.purple, 0)
+	titleLabel = UI.text(header, "", { Size = UDim2.new(1, -60, 1, -8), Position = UDim2.new(0, 14, 0, 4), XAlign = Enum.TextXAlignment.Left, MaxText = 26 })
+	UI.button(header, "✕", C.dark, function() Menus.close() end, { Size = UDim2.new(0, 38, 0, 38), Position = UDim2.new(1, -44, 0, 5), MaxText = 22 })
+	content = UI.new("Frame", { Name = "Content", BackgroundTransparency = 1, Position = UDim2.new(0, 10, 0, 56),
+		Size = UDim2.new(1, -20, 1, -64), Parent = window })
+
+	State.onChange(function(kind)
+		if refreshFn and window.Visible then
+			refreshFn(kind)
+		end
+	end)
+end
+
+local BUILDERS = {}
+local TITLES = {
+	upgrades = "💪 Upgrades", pets = "🐾 Pets", worlds = "🌍 Welten", rebirth = "♻️ Rebirth",
+	leaderboard = "🏆 Globale Rangliste", rewards = "🎁 Belohnungen", settings = "⚙️ Einstellungen",
+}
+
+function Menus.open(name)
+	if not BUILDERS[name] or not State.snap then return end
+	UI.clear(content)
+	for _, c in ipairs(content:GetChildren()) do c:Destroy() end
+	current = name
+	titleLabel.Text = TITLES[name]
+	window.Visible = true
+	refreshFn = BUILDERS[name](content)
+	if refreshFn then refreshFn("full") end
+end
+
+function Menus.close()
+	window.Visible = false
+	current = nil
+	refreshFn = nil
+end
+
+function Menus.toggle(name)
+	if current == name and window.Visible then
+		Menus.close()
+	else
+		Menus.open(name)
+	end
+end
+
+----------------------------------------------------------------------------
+-- 💪 UPGRADES
+----------------------------------------------------------------------------
+local upgradeTab = "skin"
+local buyAmount = 1
+
+BUILDERS.upgrades = function(root)
+	local tabs = UI.scroll(root, { Size = UDim2.new(1, 0, 0, 40), Horizontal = true })
+	UI.list(tabs, true, 6)
+	local amountRow = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 34), Position = UDim2.new(0, 0, 0, 46), Parent = root })
+	UI.list(amountRow, true, 6, Enum.HorizontalAlignment.Right)
+	local list = UI.scroll(root, { Size = UDim2.new(1, 0, 1, -86), Position = UDim2.new(0, 0, 0, 86) })
+	UI.list(list, false, 6)
+	UI.padding(list, 2)
+
+	local rows = {}
+	local tabButtons = {}
+	local amountButtons = {}
+
+	local function buildRows()
+		UI.clear(list)
+		rows = {}
+		local order = 0
+		for _, u in ipairs(Config.Upgrades) do
+			if u.cat == upgradeTab then
+				order = order + 1
+				local row = UI.panel(list, { Size = UDim2.new(1, -10, 0, 76), Color = C.panel2, LayoutOrder = order })
+				UI.text(row, u.emoji, { Size = UDim2.new(0, 56, 1, 0), MaxText = 40 })
+				local name = UI.text(row, "", { Size = UDim2.new(1, -200, 0.38, 0), Position = UDim2.new(0, 60, 0.04, 0), XAlign = Enum.TextXAlignment.Left, MaxText = 20 })
+				local desc = UI.text(row, u.desc, { Size = UDim2.new(1, -200, 0.3, 0), Position = UDim2.new(0, 60, 0.4, 0), XAlign = Enum.TextXAlignment.Left,
+					Font = Enum.Font.Gotham, Color = C.muted, MaxText = 14 })
+				local parts = {}
+				if u.aps > 0 then table.insert(parts, "+" .. Util.format(u.aps) .. " Aura/s") end
+				if u.click > 0 then table.insert(parts, "+" .. Util.format(u.click) .. " pro Klick") end
+				table.insert(parts, "+" .. u.glow .. " Glow")
+				UI.text(row, table.concat(parts, " · ") .. " je Stufe", { Size = UDim2.new(1, -200, 0.26, 0), Position = UDim2.new(0, 60, 0.7, 0),
+					XAlign = Enum.TextXAlignment.Left, Font = Enum.Font.GothamBold, Color = C.green, MaxText = 13 })
+				local btn = UI.button(row, "", C.gold, function()
+					Remotes.BuyUpgrade:FireServer(u.id, buyAmount)
+					Sounds.play("Buy")
+				end, { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.new(0, 128, 0, 54), TextColor = C.dark, MaxText = 18 })
+				rows[u.id] = { name = name, btn = btn, u = u, desc = desc }
+			end
+		end
+	end
+
+	local function update()
+		local d = data()
+		for id, r in pairs(rows) do
+			local level = Logic.level(d, id)
+			r.name.Text = r.u.name .. "  <font color='" .. UI.hex(C.cyan) .. "' size='14'>Stufe " .. level .. "/" .. Config.MAX_LEVEL .. "</font>"
+			if level >= Config.MAX_LEVEL then
+				r.btn.Text = "✅ MAX"
+				r.btn.BackgroundColor3 = C.grey
+				r.btn.TextColor3 = C.text
+			else
+				local count, cost = Logic.bulk(r.u, level, buyAmount, d.aura)
+				local affordable = cost <= d.aura
+				r.btn.Text = Util.format(cost) .. " ✨\n<font size='12'>" .. (count > 1 and (count .. " Stufen") or "kaufen") .. "</font>"
+				r.btn.BackgroundColor3 = affordable and C.gold or C.grey
+				r.btn.TextColor3 = affordable and C.dark or C.muted
+			end
+		end
+		for id, b in pairs(tabButtons) do
+			b.BackgroundColor3 = (id == upgradeTab) and C.pink or C.panel2
+		end
+		for amt, b in pairs(amountButtons) do
+			b.BackgroundColor3 = (tostring(buyAmount) == amt) and C.cyan or C.panel2
+			b.TextColor3 = (tostring(buyAmount) == amt) and C.dark or C.text
+		end
+	end
+
+	for i, cat in ipairs(Config.Categories) do
+		tabButtons[cat.id] = UI.button(tabs, cat.emoji .. " " .. cat.name, C.panel2, function()
+			upgradeTab = cat.id
+			buildRows()
+			update()
+		end, { Size = UDim2.new(0, 150, 1, -6), LayoutOrder = i, MaxText = 16 })
+	end
+	UI.text(amountRow, "Menge:", { Size = UDim2.new(0, 70, 1, 0), LayoutOrder = 0, MaxText = 16, Color = C.muted })
+	for i, amt in ipairs({ "1", "10", "max" }) do
+		amountButtons[amt] = UI.button(amountRow, amt == "max" and "Max" or ("x" .. amt), C.panel2, function()
+			buyAmount = (amt == "max") and "max" or tonumber(amt)
+			update()
+		end, { Size = UDim2.new(0, 64, 1, 0), LayoutOrder = i, MaxText = 16 })
+	end
+
+	buildRows()
+	return function()
+		update()
+	end
+end
+
+----------------------------------------------------------------------------
+-- 🐾 PETS
+----------------------------------------------------------------------------
+local selectedPet = nil
+
+BUILDERS.pets = function(root)
+	local info = UI.text(root, "", { Size = UDim2.new(0.7, 0, 0, 30), XAlign = Enum.TextXAlignment.Left, Font = Enum.Font.GothamBold, MaxText = 16 })
+	UI.button(root, "⭐ Beste ausrüsten", C.pink, function()
+		Remotes.EquipBest:FireServer()
+	end, { AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, 0, 0, 0), Size = UDim2.new(0.28, 0, 0, 32), MaxText = 16 })
+	local grid = UI.scroll(root, { Size = UDim2.new(0.6, -6, 1, -42), Position = UDim2.new(0, 0, 0, 42) })
+	UI.new("UIGridLayout", { CellSize = UDim2.new(0, 86, 0, 104), CellPadding = UDim2.new(0, 6, 0, 6), SortOrder = Enum.SortOrder.LayoutOrder, Parent = grid })
+	local detail = UI.panel(root, { Size = UDim2.new(0.4, -6, 1, -42), Position = UDim2.new(0.6, 6, 0, 42), Color = C.panel })
+	UI.padding(detail, 10)
+
+	local function showDetail()
+		UI.clear(detail)
+		local d = data()
+		local pet = nil
+		for _, p in ipairs(d.pets) do
+			if p.uid == selectedPet then pet = p end
+		end
+		if not pet then
+			UI.text(detail, "👈 Wähle ein Pet aus.\n\nPets folgen dir und geben dir Aura-Boosts. Öffne Geschenkboxen in jeder Welt, um neue zu finden!",
+				{ Font = Enum.Font.GothamBold, Color = C.muted, MaxText = 16 })
+			return
+		end
+		local def = Logic.petById[pet.id]
+		local rarity = Config.Rarities[def.rarity]
+		local tier = Config.PetTiers[pet.tier]
+		UI.text(detail, def.emoji, { Size = UDim2.new(1, 0, 0.26, 0), MaxText = 80 })
+		UI.text(detail, def.name, { Size = UDim2.new(1, 0, 0.09, 0), Position = UDim2.new(0, 0, 0.27, 0), MaxText = 22 })
+		UI.text(detail, rarity.name .. (pet.tier > 1 and (" · " .. tier.name) or ""), { Size = UDim2.new(1, 0, 0.07, 0), Position = UDim2.new(0, 0, 0.36, 0),
+			Color = tier.color or rarity.color, MaxText = 18 })
+		UI.text(detail, Util.formatPercent(Logic.petBoost(pet)) .. " Aura", { Size = UDim2.new(1, 0, 0.07, 0), Position = UDim2.new(0, 0, 0.43, 0),
+			Color = C.green, MaxText = 20 })
+		local same = 0
+		for _, p in ipairs(d.pets) do
+			if p.id == pet.id and p.tier == pet.tier then same = same + 1 end
+		end
+		UI.button(detail, pet.eq and "Ablegen" or "Ausrüsten", pet.eq and C.grey or C.green, function()
+			Remotes.EquipPet:FireServer(pet.uid, not pet.eq)
+		end, { Size = UDim2.new(1, 0, 0.12, 0), Position = UDim2.new(0, 0, 0.53, 0), TextColor = pet.eq and C.text or C.dark })
+		if pet.tier < #Config.PetTiers then
+			local nextTier = Config.PetTiers[pet.tier + 1]
+			UI.button(detail, "🔮 Fusionieren (" .. same .. "/" .. Config.FUSE_COUNT .. ") → " .. nextTier.name, same >= Config.FUSE_COUNT and C.purple or C.grey, function()
+				Remotes.FusePet:FireServer(pet.uid)
+			end, { Size = UDim2.new(1, 0, 0.12, 0), Position = UDim2.new(0, 0, 0.67, 0), MaxText = 16 })
+		end
+		UI.button(detail, "🗑️ Löschen", C.red, function()
+			Effects.confirm("Pet löschen?", def.emoji .. " " .. def.name .. " wirklich löschen? Das kann man nicht rückgängig machen.", "Löschen", function()
+				Remotes.DeletePet:FireServer(pet.uid)
+				selectedPet = nil
+			end)
+		end, { Size = UDim2.new(1, 0, 0.12, 0), Position = UDim2.new(0, 0, 0.81, 0) })
+	end
+
+	local function build()
+		local s, d = snap(), data()
+		local indexCount = 0
+		for _ in pairs(d.index) do indexCount = indexCount + 1 end
+		info.Text = "🐾 Ausgerüstet " .. Logic.equippedCount(d) .. "/" .. s.petSlots .. "  ·  🎒 " .. #d.pets .. "/" .. Config.MAX_PET_INVENTORY
+			.. "  ·  Boost " .. Util.formatMult(s.petMult) .. "  ·  📖 " .. indexCount .. "/" .. #Config.Pets
+		UI.clear(grid)
+		local sorted = Util.copy(d.pets)
+		table.sort(sorted, function(a, b)
+			if a.eq ~= b.eq then return a.eq end
+			return Logic.petBoost(a) > Logic.petBoost(b)
+		end)
+		for i, pet in ipairs(sorted) do
+			local def = Logic.petById[pet.id]
+			if def then
+				local rarity = Config.Rarities[def.rarity]
+				local tier = Config.PetTiers[pet.tier]
+				local cell = UI.new("TextButton", { Text = "", AutoButtonColor = true, BackgroundColor3 = rarity.color:Lerp(Color3.new(0, 0, 0), 0.6),
+					LayoutOrder = i, Parent = grid })
+				UI.corner(cell, 10)
+				UI.stroke(cell, tier.color or rarity.color, pet.uid == selectedPet and 4 or 2, 0)
+				UI.text(cell, def.emoji, { Size = UDim2.new(1, 0, 0.55, 0), MaxText = 44 })
+				UI.text(cell, Util.formatPercent(Logic.petBoost(pet)), { Size = UDim2.new(1, -4, 0.2, 0), Position = UDim2.new(0, 2, 0.56, 0), Color = C.green, MaxText = 13 })
+				UI.text(cell, pet.tier > 1 and tier.name or rarity.name, { Size = UDim2.new(1, -4, 0.18, 0), Position = UDim2.new(0, 2, 0.78, 0),
+					Color = tier.color or rarity.color, Font = Enum.Font.GothamBold, MaxText = 11 })
+				if pet.eq then
+					UI.text(cell, "✅", { Size = UDim2.new(0, 22, 0, 22), Position = UDim2.new(1, -24, 0, 2), MaxText = 18 })
+				end
+				cell.Activated:Connect(function()
+					selectedPet = pet.uid
+					build()
+				end)
+			end
+		end
+		if #sorted == 0 then
+			UI.text(grid, "Noch keine Pets.\nGeh zur 🎁 Geschenkbox!", { Color = C.muted, MaxText = 16 })
+		end
+		showDetail()
+	end
+
+	return function(kind)
+		if kind == "full" then build() end
+	end
+end
+
+----------------------------------------------------------------------------
+-- 🌍 WELTEN
+----------------------------------------------------------------------------
+BUILDERS.worlds = function(root)
+	local list = UI.scroll(root)
+	UI.list(list, false, 6)
+	UI.padding(list, 2)
+	local rows = {}
+	for i, w in ipairs(Config.Worlds) do
+		local row = UI.panel(list, { Size = UDim2.new(1, -10, 0, 70), Color = C.panel2, LayoutOrder = i })
+		UI.stroke(row, w.accent, 2, 0.3)
+		UI.text(row, w.emoji, { Size = UDim2.new(0, 60, 1, 0), MaxText = 40 })
+		UI.text(row, "<b>" .. i .. ". " .. w.name .. "</b>  <font color='" .. UI.hex(C.gold) .. "'>Aura x" .. Util.format(w.mult) .. "</font>",
+			{ Size = UDim2.new(1, -230, 0.5, 0), Position = UDim2.new(0, 64, 0, 4), XAlign = Enum.TextXAlignment.Left, MaxText = 20 })
+		local req = UI.text(row, "", { Size = UDim2.new(1, -230, 0.4, 0), Position = UDim2.new(0, 64, 0.52, 0), XAlign = Enum.TextXAlignment.Left,
+			Font = Enum.Font.GothamBold, Color = C.muted, MaxText = 14 })
+		local btn = UI.button(row, "", C.cyan, function()
+			Remotes.Teleport:FireServer(i)
+			Menus.close()
+		end, { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.new(0, 150, 0, 48), MaxText = 16 })
+		rows[i] = { req = req, btn = btn, w = w }
+	end
+	return function()
+		local s, d = snap(), data()
+		for i, r in ipairs(rows) do
+			local w = r.w
+			local unlocked = Logic.worldUnlocked(d, i)
+			if s.world == i then
+				r.req.Text = "📍 Du bist hier"
+				r.btn.Text = "📍 Hier"
+				r.btn.BackgroundColor3 = C.grey
+			elseif unlocked then
+				r.req.Text = "✅ Freigeschaltet"
+				r.btn.Text = "🌀 Teleport"
+				r.btn.BackgroundColor3 = C.cyan
+				r.btn.TextColor3 = C.dark
+			else
+				local parts = { "💸 " .. Util.format(w.cost) .. " Aura" }
+				if w.rebirths > 0 then table.insert(parts, "♻️ " .. w.rebirths .. " Rebirths") end
+				r.req.Text = table.concat(parts, "  ·  ")
+				local canBuy = Logic.worldUnlocked(d, i - 1) and d.aura >= w.cost and d.rebirths >= w.rebirths
+				r.btn.Text = canBuy and "🔓 Freischalten" or "🔒 Gesperrt"
+				r.btn.BackgroundColor3 = canBuy and C.gold or C.grey
+				r.btn.TextColor3 = canBuy and C.dark or C.muted
+			end
+		end
+	end
+end
+
+----------------------------------------------------------------------------
+-- ♻️ REBIRTH
+----------------------------------------------------------------------------
+BUILDERS.rebirth = function(root)
+	local top = UI.panel(root, { Size = UDim2.new(1, 0, 0.42, 0), Color = C.panel2 })
+	UI.padding(top, 10)
+	local infoL = UI.text(top, "", { Size = UDim2.new(0.62, 0, 0.62, 0), XAlign = Enum.TextXAlignment.Left, Font = Enum.Font.GothamBold, MaxText = 17 })
+	local barBg = UI.panel(top, { Size = UDim2.new(0.62, 0, 0.12, 0), Position = UDim2.new(0, 0, 0.66, 0), Color = C.dark, Radius = 8 })
+	local bar = UI.panel(barBg, { Size = UDim2.new(0, 0, 1, 0), Color = C.green, Radius = 8 })
+	UI.gradient(bar, C.pink, C.gold, 0)
+	UI.text(top, "Aura & Upgrades werden zurückgesetzt. Pets, Welten, Geld und Perks bleiben!", { Size = UDim2.new(0.62, 0, 0.18, 0),
+		Position = UDim2.new(0, 0, 0.82, 0), XAlign = Enum.TextXAlignment.Left, Font = Enum.Font.Gotham, Color = C.muted, MaxText = 13 })
+	local rbBtn = UI.button(top, "♻️ REBIRTH!", C.gold, function()
+		local s = snap()
+		Effects.confirm("♻️ Rebirth machen?", "Du startest mit Aura und Upgrades neu, bekommst aber dauerhaft x" .. Util.format(Logic.rebirthMult(s.data.rebirths + 1))
+			.. " Aura und " .. Logic.rebirthPointsFor(s.data.rebirths + 1) .. " Rebirth-Punkte.", "Rebirth!", function()
+			Remotes.Rebirth:FireServer()
+			Sounds.play("Rebirth")
+		end)
+	end, { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, 0, 0.5, 0), Size = UDim2.new(0.34, 0, 0.5, 0), TextColor = C.dark, MaxText = 26 })
+
+	local shopTitle = UI.text(root, "", { Size = UDim2.new(1, 0, 0, 30), Position = UDim2.new(0, 0, 0.44, 4), XAlign = Enum.TextXAlignment.Left, MaxText = 20 })
+	local list = UI.scroll(root, { Size = UDim2.new(1, 0, 0.56, -40), Position = UDim2.new(0, 0, 0.44, 40) })
+	UI.list(list, false, 6)
+	UI.padding(list, 2)
+	local rows = {}
+	for i, perk in ipairs(Config.RebirthShop) do
+		local row = UI.panel(list, { Size = UDim2.new(1, -10, 0, 60), Color = C.panel2, LayoutOrder = i })
+		UI.text(row, perk.emoji, { Size = UDim2.new(0, 50, 1, 0), MaxText = 32 })
+		local name = UI.text(row, "", { Size = UDim2.new(1, -200, 0.5, 0), Position = UDim2.new(0, 54, 0.04, 0), XAlign = Enum.TextXAlignment.Left, MaxText = 18 })
+		UI.text(row, perk.desc, { Size = UDim2.new(1, -200, 0.42, 0), Position = UDim2.new(0, 54, 0.54, 0), XAlign = Enum.TextXAlignment.Left,
+			Font = Enum.Font.Gotham, Color = C.muted, MaxText = 13 })
+		local btn = UI.button(row, "", C.cyan, function()
+			Remotes.BuyPerk:FireServer(perk.id)
+		end, { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.new(0, 120, 0, 42), MaxText = 16 })
+		rows[perk.id] = { name = name, btn = btn, perk = perk }
+	end
+
+	return function()
+		local s, d = snap(), data()
+		local cost = s.rebirthCost
+		infoL.Text = "♻️ Rebirths: <font color='" .. UI.hex(C.cyan) .. "'>" .. d.rebirths .. "</font>\n"
+			.. "Multiplikator: x" .. Util.format(Logic.rebirthMult(d.rebirths)) .. " → <font color='" .. UI.hex(C.green) .. "'>x"
+			.. Util.format(Logic.rebirthMult(d.rebirths + 1)) .. "</font>\n"
+			.. "Kosten: <font color='" .. UI.hex(C.gold) .. "'>" .. Util.format(cost) .. " Aura</font>"
+		bar.Size = UDim2.new(math.clamp(d.aura / cost, 0, 1), 0, 1, 0)
+		local can = d.aura >= cost
+		rbBtn.BackgroundColor3 = can and C.gold or C.grey
+		rbBtn.TextColor3 = can and C.dark or C.muted
+		shopTitle.Text = "🛒 Rebirth-Shop  ·  <font color='" .. UI.hex(C.cyan) .. "'>" .. d.rebirthPoints .. " Rebirth-Punkte</font>"
+		for id, r in pairs(rows) do
+			local level = Logic.perkLevel(d, id)
+			r.name.Text = r.perk.name .. "  <font size='13' color='" .. UI.hex(C.cyan) .. "'>" .. level .. "/" .. r.perk.max .. "</font>"
+			if level >= r.perk.max then
+				r.btn.Text = "✅ MAX"
+				r.btn.BackgroundColor3 = C.grey
+			else
+				local pc = Logic.perkCost(r.perk, level)
+				r.btn.Text = pc .. " RP"
+				r.btn.BackgroundColor3 = d.rebirthPoints >= pc and C.cyan or C.grey
+				r.btn.TextColor3 = d.rebirthPoints >= pc and C.dark or C.muted
+			end
+		end
+	end
+end
+
+----------------------------------------------------------------------------
+-- 🏆 RANGLISTE
+----------------------------------------------------------------------------
+BUILDERS.leaderboard = function(root)
+	local header = UI.text(root, "Lädt …", { Size = UDim2.new(1, -130, 0, 34), XAlign = Enum.TextXAlignment.Left, Font = Enum.Font.GothamBold, MaxText = 16 })
+	local list = UI.scroll(root, { Size = UDim2.new(1, 0, 1, -42), Position = UDim2.new(0, 0, 0, 42) })
+	UI.list(list, false, 4)
+	UI.padding(list, 2)
+	local me = Players.LocalPlayer.UserId
+
+	local function load()
+		header.Text = "Lädt …"
+		task.spawn(function()
+			local ok, result = pcall(function()
+				return Remotes:WaitForChild("GetLeaderboard"):InvokeServer()
+			end)
+			if not list.Parent then return end
+			UI.clear(list)
+			if not ok or not result or not result.available then
+				header.Text = "Rangliste nicht verfügbar (in Studio: API-Zugriff aktivieren)."
+				return
+			end
+			local myRank = nil
+			for i, e in ipairs(result.list) do
+				if e.userId == me then myRank = e.rank end
+				local isMe = e.userId == me
+				local row = UI.panel(list, { Size = UDim2.new(1, -10, 0, 34), Color = isMe and C.purple or C.panel2, LayoutOrder = i, Radius = 8 })
+				local medal = ({ "🥇", "🥈", "🥉" })[e.rank] or ("#" .. e.rank)
+				UI.text(row, medal, { Size = UDim2.new(0, 60, 1, 0), MaxText = 18 })
+				UI.text(row, e.name, { Size = UDim2.new(1, -220, 1, 0), Position = UDim2.new(0, 64, 0, 0), XAlign = Enum.TextXAlignment.Left, MaxText = 17 })
+				UI.text(row, "✨ " .. Util.format(e.value), { Size = UDim2.new(0, 150, 1, 0), Position = UDim2.new(1, -156, 0, 0),
+					XAlign = Enum.TextXAlignment.Right, Color = C.gold, MaxText = 17 })
+			end
+			local power = snap() and snap().glowPower or 0
+			if myRank then
+				header.Text = "Dein Platz: <font color='" .. UI.hex(C.gold) .. "'>#" .. myRank .. "</font> · Glow-Power: " .. Util.format(power)
+			else
+				header.Text = "Du bist (noch) nicht in den Top " .. Config.LEADERBOARD_SIZE .. " · deine Glow-Power: " .. Util.format(power)
+			end
+			if #result.list == 0 then
+				UI.text(list, "Noch keine Einträge. Die Rangliste aktualisiert sich alle 2 Minuten.", { Color = C.muted, MaxText = 16, Size = UDim2.new(1, 0, 0, 60) })
+			end
+		end)
+	end
+	UI.button(root, "🔄 Neu laden", C.panel2, load, { AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, 0, 0, 0), Size = UDim2.new(0, 120, 0, 34), MaxText = 15 })
+	load()
+	return nil
+end
+
+----------------------------------------------------------------------------
+-- 🎁 BELOHNUNGEN: tägliche Serie, Codes, Tränke
+----------------------------------------------------------------------------
+local function rewardText(r)
+	local parts = {}
+	if r.cash then table.insert(parts, "💵 " .. Util.format(r.cash)) end
+	if r.auraSeconds then table.insert(parts, "✨ " .. r.auraSeconds .. "s Aura") end
+	if r.potion then table.insert(parts, Logic.potionById[r.potion].emoji .. " Trank") end
+	if r.freeEgg then table.insert(parts, "🎁 Box") end
+	return table.concat(parts, "\n")
+end
+
+function Menus.dailyReady()
+	local d = data()
+	if not d then return false end
+	return os.time() - d.daily.last >= 20 * 3600
+end
+
+BUILDERS.rewards = function(root)
+	UI.text(root, "📅 Tägliche Belohnung (7-Tage-Serie)", { Size = UDim2.new(1, 0, 0, 26), XAlign = Enum.TextXAlignment.Left, MaxText = 18 })
+	local days = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 92), Position = UDim2.new(0, 0, 0, 28), Parent = root })
+	UI.list(days, true, 6, Enum.HorizontalAlignment.Center)
+	local dayCells = {}
+	for i, r in ipairs(Config.Daily) do
+		local cell = UI.panel(days, { Size = UDim2.new(1 / 7, -6, 1, 0), Color = C.panel2, LayoutOrder = i, Radius = 10 })
+		UI.padding(cell, 4)
+		UI.text(cell, "Tag " .. i, { Size = UDim2.new(1, 0, 0.28, 0), MaxText = 15 })
+		UI.text(cell, rewardText(r), { Size = UDim2.new(1, 0, 0.7, 0), Position = UDim2.new(0, 0, 0.3, 0), Font = Enum.Font.GothamBold, Color = C.muted, MaxText = 12 })
+		dayCells[i] = cell
+	end
+	local claim = UI.button(root, "", C.gold, function()
+		Remotes.ClaimDaily:FireServer()
+	end, { Size = UDim2.new(1, 0, 0, 40), Position = UDim2.new(0, 0, 0, 126), TextColor = C.dark, MaxText = 18 })
+
+	UI.text(root, "🎟️ Code einlösen", { Size = UDim2.new(0.5, 0, 0, 24), Position = UDim2.new(0, 0, 0, 174), XAlign = Enum.TextXAlignment.Left, MaxText = 17 })
+	local box = UI.new("TextBox", { Size = UDim2.new(0.65, -6, 0, 38), Position = UDim2.new(0, 0, 0, 200), BackgroundColor3 = C.dark,
+		TextColor3 = C.text, PlaceholderText = "z. B. MEWING2026", PlaceholderColor3 = C.muted, Text = "", ClearTextOnFocus = false,
+		Font = Enum.Font.GothamBold, TextScaled = true, Parent = root })
+	UI.corner(box, 10)
+	UI.padding(box, 6)
+	UI.button(root, "Einlösen", C.pink, function()
+		Remotes.RedeemCode:FireServer(box.Text)
+		box.Text = ""
+	end, { Size = UDim2.new(0.35, 0, 0, 38), Position = UDim2.new(0.65, 0, 0, 200), MaxText = 18 })
+
+	UI.text(root, "🧪 Tränke (kosten Geld)", { Size = UDim2.new(0.6, 0, 0, 24), Position = UDim2.new(0, 0, 0, 246), XAlign = Enum.TextXAlignment.Left, MaxText = 17 })
+	local list = UI.scroll(root, { Size = UDim2.new(1, 0, 1, -276), Position = UDim2.new(0, 0, 0, 274) })
+	UI.list(list, false, 6)
+	UI.padding(list, 2)
+	local potionRows = {}
+	for i, p in ipairs(Config.Potions) do
+		local row = UI.panel(list, { Size = UDim2.new(1, -10, 0, 56), Color = C.panel2, LayoutOrder = i })
+		UI.text(row, p.emoji, { Size = UDim2.new(0, 46, 1, 0), MaxText = 30 })
+		UI.text(row, p.name, { Size = UDim2.new(1, -190, 0.5, 0), Position = UDim2.new(0, 50, 0.04, 0), XAlign = Enum.TextXAlignment.Left, MaxText = 17 })
+		local sub = UI.text(row, p.desc, { Size = UDim2.new(1, -190, 0.42, 0), Position = UDim2.new(0, 50, 0.54, 0), XAlign = Enum.TextXAlignment.Left,
+			Font = Enum.Font.Gotham, Color = C.muted, MaxText = 13 })
+		local btn = UI.button(row, "💵 " .. Util.format(p.price), C.money, function()
+			Remotes.BuyPotion:FireServer(p.id)
+		end, { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.new(0, 120, 0, 40), TextColor = C.dark, MaxText = 16 })
+		potionRows[p.id] = { sub = sub, btn = btn, p = p }
+	end
+
+	return function()
+		local d = data()
+		local streak = d.daily.streak
+		local remaining = d.daily.last + 20 * 3600 - os.time()
+		local ready = remaining <= 0
+		local nextDay = (ready and os.time() - d.daily.last > 48 * 3600) and 1 or ((streak % #Config.Daily) + 1)
+		for i, cell in ipairs(dayCells) do
+			cell.BackgroundColor3 = (i == nextDay and ready) and C.pink or ((i <= streak and not (ready and nextDay == 1)) and C.purple or C.panel2)
+		end
+		claim.Text = ready and ("🎁 Tag " .. nextDay .. " abholen!") or ("⏳ Nächste Belohnung in " .. Util.formatTime(remaining))
+		claim.BackgroundColor3 = ready and C.gold or C.grey
+		local now = os.time()
+		for id, r in pairs(potionRows) do
+			local untilTime = d.potions[id]
+			if untilTime and untilTime > now then
+				r.sub.Text = "<font color='" .. UI.hex(C.green) .. "'>Aktiv: noch " .. Util.formatTime(untilTime - now) .. "</font>"
+			else
+				r.sub.Text = r.p.desc
+			end
+			r.btn.BackgroundColor3 = d.cash >= r.p.price and C.money or C.grey
+		end
+	end
+end
+
+----------------------------------------------------------------------------
+-- ⚙️ EINSTELLUNGEN
+----------------------------------------------------------------------------
+BUILDERS.settings = function(root)
+	UI.list(root, false, 10)
+	local musicBtn, sfxBtn
+	local function update()
+		local d = data()
+		musicBtn.Text = "🎵 Musik: " .. (d.settings.music and "AN" or "AUS")
+		musicBtn.BackgroundColor3 = d.settings.music and C.green or C.grey
+		sfxBtn.Text = "🔊 Soundeffekte: " .. (d.settings.sfx and "AN" or "AUS")
+		sfxBtn.BackgroundColor3 = d.settings.sfx and C.green or C.grey
+	end
+	musicBtn = UI.button(root, "", C.green, function()
+		local d = data()
+		d.settings.music = not d.settings.music
+		Sounds.setMusic(d.settings.music)
+		Remotes.Setting:FireServer("music", d.settings.music)
+		update()
+	end, { Size = UDim2.new(1, 0, 0, 46), LayoutOrder = 1, TextColor = C.dark })
+	sfxBtn = UI.button(root, "", C.green, function()
+		local d = data()
+		d.settings.sfx = not d.settings.sfx
+		Sounds.setSfx(d.settings.sfx)
+		Remotes.Setting:FireServer("sfx", d.settings.sfx)
+		update()
+	end, { Size = UDim2.new(1, 0, 0, 46), LayoutOrder = 2, TextColor = C.dark })
+	local s = snap()
+	local d = data()
+	UI.text(root, (s.saving and "💾 Dein Spielstand wird automatisch gespeichert." or "⚠️ Speichern ist gerade aus.")
+		.. "\n\n📊 Klicks: " .. Util.format(d.clicks) .. "  ·  🎁 Boxen geöffnet: " .. Util.format(d.eggsOpened)
+		.. "\n⚔️ Mog-Siege: " .. d.mogWins .. "  ·  Niederlagen: " .. d.mogLosses .. "  ·  👑 Boss-Siege: " .. d.bossWins
+		.. "\n🌌 Aura insgesamt: " .. Util.format(d.totalAura),
+		{ Size = UDim2.new(1, 0, 0, 130), LayoutOrder = 3, Font = Enum.Font.GothamBold, Color = C.muted, MaxText = 16 })
+	update()
+	return nil
+end
+
+return Menus
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX00000014"><Properties><string name="Name">PetFollow</string><ProtectedString name="Source"><![CDATA[--[[
+	PETFOLLOW – bewegt alle Pets (von allen Spielern) flüssig hinter ihren Besitzern her.
+	Läuft auf jedem Gerät selbst, damit es ruckelfrei aussieht.
+]]
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local PetFollow = {}
+local t = 0
+
+function PetFollow.init()
+	RunService.RenderStepped:Connect(function(dt)
+		t = t + dt
+		local folder = workspace:FindFirstChild("Pets")
+		if not folder then return end
+		for _, ownerFolder in ipairs(folder:GetChildren()) do
+			local owner = Players:GetPlayerByUserId(tonumber(ownerFolder.Name) or 0)
+			local char = owner and owner.Character
+			local hrp = char and char:FindFirstChild("HumanoidRootPart")
+			if hrp then
+				local pets = ownerFolder:GetChildren()
+				local n = #pets
+				for _, p in ipairs(pets) do
+					if p:IsA("BasePart") then
+						local slot = p:GetAttribute("Slot") or 1
+						-- Pets im Halbkreis hinter dem Spieler
+						local angle = 0
+						if n > 1 then
+							angle = math.rad(-70 + (slot - 1) * (140 / (n - 1)))
+						end
+						local bob = math.sin(t * 3 + slot) * 0.4
+						local target = hrp.CFrame * CFrame.new(math.sin(angle) * 6, -1 + bob, 4 + math.cos(angle) * 2)
+						p.CFrame = p.CFrame:Lerp(target, math.clamp(dt * 7, 0, 1))
+						-- Regenbogen-Pets wechseln die Farbe
+						if p:GetAttribute("Tier") == 3 then
+							p.Color = Color3.fromHSV((t * 0.25 + slot * 0.1) % 1, 0.65, 1)
+						end
+					end
+				end
+			end
+		end
+	end)
+end
+
+return PetFollow
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX00000015"><Properties><string name="Name">Sounds</string><ProtectedString name="Source"><![CDATA[--[[
+	SOUNDS – spielt Soundeffekte und Hintergrundmusik.
+	Die Sound-IDs stehen in Config.Sounds / Config.Music.
+]]
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SoundService = game:GetService("SoundService")
+
+local Config = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Config"))
+
+local Sounds = { sfx = true, music = true }
+local cache = {}
+local currentMusic = nil
+
+local music = Instance.new("Sound")
+music.Name = "Musik"
+music.Looped = true
+music.Volume = 0.3
+music.Parent = SoundService
+
+function Sounds.play(name)
+	if not Sounds.sfx then return end
+	local id = Config.Sounds[name]
+	if not id or id == "" then return end
+	local s = cache[name]
+	if not s then
+		s = Instance.new("Sound")
+		s.Name = name
+		s.SoundId = id
+		s.Volume = 0.6
+		s.Parent = SoundService
+		cache[name] = s
+	end
+	SoundService:PlayLocalSound(s)
+end
+
+function Sounds.setWorld(index)
+	local id = Config.Music[index] or ""
+	if id == currentMusic then return end
+	currentMusic = id
+	music:Stop()
+	if id ~= "" and Sounds.music then
+		music.SoundId = id
+		music:Play()
+	end
+end
+
+function Sounds.setMusic(on)
+	Sounds.music = on
+	if on and currentMusic and currentMusic ~= "" then
+		music.SoundId = currentMusic
+		music:Play()
+	else
+		music:Stop()
+	end
+end
+
+function Sounds.setSfx(on)
+	Sounds.sfx = on
+end
+
+return Sounds
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX00000016"><Properties><string name="Name">State</string><ProtectedString name="Source"><![CDATA[--[[
+	STATE – speichert auf dem Gerät den letzten Spielstand vom Server
+	und informiert alle Menüs, wenn sich etwas ändert.
+]]
+
+local State = {}
+State.snap = nil        -- letzter Stand vom Server (siehe GameService.snapshot)
+State.listeners = {}
+
+function State.onChange(fn)
+	table.insert(State.listeners, fn)
+end
+
+local function fire(kind)
+	for _, fn in ipairs(State.listeners) do
+		local ok, err = pcall(fn, kind)
+		if not ok then
+			warn("[Looksmaxxer UI]", err)
+		end
+	end
+end
+
+function State.setFull(snap)
+	State.snap = snap
+	fire("full")
+end
+
+function State.setLight(l)
+	local s = State.snap
+	if not s then return end
+	s.data.aura = l.aura
+	s.data.cash = l.cash
+	s.data.totalAura = l.totalAura
+	s.aps = l.aps
+	s.click = l.click
+	s.mult = l.mult
+	s.world = l.world
+	s.serverTime = l.serverTime
+	fire("light")
+end
+
+-- nur lokal (z. B. Klick sofort anzeigen, bevor der Server antwortet)
+function State.bump()
+	fire("light")
+end
+
+return State
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX00000017"><Properties><string name="Name">UI</string><ProtectedString name="Source"><![CDATA[--[[
+	UI – kleine Helfer, um Oberflächen per Code zu bauen.
+	Farben und Schriften des Spiels sind hier festgelegt.
+]]
+
+local UI = {}
+
+UI.C = {
+	bg = Color3.fromRGB(26, 11, 46),
+	panel = Color3.fromRGB(45, 18, 78),
+	panel2 = Color3.fromRGB(64, 28, 108),
+	dark = Color3.fromRGB(15, 5, 28),
+	pink = Color3.fromRGB(255, 79, 216),
+	purple = Color3.fromRGB(155, 92, 255),
+	cyan = Color3.fromRGB(62, 242, 255),
+	gold = Color3.fromRGB(255, 209, 102),
+	orange = Color3.fromRGB(255, 159, 67),
+	green = Color3.fromRGB(78, 240, 160),
+	money = Color3.fromRGB(124, 252, 154),
+	red = Color3.fromRGB(255, 93, 115),
+	text = Color3.new(1, 1, 1),
+	muted = Color3.fromRGB(199, 181, 220),
+	grey = Color3.fromRGB(90, 80, 110),
+}
+
+-- Instanz mit Eigenschaften und Kindern erstellen
+function UI.new(className, props, children)
+	local inst = Instance.new(className)
+	local parent = nil
+	for k, v in pairs(props or {}) do
+		if k == "Parent" then
+			parent = v
+		else
+			inst[k] = v
+		end
+	end
+	for _, child in ipairs(children or {}) do
+		child.Parent = inst
+	end
+	if parent then
+		inst.Parent = parent
+	end
+	return inst
+end
+
+function UI.corner(inst, radius)
+	return UI.new("UICorner", { CornerRadius = UDim.new(0, radius or 12), Parent = inst })
+end
+
+function UI.stroke(inst, color, thickness, transparency)
+	return UI.new("UIStroke", {
+		Color = color or Color3.new(1, 1, 1), Thickness = thickness or 1.5,
+		Transparency = transparency or 0.6, ApplyStrokeMode = Enum.ApplyStrokeMode.Border, Parent = inst,
+	})
+end
+
+function UI.gradient(inst, c1, c2, rotation)
+	return UI.new("UIGradient", { Color = ColorSequence.new(c1, c2), Rotation = rotation or 0, Parent = inst })
+end
+
+function UI.padding(inst, px)
+	return UI.new("UIPadding", {
+		PaddingLeft = UDim.new(0, px), PaddingRight = UDim.new(0, px),
+		PaddingTop = UDim.new(0, px), PaddingBottom = UDim.new(0, px), Parent = inst,
+	})
+end
+
+function UI.list(inst, horizontal, padding, hAlign, vAlign)
+	return UI.new("UIListLayout", {
+		FillDirection = horizontal and Enum.FillDirection.Horizontal or Enum.FillDirection.Vertical,
+		Padding = UDim.new(0, padding or 6),
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		HorizontalAlignment = hAlign or Enum.HorizontalAlignment.Left,
+		VerticalAlignment = vAlign or Enum.VerticalAlignment.Top,
+		Parent = inst,
+	})
+end
+
+-- Textfeld (passt die Schriftgröße automatisch an)
+function UI.text(parent, text, props)
+	props = props or {}
+	local l = UI.new("TextLabel", {
+		BackgroundTransparency = 1,
+		Size = props.Size or UDim2.new(1, 0, 1, 0),
+		Position = props.Position or UDim2.new(0, 0, 0, 0),
+		AnchorPoint = props.AnchorPoint or Vector2.new(0, 0),
+		Text = text or "",
+		RichText = true,
+		TextScaled = true,
+		Font = props.Font or Enum.Font.FredokaOne,
+		TextColor3 = props.Color or UI.C.text,
+		TextXAlignment = props.XAlign or Enum.TextXAlignment.Center,
+		TextYAlignment = props.YAlign or Enum.TextYAlignment.Center,
+		TextWrapped = true,
+		LayoutOrder = props.LayoutOrder or 0,
+		ZIndex = props.ZIndex or 1,
+		Name = props.Name or "Label",
+		Parent = parent,
+	})
+	UI.new("UITextSizeConstraint", { MaxTextSize = math.min(props.MaxText or 26, 100), MinTextSize = props.MinText or 8, Parent = l })
+	return l
+end
+
+-- Knopf
+function UI.button(parent, text, color, onClick, props)
+	props = props or {}
+	local b = UI.new("TextButton", {
+		Size = props.Size or UDim2.new(0, 120, 0, 40),
+		Position = props.Position or UDim2.new(0, 0, 0, 0),
+		AnchorPoint = props.AnchorPoint or Vector2.new(0, 0),
+		BackgroundColor3 = color or UI.C.purple,
+		AutoButtonColor = true,
+		Text = text or "",
+		RichText = true,
+		TextScaled = true,
+		Font = props.Font or Enum.Font.FredokaOne,
+		TextColor3 = props.TextColor or UI.C.text,
+		LayoutOrder = props.LayoutOrder or 0,
+		ZIndex = props.ZIndex or 1,
+		Name = props.Name or "Button",
+		Parent = parent,
+	})
+	UI.corner(b, props.Radius or 10)
+	UI.new("UITextSizeConstraint", { MaxTextSize = math.min(props.MaxText or 22, 100), MinTextSize = 8, Parent = b })
+	UI.padding(b, props.Pad or 4)
+	if onClick then
+		b.Activated:Connect(onClick)
+	end
+	return b
+end
+
+-- Panel (Hintergrund-Kasten)
+function UI.panel(parent, props)
+	props = props or {}
+	local f = UI.new("Frame", {
+		Size = props.Size or UDim2.new(1, 0, 1, 0),
+		Position = props.Position or UDim2.new(0, 0, 0, 0),
+		AnchorPoint = props.AnchorPoint or Vector2.new(0, 0),
+		BackgroundColor3 = props.Color or UI.C.panel,
+		BackgroundTransparency = props.Transparency or 0,
+		LayoutOrder = props.LayoutOrder or 0,
+		ZIndex = props.ZIndex or 1,
+		Name = props.Name or "Panel",
+		Parent = parent,
+	})
+	UI.corner(f, props.Radius or 14)
+	return f
+end
+
+-- Scrollbare Liste
+function UI.scroll(parent, props)
+	props = props or {}
+	local s = UI.new("ScrollingFrame", {
+		Size = props.Size or UDim2.new(1, 0, 1, 0),
+		Position = props.Position or UDim2.new(0, 0, 0, 0),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		ScrollBarThickness = 6,
+		ScrollBarImageColor3 = UI.C.pink,
+		CanvasSize = UDim2.new(0, 0, 0, 0),
+		AutomaticCanvasSize = props.Horizontal and Enum.AutomaticSize.X or Enum.AutomaticSize.Y,
+		ScrollingDirection = props.Horizontal and Enum.ScrollingDirection.X or Enum.ScrollingDirection.Y,
+		Name = props.Name or "Scroll",
+		Parent = parent,
+	})
+	return s
+end
+
+-- Farbe als Hex-Text für RichText
+function UI.hex(c)
+	return string.format("#%02x%02x%02x", math.floor(c.R * 255 + 0.5), math.floor(c.G * 255 + 0.5), math.floor(c.B * 255 + 0.5))
+end
+
+function UI.clear(frame)
+	for _, child in ipairs(frame:GetChildren()) do
+		if not child:IsA("UIListLayout") and not child:IsA("UIGridLayout") and not child:IsA("UIPadding") then
+			child:Destroy()
+		end
+	end
+end
+
+return UI
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX00000018"><Properties><string name="Name">WorldFx</string><ProtectedString name="Source"><![CDATA[--[[
+	WORLDFX – Licht, Nebel und Musik passend zur Welt,
+	und versteckt den eigenen "Mog Battle"-Knopf am eigenen Körper.
+]]
+
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local TweenService = game:GetService("TweenService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Config = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Config"))
+local Sounds = require(script.Parent:WaitForChild("Sounds"))
+
+local WorldFx = {}
+local player = Players.LocalPlayer
+local lastWorld = nil
+
+local function apply(index)
+	if index == lastWorld then return end
+	lastWorld = index
+	local w = Config.Worlds[index]
+	if not w then return end
+	local L = w.light
+	TweenService:Create(Lighting, TweenInfo.new(1.5), {
+		ClockTime = L.ClockTime, Ambient = L.Ambient, OutdoorAmbient = L.Ambient,
+		FogColor = L.Fog, FogEnd = L.FogEnd,
+	}):Play()
+	Sounds.setWorld(index)
+end
+
+local function hideOwnPrompt(char)
+	local hrp = char:WaitForChild("HumanoidRootPart", 10)
+	if not hrp then return end
+	local pr = hrp:WaitForChild("MogPrompt", 15)
+	if pr then pr.Enabled = false end
+end
+
+function WorldFx.init()
+	apply(player:GetAttribute("World") or 1)
+	player:GetAttributeChangedSignal("World"):Connect(function()
+		apply(player:GetAttribute("World") or 1)
+	end)
+	player.CharacterAdded:Connect(hideOwnPrompt)
+	if player.Character then
+		task.spawn(hideOwnPrompt, player.Character)
+	end
+end
+
+return WorldFx
+]]></ProtectedString></Properties></Item>
+</Item>
+</Item>
+</Item>
+</roblox>

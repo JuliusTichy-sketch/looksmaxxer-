@@ -38,3 +38,9 @@ Die App hat dann ein eigenes Symbol, startet im Vollbild und funktioniert auch o
 - **🏆 Leaderboard:** Glow-Power, Vermögen, Mog-Siege und Fans im Vergleich.
 
 Der Spielstand wird automatisch im Browser gespeichert.
+
+## 🎮 Roblox-Version
+Im Ordner [`roblox/`](roblox/) liegt die Roblox-Version:
+- `Looksmaxxer.rbxlx` – in Roblox Studio öffnen (File → Open from File)
+- `ANLEITUNG.md` – Schritt-für-Schritt-Anleitung
+- `src/` – der Code (Luau); `build_place.py` baut daraus die .rbxlx-Datei neu
