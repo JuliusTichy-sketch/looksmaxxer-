@@ -28,6 +28,7 @@
        3.5 Oberfläche   (Shop, Anzeigen, Pop-ups)
        3.6 Events, Meilensteine, Prestige
        3.6b Freunde, Stadt, Mog Battles, Ansprechen, App-Installation
+       3.6c Geld & Jobs, Luxus-Shop, Zigaretten & Alkohol, Casino, Endboss Leon, Leaderboard
        3.7 Spielschleife & Start
   ==========================================================================
 -->
@@ -100,7 +101,7 @@
   /* ---------- Statistik-Leiste oben ---------- */
   .stats {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 10px;
     max-width: 1200px;
     margin: 10px auto;
@@ -113,6 +114,7 @@
   .stat.aps .value { color: var(--green); }
   .stat.glow .value { color: var(--pink); }
   .stat.mult .value { color: var(--cyan); }
+  .stat.money .value { color: #7CFC9A; }
 
   /* ---------- Hauptbereich: links Figur, rechts Shop ---------- */
   main {
@@ -539,6 +541,77 @@
   .friend .fbtns button { padding: 6px 10px; border-radius: 10px; background: rgba(255,255,255,.12); font-weight: 700; font-size: .8rem; }
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
+  /* ---------- Endboss, Stadt-Rucksack ---------- */
+  .tag.t-boss { color: #ffd166; background: linear-gradient(90deg, #7a0010, #3a0040); border: 1px solid #ffd166; font-size: 12px; }
+  #townHud { position: absolute; top: 10px; left: 10px; display: flex; gap: 6px; z-index: 5000; flex-wrap: wrap; max-width: 75%; }
+  #townHud button {
+    padding: 7px 11px; border-radius: 10px; background: rgba(20,5,35,.88);
+    border: 1px solid var(--card-border); font-weight: 800; font-size: .85rem;
+  }
+
+  /* ---------- Job-Minispiel ---------- */
+  .mg-bar { position: relative; height: 34px; border-radius: 999px; background: rgba(255,255,255,.12); overflow: hidden; margin: 16px 0 10px; }
+  .mg-zone { position: absolute; top: 0; bottom: 0; background: rgba(78,240,160,.5); }
+  .mg-perfect { position: absolute; top: 0; bottom: 0; background: rgba(255,209,102,.95); }
+  .mg-marker { position: absolute; top: -2px; bottom: -2px; width: 6px; margin-left: -3px; background: #fff; border-radius: 3px; box-shadow: 0 0 8px #fff; }
+  .mg-results { display: flex; gap: 6px; justify-content: center; min-height: 32px; flex-wrap: wrap; }
+
+  /* ---------- Casino ---------- */
+  .casino-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .casino-grid h3 { margin: 0 0 8px; }
+  .bet-bar { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 10px; font-weight: 800; }
+  .bet-bar input, .rou-num-bet input {
+    width: 110px; padding: 8px; border-radius: 10px; border: 2px solid var(--card-border);
+    background: rgba(0,0,0,.25); color: var(--text); font-size: 1rem; font-family: inherit;
+  }
+  .bet-bar button, .rou-bets button, .rou-num-bet button { padding: 8px 12px; border-radius: 10px; background: rgba(255,255,255,.12); font-weight: 800; }
+  .casino-btn {
+    flex: 1; width: 100%; padding: 12px; border-radius: 12px; font-weight: 900; font-size: 1rem;
+    background: linear-gradient(135deg, var(--gold), #ff9f43); color: #3a1d00; margin-top: 8px;
+  }
+  .casino-btn:disabled { opacity: .5; cursor: not-allowed; }
+  .casino-msg { min-height: 24px; margin-top: 8px; font-weight: 800; text-align: center; }
+  .reels { display: flex; gap: 8px; justify-content: center; }
+  .reel {
+    width: 72px; height: 80px; border-radius: 14px; background: #fff; font-size: 2.6rem;
+    display: flex; align-items: center; justify-content: center; box-shadow: inset 0 -6px 0 rgba(0,0,0,.12);
+  }
+  .roulette-num {
+    width: 90px; height: 90px; margin: 0 auto 10px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 2.2rem; font-weight: 900; background: #1b7a3a; border: 6px solid var(--gold);
+  }
+  .rou-bets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .rou-bets .red { background: #c1121f; } .rou-bets .black { background: #111; }
+  .rou-num-bet { display: flex; gap: 6px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+  .cards { display: flex; gap: 6px; min-height: 64px; margin: 4px 0 8px; flex-wrap: wrap; }
+  .pcard {
+    width: 44px; height: 62px; border-radius: 8px; background: #fff; color: #111; font-weight: 900;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; animation: pop .25s ease-out;
+  }
+  .pcard.red { color: #c1121f; }
+  .pcard.back { background: repeating-linear-gradient(45deg, #9b5cff, #9b5cff 6px, #ff4fd8 6px, #ff4fd8 12px); }
+  #bjBtns { display: flex; gap: 6px; flex-wrap: wrap; }
+  .mb-fighters { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; }
+  .mb-fighters svg { width: 100%; max-width: 110px; height: auto; }
+  .mb-btn { width: 100%; margin-top: 6px; padding: 9px; border-radius: 10px; font-weight: 800; background: linear-gradient(135deg, #ff8c42, var(--red)); }
+  .mb-btn:disabled { opacity: .5; }
+
+  /* ---------- Leaderboard ---------- */
+  .lb-row {
+    display: grid; grid-template-columns: 40px 50px 1fr auto; gap: 10px; align-items: center;
+    padding: 8px 10px; border-radius: 12px; background: rgba(255,255,255,.06); margin-top: 6px;
+  }
+  .lb-row.me { border: 1px solid var(--gold); }
+  .lb-row.boss { border: 1px solid var(--red); background: rgba(255,93,115,.12); }
+  .lb-row svg { width: 50px; height: auto; display: block; }
+  .lb-row .rank { font-size: 1.2rem; font-weight: 900; text-align: center; }
+  .lb-row .val { font-weight: 900; color: var(--gold); text-align: right; }
+
+  /* Pop-ups am PC oben rechts, damit sie die Navigation nicht verdecken */
+  @media (min-width: 801px) {
+    #toasts { left: auto; right: 12px; transform: none; width: 360px; }
+  }
+
   /* ---------- Handy-Ansicht ---------- */
   @media (max-width: 800px) {
     main { grid-template-columns: minmax(0, 1fr); }
@@ -546,9 +619,12 @@
     .preview-card { position: static; }
     .preview-card svg { max-width: 200px; }
     .stats { grid-template-columns: repeat(2, 1fr); }
+    .stat.money { grid-column: span 2; }
+    .casino-grid { grid-template-columns: 1fr !important; }
     .char-wrap { max-width: 230px; }
     .two-col { grid-template-columns: 1fr; }
-    .mainnav button { padding: 9px 12px; font-size: .9rem; }
+    .mainnav { gap: 5px; }
+    .mainnav button { padding: 7px 10px; font-size: .8rem; }
   }
   @media (max-width: 420px) {
     .item { grid-template-columns: 36px 1fr; }
@@ -595,8 +671,11 @@
     <!-- Hauptnavigation -->
     <nav class="mainnav" id="mainnav">
       <button data-view="home" class="active">🪞 Glow-Up</button>
+      <button data-view="jobs">💼 Jobs</button>
       <button data-view="town">🏙️ Stadt</button>
+      <button data-view="casino">🎰 Casino</button>
       <button data-view="friends">👥 Freunde</button>
+      <button data-view="leader">🏆 Leaderboard</button>
     </nav>
   </header>
 
@@ -605,6 +684,7 @@
     <div class="card stat aps"><div class="label">Aura / Sekunde</div><div class="value" id="sAps">0</div></div>
     <div class="card stat glow"><div class="label">Glow-Score</div><div class="value" id="sGlow">0</div></div>
     <div class="card stat mult"><div class="label">Multiplikator</div><div class="value" id="sMult">x1</div></div>
+    <div class="card stat money"><div class="label">💵 Geld</div><div class="value" id="sMoney">0 €</div></div>
   </section>
 
   <main id="viewHome">
@@ -673,6 +753,7 @@
       <div id="townViewport">
         <div id="townWorld"></div>
         <div id="interactBar" class="hidden"></div>
+        <div id="townHud"></div>
       </div>
     </div>
     <div class="two-col">
@@ -684,8 +765,86 @@
       <div class="card">
         <h3 style="margin:0">⚔️ Mog-Bilanz</h3>
         <div class="small" id="mogStats"></div>
-        <div class="small" style="margin-top:6px">Rivalen in der Stadt: Gym-Bro Dennis, Influencer Leon, Mewing-Meister Kai und der legendäre Gigachad Sven. Deine Freunde laufen hier auch herum!</div>
+        <div class="small" style="margin-top:6px">Rivalen in der Stadt: Gym-Bro Dennis, Influencer Luca, Mewing-Meister Kai und Gigachad Sven. Deine Freunde laufen hier auch herum – und irgendwo wartet <b style="color:var(--gold)">👑 Endboss LEON</b>.</div>
       </div>
+    </div>
+      <div class="card">
+      <h3 style="margin:0">🏪 Späti</h3>
+      <div class="small">Zigaretten & Alkohol. Benutzen kannst du sie in der Stadt (Knöpfe oben links im Stadtbild). Sie senken deinen Glow-Score!</div>
+      <div class="items" id="kioskList" style="margin-top:8px"></div>
+    </div>
+  </section>
+
+  <!-- ===== Bereich: JOBS ===== -->
+  <section class="view hidden" id="viewJobs">
+    <div class="card">
+      <h2 style="margin:0 0 4px">💼 Jobs</h2>
+      <p class="small" style="margin:0">Bessere Jobs gibt es erst ab einem bestimmten Glow-Score – und je höher dein Glow-Score, desto mehr zahlen sie.
+        Geschenkt gibt's aber nichts: Bei jedem Job musst du im richtigen Moment tippen. Danach brauchst du eine Pause.</p>
+      <p class="small" id="jobInfo"></p>
+      <div class="items" id="jobList"></div>
+    </div>
+    <div class="card">
+      <h2 style="margin:0 0 4px">🛍️ Luxus-Shop</h2>
+      <p class="small">Gönn dir was: kurzfristige Boosts für dein Geld.</p>
+      <div class="items" id="luxList"></div>
+    </div>
+  </section>
+
+  <!-- ===== Bereich: CASINO ===== -->
+  <section class="view hidden" id="viewCasino">
+    <div class="card">
+      <h2 style="margin:0">🎰 Casino Royal-Glow</h2>
+      <div class="small">Nur Spielgeld – das Haus gewinnt trotzdem meistens. 😉</div>
+      <div class="bet-bar" id="betBar">Einsatz:
+        <input id="betInput" type="number" min="1" value="10" inputmode="numeric"> €
+        <button data-bet="10">10</button><button data-bet="100">100</button><button data-bet="1000">1.000</button>
+        <button data-bet="half">½</button><button data-bet="max">Alles</button>
+      </div>
+    </div>
+    <div class="casino-grid">
+      <div class="card" id="gSlots">
+        <h3>🎰 Glow-Slots</h3>
+        <div class="reels"><div class="reel" id="reel0">💎</div><div class="reel" id="reel1">👑</div><div class="reel" id="reel2">🗿</div></div>
+        <div class="small" style="text-align:center;margin-top:8px">3 gleiche: 🍒x5 · 💅x10 · 🧴x15 · 🗿x25 · 💎x50 · 👑x100<br>2 gleiche: Einsatz zurück</div>
+        <button class="casino-btn" id="slotBtn">Drehen!</button>
+        <div class="casino-msg" id="slotMsg"></div>
+      </div>
+      <div class="card" id="gRoulette">
+        <h3>🎡 Roulette</h3>
+        <div class="roulette-num" id="rouNum">0</div>
+        <div class="rou-bets">
+          <button data-rou="rot" class="red">Rot x2</button><button data-rou="schwarz" class="black">Schwarz x2</button><button data-rou="gerade">Gerade x2</button>
+          <button data-rou="ungerade">Ungerade x2</button><button data-rou="low">1–18 x2</button><button data-rou="high">19–36 x2</button>
+        </div>
+        <div class="rou-num-bet">Zahl: <input id="rouPick" type="number" min="0" max="36" value="7" inputmode="numeric">
+          <button data-rou="zahl">Auf Zahl setzen (x36)</button></div>
+        <div class="casino-msg" id="rouMsg"></div>
+      </div>
+      <div class="card" id="gBlackjack">
+        <h3>🃏 Blackjack</h3>
+        <div class="small">Dealer <span id="bjDealerVal"></span></div><div class="cards" id="bjDealer"></div>
+        <div class="small">Du <span id="bjYouVal"></span></div><div class="cards" id="bjYou"></div>
+        <div id="bjBtns"></div>
+        <div class="casino-msg" id="bjMsg"></div>
+      </div>
+      <div class="card" id="gMogBet">
+        <h3>⚔️ Mog-Wetten</h3>
+        <div class="small" style="margin-bottom:8px">Zwei Typen, ein Mog Battle. Auf wen setzt du? Je kleiner die Gewinnchance, desto höher die Quote.</div>
+        <div id="mbFighters"></div>
+        <div class="casino-msg" id="mbMsg"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Bereich: LEADERBOARD ===== -->
+  <section class="view hidden" id="viewLeader">
+    <div class="card">
+      <h2 style="margin:0">🏆 Leaderboard</h2>
+      <div class="small" style="margin-bottom:10px">Du, deine Freunde, die Rivalen der Stadt – und Endboss Leon. Wer ist ganz oben?
+        (Freunde erscheinen mit dem Stand ihres letzten Freundescodes.)</div>
+      <div class="tabs" id="lbTabs"></div>
+      <div id="lbList"></div>
     </div>
   </section>
 
@@ -925,6 +1084,14 @@ function newState() {
     contacts: [],            // Nummern aus der Stadt
     mogWins: 0,              // gewonnene Mog Battles
     mogLosses: 0,            // verlorene Mog Battles
+    money: 0,                // Geld (aus Jobs & Casino)
+    moneyEarned: 0,          // insgesamt verdientes Geld
+    jobCd: {},               // Pausen der Jobs
+    inv: { zigarette: 0, bier: 0, wodka: 0 },   // Rucksack
+    vice: 0,                 // Glow-Abzug durch Zigaretten & Alkohol
+    casinoNet: 0,            // Gewinn/Verlust im Casino
+    biggestWin: 0,           // größter Casino-Gewinn
+    bossWins: 0,             // wie oft Leon besiegt
   };
 }
 
@@ -945,6 +1112,7 @@ function load() {
     // Mit Standardwerten zusammenführen, falls später neue Felder dazukommen
     S = Object.assign(newState(), data);
     S.look = Object.assign(newState().look, data.look || {});
+    S.inv = Object.assign(newState().inv, data.inv || {});
     return true;
   } catch (e) {
     return false;
@@ -1019,9 +1187,11 @@ function clickValue() {
 }
 
 // Glow-Score = Summe aller Glow-Werte der gekauften Stufen
-function glowScore() {
+function baseGlow() {
   return UPGRADES.reduce((sum, u) => sum + lvl(u.id) * u.glow, 0);
 }
+// Glow-Score MIT Abzug durch Zigaretten & Alkohol
+function glowScore() { return Math.max(0, Math.round(baseGlow() - S.vice)); }
 
 // Aktueller Meilenstein (Index in MILESTONES)
 function milestoneIndex(glow) {
@@ -1276,6 +1446,14 @@ function characterSVG(look, L, opts = {}) {
     s += `<path d="M83,74 Q88,78 93,74 M107,74 Q112,78 117,74" fill="none" stroke="${skinDD}" stroke-width="1.6" opacity="${bags}"/>`;
   }
 
+  // Betrunken: halb geschlossene Augen & rote Wangen
+  if (flags.drunk) {
+    [88, 112].forEach(x => { s += `<path d="M${x - 6},63 L${x + 6},63 L${x + 6},68.5 Q${x},66.5 ${x - 6},68.5 Z" fill="${skin}"/>`; });
+    s += `<ellipse cx="82" cy="82" rx="6" ry="3.5" fill="#ff5d73" opacity=".5"/><ellipse cx="118" cy="82" rx="6" ry="3.5" fill="#ff5d73" opacity=".5"/>`;
+  }
+  // Raucher: fahle Haut
+  if (flags.smoke) s += `<ellipse cx="100" cy="70" rx="30" ry="34" fill="#9aa08a" opacity=".18"/>`;
+
   // Augenbrauen (selbstbewusster = höher & gerader)
   const browY = 60 - Math.min(2, confT * 0.15);
   const worry = Math.max(0, 3 - confT * 0.3);
@@ -1289,9 +1467,13 @@ function characterSVG(look, L, opts = {}) {
   // Nase
   s += `<path d="M100,70 Q96,82 100,84 Q102,84.5 104,83" fill="none" stroke="${skinDD}" stroke-width="1.4" stroke-linecap="round"/>`;
 
+  // Rote Nase (betrunken)
+  if (flags.drunk) s += `<circle cx="101" cy="81" r="3.5" fill="#ff5d73" opacity=".85"/>`;
+
   // Mund & Zähne
   const teethQ = L('zahnseide') + L('bleaching') * 3;
-  const teethColor = mix('#d9c27a', '#ffffff', Math.min(1, teethQ / 30));
+  let teethColor = mix('#d9c27a', '#ffffff', Math.min(1, teethQ / 30));
+  if (flags.smoke) teethColor = mix(teethColor, '#b8962e', 0.55);   // Raucherzähne
   const braces = L('zahnspange') >= 1 && L('zahnspange') < 10;
   if (smile >= 0.4) {
     const d = 4 + smile * 6;
@@ -1304,6 +1486,13 @@ function characterSVG(look, L, opts = {}) {
     if (L('zahnspange') >= 10) s += `<path class="twinkle" d="M116,88 l1.5,3 l3,1.5 l-3,1.5 l-1.5,3 l-1.5,-3 l-3,-1.5 l3,-1.5 Z" fill="#fff"/>`;
   } else {
     s += `<path d="M90,93 Q100,${93 + smile * 10} 110,93" fill="none" stroke="${fem ? '#c2185b' : '#7a1f2b'}" stroke-width="${fem ? 3 : 2}" stroke-linecap="round"/>`;
+  }
+
+  // Zigarette im Mund + Rauch
+  if (flags.smoke) {
+    s += `<rect x="108" y="92" width="16" height="3" rx="1" fill="#f5f5f5" transform="rotate(-10 108 93)"/>`;
+    s += `<circle cx="124" cy="90.3" r="1.8" fill="#ff7b00"/>`;
+    s += `<g class="waft" fill="none" stroke="#c8c8c8" stroke-width="2" stroke-linecap="round"><path d="M125,86 q4,-5 0,-10 q-4,-5 0,-10"/><path d="M131,82 q3,-4 0,-8"/></g>`;
   }
 
   // ===== Haare vorne =====
@@ -1367,11 +1556,16 @@ function characterSVG(look, L, opts = {}) {
 }
 
 // Hauptfigur im Spiel neu zeichnen
-function renderCharacter() {
+function currentFlags() {
   const flags = {};
   effects.forEach(e => { if (e.flag) flags[e.flag] = true; });
-  document.getElementById('mainChar').innerHTML =
-    characterSVG(S.look, lvl, { flags, glow: glowScore(), stars: S.stars, uid: 'main' });
+  return flags;
+}
+function renderCharacter() {
+  const opts = () => ({ flags: currentFlags(), glow: glowScore(), stars: S.stars, uid: 'm' + (svgCounter++) });
+  document.getElementById('mainChar').innerHTML = characterSVG(S.look, lvl, opts());
+  // auch die eigene Figur in der Stadt aktualisieren
+  if (town && town.player && town.player.el) town.player.el.querySelector('.body').innerHTML = characterSVG(S.look, lvl, opts());
 }
 
 /* ---------------------------------------------------------------
@@ -1529,7 +1723,9 @@ function updateUI() {
   const glow = glowScore();
   $('sAura').textContent = fmt(S.aura);
   $('sAps').textContent = fmt(totalAps());
-  $('sGlow').textContent = fmt(glow);
+  $('sGlow').innerHTML = fmt(glow) + (S.vice >= 1 ? ` <span style="font-size:.6em;color:var(--red)">(-${Math.ceil(S.vice)} 🚬🍺)</span>` : '');
+  $('sMoney').textContent = fmtMoney(S.money);
+  updateJobs();
   const mult = prestigeMult() * eventMult('aps');
   $('sMult').textContent = 'x' + mult.toLocaleString('de-DE', { maximumFractionDigits: 2 });
   $('clickValue').textContent = `+${fmt(clickValue())} Aura pro Klick`;
@@ -1579,7 +1775,7 @@ function updateUI() {
   });
 
   // Gelber Punkt auf Reitern, in denen man etwas kaufen kann
-  document.querySelectorAll('.tab').forEach(t => {
+  document.querySelectorAll('#tabs .tab').forEach(t => {
     const affordable = UPGRADES.some(u => u.cat === t.dataset.tab && isUnlocked(u) &&
       lvl(u.id) < MAX_LEVEL && costAt(u, lvl(u.id)) <= S.aura);
     t.querySelector('.dot').classList.toggle('hidden', !affordable);
@@ -1609,7 +1805,9 @@ function updateUI() {
     🌌 Aura insgesamt (für immer): <b>${fmt(S.lifetimeAura)}</b><br>
     🌟 Glow Ups gemacht: <b>${S.glowUps}</b><br>
     ⚔️ Mog Battles: <b>${S.mogWins}</b> gewonnen / <b>${S.mogLosses}</b> verloren<br>
-    📱 Kontakte: <b>${S.contacts.length}</b> · 👥 Freunde: <b>${S.friends.length}</b>`;
+    📱 Kontakte: <b>${S.contacts.length}</b> · 👥 Freunde: <b>${S.friends.length}</b><br>
+    💵 Geld verdient: <b>${fmtMoney(S.moneyEarned)}</b> · 🎰 Casino-Bilanz: <b>${S.casinoNet >= 0 ? '+' : '-'}${fmtMoney(Math.abs(S.casinoNet))}</b><br>
+    👑 Leon besiegt: <b>${S.bossWins}x</b>`;
 }
 
 // --- Toast (kleine Nachricht oben) ---
@@ -1810,7 +2008,27 @@ function versusHTML(a, b) {
 
 // Mich selbst als "Kämpfer" beschreiben
 function meAsFighter() {
-  return { name: S.name, look: S.look, L: lvl, stars: S.stars, glow: glowScore() };
+  // factor: Zigaretten & Alkohol schwächen dich auch im Mog Battle
+  const base = baseGlow();
+  return { name: S.name, look: S.look, L: lvl, stars: S.stars, glow: glowScore(), factor: base ? glowScore() / base : 1 };
+}
+
+// Einen Mog Battle ausrechnen: 5 zufällige Kategorien mit etwas Glück (±25 %)
+function simulateBattle(A, B) {
+  const rounds = shuffle(CATEGORIES.slice()).slice(0, 5).map(c => ({
+    c,
+    a: catScore(A.L, c.id, A.stars) * (A.factor || 1) * rand(0.75, 1.25) + rand(0, 4),
+    b: catScore(B.L, c.id, B.stars) * (B.factor || 1) * rand(0.75, 1.25) + rand(0, 4),
+  }));
+  const wins = rounds.filter(r => r.a > r.b).length;
+  return { rounds, wins, won: wins >= 3 };
+}
+function roundHTML(r, i) {
+  const aw = r.a > r.b;
+  return `<div class="round">
+    <div class="l ${aw ? 'win' : 'lose'}">${aw ? '✅ ' : ''}${fmt(r.a)}</div>
+    <div class="mid">Runde ${i}<br>${r.c.emoji} ${CAT_BATTLE_NAMES[r.c.id]}</div>
+    <div class="r ${aw ? 'lose' : 'win'}">${fmt(r.b)}${aw ? '' : ' ✅'}</div></div>`;
 }
 
 /* ===================== FREUNDE ===================== */
@@ -1819,7 +2037,8 @@ function meAsFighter() {
 function myCode() {
   const lv = {};
   UPGRADES.forEach(u => { if (lvl(u.id)) lv[u.id] = lvl(u.id); });
-  const data = { v: 1, id: S.id, n: S.name, l: S.look, lv, s: S.stars };
+  const data = { v: 1, id: S.id, n: S.name, l: S.look, lv, s: S.stars,
+    m: Math.floor(S.money), w: S.mogWins, c: S.contacts.length, b: S.bossWins };
   return 'LMX-' + btoa(unescape(encodeURIComponent(JSON.stringify(data))));
 }
 
@@ -1860,6 +2079,10 @@ function parseCode(code) {
     look: sanitizeLook(data.l),
     levels,
     stars: clamp(Math.floor(Number(data.s) || 0), 0, 9999),
+    money: clamp(Math.floor(Number(data.m) || 0), 0, 1e15),
+    mogWins: clamp(Math.floor(Number(data.w) || 0), 0, 1e9),
+    contacts: clamp(Math.floor(Number(data.c) || 0), 0, 1e9),
+    bossWins: clamp(Math.floor(Number(data.b) || 0), 0, 1e9),
     updated: Date.now(),
   };
 }
@@ -1992,38 +2215,37 @@ function mogBattle(opp) {
     toast('⏳ Verschnaufpause', `${escapeHtml(opp.name)} muss sich noch ${Math.ceil((mogCooldown[opp.id] - now) / 1000)} s vom letzten Battle erholen.`, '', 2500);
     return;
   }
-  mogCooldown[opp.id] = now + 30000;
+  mogCooldown[opp.id] = now + (opp.boss ? 120000 : 30000);
 
   const me = meAsFighter();
-  // 5 zufällige Kategorien, jeweils mit etwas Glück (±25 %)
-  const rounds = shuffle(CATEGORIES.slice()).slice(0, 5).map(c => ({
-    c,
-    a: catScore(me.L, c.id, me.stars) * rand(0.75, 1.25) + rand(0, 4),
-    b: catScore(opp.L, c.id, opp.stars) * rand(0.75, 1.25) + rand(0, 4),
-  }));
-  const wins = rounds.filter(r => r.a > r.b).length;
-  const won = wins >= 3;
-
-  bigModal(`<h2>⚔️ MOG BATTLE ⚔️</h2>${versusHTML(me, opp)}
-    <div class="rounds" id="mogRounds"></div><div id="mogVerdict"></div>`, []);
+  const { rounds, wins, won } = simulateBattle(me, opp);
+  bigModal(`<h2>${opp.boss ? '👑 ENDBOSS-BATTLE 👑' : '⚔️ MOG BATTLE ⚔️'}</h2>
+    ${opp.boss ? `<p class="small"><i>„${pick(BOSS_TAUNTS)}“</i> – Leon</p>` : ''}
+    ${versusHTML(me, opp)}<div class="rounds" id="mogRounds"></div><div id="mogVerdict"></div>`, []);
 
   // Runden nacheinander aufdecken (Spannung!)
   let i = 0;
   const step = () => {
     if (!$('mogRounds')) return;
     if (i < rounds.length) {
-      const r = rounds[i++];
-      const aw = r.a > r.b;
-      $('mogRounds').insertAdjacentHTML('beforeend', `<div class="round">
-        <div class="l ${aw ? 'win' : 'lose'}">${aw ? '✅ ' : ''}${fmt(r.a)}</div>
-        <div class="mid">Runde ${i}<br>${r.c.emoji} ${CAT_BATTLE_NAMES[r.c.id]}</div>
-        <div class="r ${aw ? 'lose' : 'win'}">${fmt(r.b)}${aw ? '' : ' ✅'}</div></div>`);
-      setTimeout(step, 750);
+      $('mogRounds').insertAdjacentHTML('beforeend', roundHTML(rounds[i], i + 1));
+      i++;
+      setTimeout(step, opp.boss ? 1000 : 750);
       return;
     }
     const name = escapeHtml(opp.name);
     let html;
-    if (won) {
+    if (won && opp.boss) {
+      const reward = Math.max(5000, totalAps() * 600), cash = 100000;
+      gainAura(reward);
+      S.money += cash;
+      S.moneyEarned += cash;
+      S.mogWins++;
+      S.bossWins++;
+      html = `<div class="verdict" style="color:var(--gold)">👑 DU HAST LEON GEMOGGT!!! (${wins}:${5 - wins})</div>
+        <p>Die ganze Stadt rastet aus. Leon setzt wortlos seine Sonnenbrille auf und geht. Gerüchten zufolge zieht er nach Bielefeld.</p>
+        <p><b style="color:var(--gold)">+${fmt(reward)} Aura · +${fmtMoney(cash)}</b></p>`;
+    } else if (won) {
       const reward = Math.max(50, totalAps() * 45);
       gainAura(reward);
       S.mogWins++;
@@ -2032,8 +2254,8 @@ function mogBattle(opp) {
     } else {
       S.mogLosses++;
       html = `<div class="verdict" style="color:var(--red)">💀 GEMOGGT! (${wins}:${5 - wins})</div>
-        <p>${pick(MOG_LOSE).replace('{n}', name)}</p>
-        <p class="small">Tipp: Kauf mehr Upgrades in den Kategorien, in denen du verloren hast.</p>`;
+        <p>${opp.boss ? 'Leon hat dich nicht mal angeschaut – und trotzdem gewonnen.' : pick(MOG_LOSE).replace('{n}', name)}</p>
+        <p class="small">${opp.boss ? 'Leon ist extrem stark. Du brauchst fast alle Upgrades auf MAX und viele Glow-Sterne (Prestige)!' : 'Tipp: Kauf mehr Upgrades in den Kategorien, in denen du verloren hast.'}</p>`;
     }
     $('mogVerdict').innerHTML = html;
     setModalButtons([{ label: won ? 'Ehrenrunde 😎' : 'Ab ins Gym 💪', primary: true }]);
@@ -2082,7 +2304,7 @@ function rizzScore() { return glowScore() + confOf(lvl) * 10 + S.stars * 30; }
 
 function dateChance(w, mod = 0) {
   const req = BEAUTY_REQ[w.beauty - 1];
-  return clamp(0.5 + 0.45 * (rizzScore() - req) / req + mod, 0.03, 0.97);
+  return clamp(0.5 + 0.45 * (rizzScore() - req) / req + mod + rizzMod(), 0.03, 0.97);
 }
 
 // Mögliche Anmachsprüche (mod = Bonus/Malus auf die Chance)
@@ -2171,7 +2393,7 @@ const RIVALS = [
   { id: 'r_dennis', name: 'Gym-Bro Dennis', stars: 0,
     look: { hair: 'kurz', hairColor: '#1c1c1c', skin: '#e0ac69', eyes: '#6b3e1f', outfit: 'tshirt' },
     lv: { liegestuetze: 20, gym: 12, reinigung: 3, friseur: 4, schlaf: 5, haltung: 3, basics: 2, zahnseide: 2, augenkontakt: 6 } },
-  { id: 'r_leon', name: 'Influencer Leon', stars: 1,
+  { id: 'r_luca', name: 'Influencer Luca', stars: 1,
     look: { hair: 'scheitel', hairColor: '#d8b45a', skin: '#ffe0c4', eyes: '#3a7bd5', outfit: 'lederjacke' },
     lv: { reinigung: 15, feuchtigkeit: 12, sonnencreme: 8, friseur: 12, styling: 10, basics: 15, kleidung: 10, parfum: 3,
           zahnseide: 10, bleaching: 5, augenkontakt: 10, smalltalk: 6, liegestuetze: 6, schlaf: 4 } },
@@ -2194,7 +2416,8 @@ const BUILDINGS = [
   { x: 800,  y: 80,  w: 230, h: 160, color: '#c08552', roof: '#8c5a33', sign: '☕ Café Mewing' },
   { x: 1090, y: 50,  w: 260, h: 190, color: '#4d908e', roof: '#2f6664', sign: '🛍️ Drip Mall' },
   { x: 820,  y: 620, w: 220, h: 150, color: '#7fc8d8', roof: '#3f8fa8', sign: '🦷 Dr. Strahleweiß' },
-  { x: 1110, y: 640, w: 220, h: 140, color: '#b388ff', roof: '#7c4dff', sign: '🪞 Selfie-Studio' },
+  { x: 1110, y: 640, w: 220, h: 140, color: '#2b1a4a', roof: '#d4af37', sign: '🎰 CASINO', action: 'casino', hint: 'Slots, Roulette, Blackjack & Mog-Wetten' },
+  { x: 400,  y: 295, w: 170, h: 110, color: '#e9c46a', roof: '#c08a2e', sign: '🏪 Späti', action: 'kiosk', hint: 'Zigaretten, Bier & Wodka' },
 ];
 const FOUNTAIN = { x: 330, y: 780, r: 50 };
 const TREES = [[90, 640], [180, 920], [560, 640], [560, 910], [90, 860], [440, 930], [250, 640], [470, 700]];
@@ -2267,7 +2490,7 @@ function townSVG() {
   [[620, 300], [780, 300], [620, 700], [780, 700], [200, 420], [1200, 420], [200, 580], [1200, 580]].forEach(([x, y]) => {
     s += `<rect x="${x - 2}" y="${y - 40}" width="4" height="40" fill="#555"/><circle cx="${x}" cy="${y - 42}" r="7" fill="#ffe08a"/>`;
   });
-  [[930, 840], [1200, 840], [470, 300]].forEach(([x, y]) => {
+  [[930, 840], [1200, 860], [1000, 340]].forEach(([x, y]) => {
     s += `<rect x="${x - 25}" y="${y}" width="50" height="8" rx="2" fill="#8d5a2b"/><rect x="${x - 25}" y="${y - 10}" width="50" height="5" rx="2" fill="#a86b3c"/>`;
   });
   return s + '</svg>';
@@ -2290,6 +2513,7 @@ function buildTown() {
     town = { people: [], player: { kind: 'player', x: 700, y: 610 } };
     for (let i = 0; i < 7; i++) town.people.push(makeWoman(town.people.map(p => p.name)));
     RIVALS.forEach(r => town.people.push(Object.assign({ kind: 'rival', L: id => r.lv[id] || 0 }, r)));
+    town.people.push(Object.assign({ kind: 'boss', L: id => BOSS.lv[id] || 0, taunt: pick(BOSS_TAUNTS) }, BOSS));
   } else {
     // Frauen, deren Nummer du schon hast, gehen nach Hause – neue Leute kommen
     town.people = town.people.map(p => (p.kind === 'woman' && p.got)
@@ -2311,6 +2535,7 @@ function buildTown() {
   });
   currentNear = null;
   lastInteractHTML = '';
+  refreshViceUI();
 }
 
 // Eine Figur als kleines "Sprite" für die Stadt
@@ -2321,7 +2546,9 @@ function makeSprite(p) {
   const look = isMe ? S.look : p.look;
   const L = isMe ? lvl : p.L;
   const glow = isMe ? glowScore() : (p.glow !== undefined ? p.glow : glowOf(L));
-  el.innerHTML = `<div class="tag"></div><div class="body">${characterSVG(look, L, { glow, stars: isMe ? S.stars : p.stars, uid: 't' + (svgCounter++) })}</div>`;
+  const flags = isMe ? currentFlags() : {};
+  el.innerHTML = `<div class="tag"></div><div class="body">${characterSVG(look, L, { glow, flags, stars: isMe ? S.stars : p.stars, uid: 't' + (svgCounter++) })}</div>`;
+  if (p.boss) el.style.transformOrigin = '27px 68px';   // Endboss wird größer gezeichnet
   p.el = el;
   updateTag(p);
   return el;
@@ -2331,6 +2558,7 @@ function makeSprite(p) {
 function updateTag(p) {
   const tag = p.el.querySelector('.tag');
   if (p.kind === 'player') { tag.className = 'tag t-player'; tag.textContent = '👑 ' + S.name; }
+  else if (p.kind === 'boss') { tag.className = 'tag t-boss'; tag.textContent = '💀 LEON · ENDBOSS'; }
   else if (p.kind === 'woman') {
     tag.className = 'tag ' + (p.got ? 't-done' : 't-woman');
     tag.textContent = (p.got ? '💚 ' : '') + p.name + ' · ' + p.beauty + '⭐';
@@ -2361,6 +2589,10 @@ function townLoop(t) {
       if (d < 4) P.target = null; else { dx = vx / d; dy = vy / d; }
     }
   }
+  if ((dx || dy) && hasFlag('drunk')) {   // betrunken = Schlangenlinien
+    dx += Math.sin(t / 170) * 0.9;
+    dy += Math.cos(t / 230) * 0.7;
+  }
   const len = Math.hypot(dx, dy);
   P.moving = len > 0;
   if (len) {
@@ -2378,7 +2610,8 @@ function townLoop(t) {
     const vx = p.target.x - p.x, vy = p.target.y - p.y, d = Math.hypot(vx, vy);
     if (d < 4) { p.target = null; p.wait = rand(1, 4); return; }
     const ox = p.x, oy = p.y;
-    tryMove(p, p.x + vx / d * 60 * dt, p.y + vy / d * 60 * dt);
+    const spd = p.boss ? 40 : 60;   // Leon schreitet langsam und majestätisch
+    tryMove(p, p.x + vx / d * spd * dt, p.y + vy / d * spd * dt);
     if (dt > 0 && p.x === ox && p.y === oy) { p.target = null; p.wait = rand(0.5, 1.5); }
     else p.moving = true;
   });
@@ -2391,7 +2624,7 @@ function townLoop(t) {
 
   // --- Figuren zeichnen (weiter unten = weiter vorne) ---
   [P, ...town.people].forEach(p => {
-    p.el.style.transform = `translate(${p.x - 27}px, ${p.y - 68}px)`;
+    p.el.style.transform = `translate(${p.x - 27}px, ${p.y - 68}px)${p.boss ? ' scale(1.35)' : ''}`;
     p.el.style.zIndex = Math.floor(p.y);
     p.el.classList.toggle('walking', !!p.moving);
   });
@@ -2401,31 +2634,43 @@ function townLoop(t) {
 }
 
 // Wer ist in deiner Nähe? → Aktions-Leiste unten anzeigen
+let currentDoor = null;
 function updateInteract() {
   const P = town.player;
   let best = null, bd = 75;
   town.people.forEach(p => {
-    const d = Math.hypot(p.x - P.x, p.y - P.y);
+    const d = Math.hypot(p.x - P.x, p.y - P.y) - (p.boss ? 15 : 0);
     if (d < bd) { bd = d; best = p; }
   });
   currentNear = best;
+  // Eingang eines Gebäudes in der Nähe?
+  currentDoor = null;
+  if (!best) BUILDINGS.forEach(b => {
+    if (b.action && Math.hypot(P.x - (b.x + b.w / 2), P.y - (b.y + b.h + 14)) < 60) currentDoor = b;
+  });
 
   let html = '';
+  const now = Date.now();
   if (best) {
-    const now = Date.now();
     const name = escapeHtml(best.name);
+    const cd = mogCooldown[best.id] > now ? Math.ceil((mogCooldown[best.id] - now) / 1000) : 0;
     if (best.kind === 'woman') {
-      const cd = best.cooldown > now ? Math.ceil((best.cooldown - now) / 1000) : 0;
+      const wcd = best.cooldown > now ? Math.ceil((best.cooldown - now) / 1000) : 0;
       const info = best.got ? 'Ihr habt schon Nummern getauscht 💚'
-        : cd ? `Ist gerade genervt … (${cd} s)` : `Ausstrahlung ${best.beauty}/10 · Chance ~${Math.round(dateChance(best) * 100)} %`;
+        : wcd ? `Ist gerade genervt … (${wcd} s)` : `Ausstrahlung ${best.beauty}/10 · Chance ~${Math.round(dateChance(best) * 100)} %`;
       html = `<div class="who">${name}<small>${info}</small></div>
-        <button class="act-btn" data-act="talk" ${best.got || cd ? 'disabled' : ''}>💬 Ansprechen</button>`;
+        <button class="act-btn" data-act="talk" ${best.got || wcd ? 'disabled' : ''}>💬 Ansprechen</button>`;
+    } else if (best.kind === 'boss') {
+      html = `<div class="who">💀 LEON · Endboss<small>${fmt(glowPower(glowOf(best.L), best.stars))} Glow-Power · „${escapeHtml(best.taunt)}“</small></div>
+        <button class="act-btn mog" data-act="mog" ${cd ? 'disabled' : ''}>👑 Herausfordern${cd ? ` (${cd} s)` : ''}</button>`;
     } else {
-      const cd = mogCooldown[best.id] > now ? Math.ceil((mogCooldown[best.id] - now) / 1000) : 0;
       const g = glowOf(best.L);
       html = `<div class="who">${best.kind === 'friend' ? '👥 ' : '⚔️ '}${name}<small>${titleOf(g)} · ${fmt(g)} Glow</small></div>
         <button class="act-btn mog" data-act="mog" ${cd ? 'disabled' : ''}>⚔️ Mog Battle${cd ? ` (${cd} s)` : ''}</button>`;
     }
+  } else if (currentDoor) {
+    html = `<div class="who">${currentDoor.sign}<small>${currentDoor.hint}</small></div>
+      <button class="act-btn" data-act="door">🚪 Reingehen</button>`;
   }
   // nur neu zeichnen, wenn sich etwas geändert hat (sonst gehen Klicks verloren)
   if (html !== lastInteractHTML) {
@@ -2437,14 +2682,17 @@ function updateInteract() {
 
 $('interactBar').addEventListener('click', e => {
   const b = e.target.closest('[data-act]');
-  if (!b || !currentNear) return;
-  if (b.dataset.act === 'talk') approach(currentNear);
-  if (b.dataset.act === 'mog') mogBattle(currentNear);
+  if (!b) return;
+  if (b.dataset.act === 'talk' && currentNear) approach(currentNear);
+  if (b.dataset.act === 'mog' && currentNear) mogBattle(currentNear);
+  if (b.dataset.act === 'door' && currentDoor) {
+    if (currentDoor.action === 'casino') setView('casino'); else openKiosk();
+  }
 });
 
 // Antippen/Klicken in der Stadt = dorthin laufen
 $('townViewport').addEventListener('pointerdown', e => {
-  if (e.target.closest('#interactBar') || !town) return;
+  if (e.target.closest('#interactBar') || e.target.closest('#townHud') || !town) return;
   const r = $('townViewport').getBoundingClientRect();
   const x = e.clientX - r.left + camX, y = e.clientY - r.top + camY;
   town.player.target = { x, y };
@@ -2483,10 +2731,9 @@ function renderTownInfo() {
 }
 
 /* ===================== NAVIGATION ===================== */
+const VIEWS = { home: 'viewHome', jobs: 'viewJobs', town: 'viewTown', casino: 'viewCasino', friends: 'viewFriends', leader: 'viewLeader' };
 function setView(v) {
-  $('viewHome').classList.toggle('hidden', v !== 'home');
-  $('viewTown').classList.toggle('hidden', v !== 'town');
-  $('viewFriends').classList.toggle('hidden', v !== 'friends');
+  Object.entries(VIEWS).forEach(([k, id]) => $(id).classList.toggle('hidden', k !== v));
   document.querySelectorAll('#mainnav button').forEach(b => b.classList.toggle('active', b.dataset.view === v));
   if (v === 'town') {
     buildTown();
@@ -2496,6 +2743,9 @@ function setView(v) {
     townActive = false;
   }
   if (v === 'friends') renderFriends();
+  if (v === 'jobs') renderJobs();
+  if (v === 'casino') renderCasino();
+  if (v === 'leader') renderLeaderboard();
 }
 $('mainnav').addEventListener('click', e => {
   const b = e.target.closest('[data-view]');
@@ -2527,6 +2777,563 @@ $('installBtn').addEventListener('click', async () => {
 });
 
 /* ---------------------------------------------------------------
+   3.6c GELD, JOBS, LUXUS-SHOP, LASTER, CASINO, ENDBOSS & LEADERBOARD
+   --------------------------------------------------------------- */
+function fmtMoney(n) { return fmt(Math.floor(n)) + ' €'; }
+function hasFlag(f) { return effects.some(e => e.flag === f); }
+// Bonus/Malus beim Ansprechen durch aktive Effekte (z. B. Bier = Mut)
+function rizzMod() { return effects.reduce((sum, e) => sum + (e.rizz || 0), 0); }
+
+// innerHTML nur setzen, wenn sich etwas geändert hat (verhindert verschluckte Klicks)
+function setHTML(el, html) { if (el && el._h !== html) { el._h = html; el.innerHTML = html; } }
+
+// Einen Effekt starten (z. B. aus dem Luxus-Shop oder dem Späti)
+function addEffect(def, good) {
+  effects = effects.filter(e => e.title !== def.title);
+  effects.push(Object.assign({ good }, def, { until: Date.now() + def.dur * 1000 }));
+  if (def.flag) renderCharacter();
+}
+
+/* ===================== JOBS ===================== */
+// req = nötiger Glow-Score, pay = Grundlohn, cd = Pause in Sekunden, diff = Schwierigkeit
+const JOBS = [
+  { id: 'flyer',     emoji: '📄', name: 'Flyer verteilen',              req: 0,    pay: 20,    cd: 30,  diff: 0, act: 'Flyer geben!',
+    desc: 'Für einen Döner-Laden. Bezahlung in Cash und Knoblauchsoße.' },
+  { id: 'barista',   emoji: '☕', name: 'Barista im Café Mewing',       req: 40,   pay: 60,    cd: 45,  diff: 1, act: 'Milch eingießen!',
+    desc: 'Latte Art in Form eines Kieferknochens.' },
+  { id: 'statist',   emoji: '🎬', name: 'Statist im Werbespot',         req: 150,  pay: 200,   cd: 60,  diff: 2, act: 'Lächeln!',
+    desc: 'Du läufst im Hintergrund vorbei. Mit Gefühl.' },
+  { id: 'insta',     emoji: '📸', name: 'Instagram-Fotoshooting',       req: 400,  pay: 700,   cd: 90,  diff: 3, act: 'Pose!',
+    desc: '„Und jetzt nachdenklich in die Ferne schauen.“' },
+  { id: 'laufsteg',  emoji: '🕴️', name: 'Laufsteg in Mailand',          req: 1000, pay: 2500,  cd: 120, diff: 4, act: 'Schritt!',
+    desc: 'Nicht stolpern. NICHT stolpern.' },
+  { id: 'parfum',    emoji: '🌸', name: 'Gesicht einer Parfum-Kampagne', req: 2000, pay: 8000,  cd: 180, diff: 5, act: 'Blick!',
+    desc: 'Du stehst am Strand und flüsterst einen französischen Namen.' },
+  { id: 'hollywood', emoji: '🎥', name: 'Hollywood-Hauptrolle',         req: 3200, pay: 30000, cd: 300, diff: 6, act: 'Action!',
+    desc: 'Du spielst dich selbst. Oscar-verdächtig.' },
+];
+
+// Lohn-Multiplikator: je höher Glow-Score & Glow-Sterne, desto mehr Geld
+function glowPayMult() { return (1 + glowScore() / 400) * (1 + S.stars * 0.1); }
+function jobPay(job) { return Math.round(job.pay * glowPayMult()); }
+
+// Luxus-Shop: kurzfristige Boosts für Geld
+const LUX = [
+  { id: 'smoothie', emoji: '🥤', name: 'Glow-Smoothie', price: 100,
+    desc: 'Grünkohl, Ingwer, Hoffnung. Klicks x3 für 60 Sekunden.', effect: { title: '🥤 Glow-Smoothie', dur: 60, click: 3 } },
+  { id: 'spa', emoji: '💆', name: 'Spa-Tag', price: 800,
+    desc: 'Gurkenscheiben auf den Augen. Aura/s x2 für 2 Minuten.', effect: { title: '💆 Spa-Tag', dur: 120, aps: 2 } },
+  { id: 'vipcut', emoji: '💈', name: 'VIP-Friseur', price: 5000,
+    desc: 'Er hat schon Gigachad Sven geschnitten. Aura/s x3 für 2 Minuten.', effect: { title: '💈 VIP-Haarschnitt', dur: 120, aps: 3 } },
+  { id: 'dubai', emoji: '🏝️', name: 'Wochenende in Dubai', price: 40000,
+    desc: 'Rooftop-Pool, Sonnenbrille, Selfies. Aura/s x5 & Klicks x5 für 3 Minuten.', effect: { title: '🏝️ Dubai-Glow', dur: 180, aps: 5, click: 5 } },
+];
+
+function renderJobs() {
+  $('jobList').innerHTML = JOBS.map(j => `
+    <div class="item" id="job-${j.id}">
+      <div class="icon">${j.emoji}</div>
+      <div><div class="name">${j.name}</div><div class="desc">${j.desc}</div><div class="eff" id="jobeff-${j.id}"></div></div>
+      <button class="buy-btn" data-job="${j.id}" id="jobbtn-${j.id}"></button>
+    </div>`).join('');
+  $('luxList').innerHTML = LUX.map(l => `
+    <div class="item">
+      <div class="icon">${l.emoji}</div>
+      <div><div class="name">${l.name}</div><div class="desc">${l.desc}</div></div>
+      <button class="buy-btn" data-lux="${l.id}" id="luxbtn-${l.id}">${fmtMoney(l.price)}<small>kaufen</small></button>
+    </div>`).join('');
+  updateJobs();
+}
+
+// Wird 10x pro Sekunde aufgerufen, solange der Jobs-Bereich offen ist
+function updateJobs() {
+  if ($('viewJobs').classList.contains('hidden')) return;
+  const now = Date.now(), g = glowScore();
+  setHTML($('jobInfo'), `Dein Glow-Bonus auf jeden Lohn: <b>x${glowPayMult().toLocaleString('de-DE', { maximumFractionDigits: 2 })}</b> – steigt mit Glow-Score und Glow-Sternen.`);
+  JOBS.forEach(j => {
+    const btn = $('jobbtn-' + j.id);
+    if (!btn) return;
+    const cd = (S.jobCd[j.id] || 0) - now;
+    setHTML($('jobeff-' + j.id), `💵 bis zu ${fmtMoney(jobPay(j) * 1.25)} · ⏱️ Pause ${j.cd} s · ab ${j.req} Glow`);
+    $('job-' + j.id).classList.toggle('locked', g < j.req);
+    if (g < j.req) { btn.disabled = true; setHTML(btn, `🔒 ab ${j.req} Glow`); }
+    else if (cd > 0) { btn.disabled = true; setHTML(btn, `⏳ ${Math.ceil(cd / 1000)} s`); }
+    else { btn.disabled = false; setHTML(btn, 'Arbeiten<small>Minispiel</small>'); }
+  });
+  LUX.forEach(l => { const b = $('luxbtn-' + l.id); if (b) b.disabled = S.money < l.price; });
+}
+
+$('jobList').addEventListener('click', e => {
+  const b = e.target.closest('[data-job]');
+  if (b && !b.disabled) startJob(JOBS.find(j => j.id === b.dataset.job));
+});
+$('luxList').addEventListener('click', e => {
+  const b = e.target.closest('[data-lux]');
+  if (!b) return;
+  const l = LUX.find(x => x.id === b.dataset.lux);
+  if (S.money < l.price) return;
+  S.money -= l.price;
+  addEffect(l.effect, true);
+  toast(`${l.emoji} ${l.name} gekauft!`, l.desc, 'good');
+  save();
+  updateJobs();
+});
+
+// Das Job-Minispiel: Ein Balken läuft hin und her – im richtigen Moment tippen!
+function startJob(job) {
+  if (glowScore() < job.req || (S.jobCd[job.id] || 0) > Date.now()) return;
+  const zone = Math.max(0.1, 0.32 - job.diff * 0.035);   // Breite des grünen Bereichs
+  const speed = 0.55 + job.diff * 0.17;                    // Geschwindigkeit des Balkens
+  let pos = 0, dir = 1, zoneStart = 0, last = performance.now(), results = [];
+
+  bigModal(`<h2>${job.emoji} ${job.name}</h2>
+    <p class="small">Tippe auf „${job.act}“, wenn der weiße Strich im <b style="color:var(--green)">grünen</b> Bereich ist.
+      Ganz in der <b style="color:var(--gold)">gelben</b> Mitte = PERFEKT! (3 Versuche)</p>
+    <div class="mg-bar"><div class="mg-zone" id="mgZone"></div><div class="mg-perfect" id="mgPerf"></div><div class="mg-marker" id="mgMarker"></div></div>
+    <div class="mg-results" id="mgResults"></div>
+    <button class="routine-btn" id="mgBtn">${job.act}</button>
+    <div id="mgDone"></div>`, []);
+
+  const newZone = () => {
+    zoneStart = rand(0.05, 0.95 - zone);
+    $('mgZone').style.left = zoneStart * 100 + '%';
+    $('mgZone').style.width = zone * 100 + '%';
+    $('mgPerf').style.left = (zoneStart + zone * 0.35) * 100 + '%';
+    $('mgPerf').style.width = zone * 0.3 * 100 + '%';
+  };
+  newZone();
+
+  const loop = t => {
+    if (!$('mgMarker') || results.length >= 3) return;
+    const dt = (t - last) / 1000;
+    last = t;
+    pos += dir * speed * dt;
+    if (pos > 1) { pos = 1; dir = -1; }
+    if (pos < 0) { pos = 0; dir = 1; }
+    $('mgMarker').style.left = pos * 100 + '%';
+    requestAnimationFrame(loop);
+  };
+  requestAnimationFrame(loop);
+
+  $('mgBtn').addEventListener('click', () => {
+    if (results.length >= 3) return;
+    let score, label;
+    if (pos >= zoneStart + zone * 0.35 && pos <= zoneStart + zone * 0.65) { score = 1; label = '🌟 PERFEKT'; }
+    else if (pos >= zoneStart && pos <= zoneStart + zone) { score = 0.6; label = '👍 Gut'; }
+    else { score = 0.1; label = '😬 Daneben'; }
+    results.push(score);
+    $('mgResults').insertAdjacentHTML('beforeend', `<span class="chip">${label}</span>`);
+    if (results.length < 3) { newZone(); return; }
+
+    // Abrechnung
+    let perf = results.reduce((a, b) => a + b, 0) / 3;
+    if (results.every(r => r === 1)) perf *= 1.25;   // alles perfekt = Bonus
+    const earned = Math.max(1, Math.round(jobPay(job) * perf));
+    S.money += earned;
+    S.moneyEarned += earned;
+    S.jobCd[job.id] = Date.now() + job.cd * 1000;
+    const quip = perf >= 1.1 ? 'Der Kunde ist begeistert und will dich wieder buchen! 🤩'
+      : perf >= 0.6 ? 'Solide Arbeit. Der Chef nickt anerkennend.'
+      : 'Naja … bezahlt wurdest du trotzdem. Irgendwie.';
+    $('mgBtn').remove();
+    $('mgDone').innerHTML = `<div class="verdict" style="color:var(--green)">💵 +${fmtMoney(earned)}</div><p>${quip}</p>`;
+    setModalButtons([{ label: 'Zahltag! 💵', primary: true }]);
+    save();
+    updateJobs();
+  });
+}
+
+/* ===================== LASTER: ZIGARETTEN & ALKOHOL ===================== */
+// penalty = so viel Glow-Score geht verloren (erholt sich langsam wieder)
+const VICE_DECAY = 0.08;   // Glow-Punkte Erholung pro Sekunde
+const VICES = [
+  { id: 'zigarette', emoji: '🚬', name: 'Zigarette', price: 15, penalty: 25, verb: 'Rauchen',
+    desc: 'Gelbe Zähne, fahle Haut, Geruch nach Bushaltestelle. Frauen finden das eher nicht so gut.',
+    effect: { title: '🚬 Riechst nach Rauch (-15 % Chance beim Ansprechen)', dur: 120, flag: 'smoke', rizz: -0.15 },
+    msgs: ['Du hustest. Stilvoll, glaubst du.', 'Deine Haut hat gerade leise „Warum?“ gefragt.', 'Du riechst jetzt wie ein Aschenbecher mit WLAN.'] },
+  { id: 'bier', emoji: '🍺', name: 'Bier', price: 8, penalty: 15, verb: 'Trinken',
+    desc: 'Gibt kurz etwas Mut beim Ansprechen, macht deine Klicks aber wackelig. Und dein Sixpack weint.',
+    effect: { title: '🍺 Angetrunken (+Mut, Klicks -20 %)', dur: 60, flag: 'drunk', rizz: 0.08, click: 0.8 },
+    msgs: ['Liquid Courage! Du fühlst dich wie Gigachad. Du bist es nicht.', 'Prost! Dein Bauch freut sich, dein Sixpack nicht.'] },
+  { id: 'wodka', emoji: '🥃', name: 'Wodka-Shot', price: 25, penalty: 45, verb: 'Trinken',
+    desc: 'Viel Mut, kein Gleichgewicht. Die Stadt dreht sich – und du läufst Schlangenlinien.',
+    effect: { title: '🥃 Betrunken (Klicks -50 %)', dur: 90, flag: 'drunk', rizz: 0.03, click: 0.5 },
+    msgs: ['Die Stadt dreht sich. Oder du.', 'Du hast gerade einer Laterne ein Kompliment gemacht.', 'Du erklärst einem Mülleimer Mewing.'] },
+];
+
+function viceShopHTML() {
+  return VICES.map(v => `
+    <div class="item">
+      <div class="icon">${v.emoji}</div>
+      <div><div class="name">${v.name}<span class="lvl">${S.inv[v.id] || 0}x im Rucksack</span></div>
+        <div class="desc">${v.desc}</div>
+        <div class="eff" style="color:var(--red)">-${v.penalty} Glow-Score beim ${v.verb}</div></div>
+      <button class="buy-btn" data-vice="${v.id}" ${S.money < v.price ? 'disabled' : ''}>${fmtMoney(v.price)}<small>kaufen</small></button>
+    </div>`).join('');
+}
+function refreshViceUI() {
+  if ($('kioskList')) $('kioskList').innerHTML = viceShopHTML();
+  if ($('kioskModalList')) $('kioskModalList').innerHTML = viceShopHTML();
+  $('townHud').innerHTML = VICES.filter(v => S.inv[v.id] > 0)
+    .map(v => `<button data-usevice="${v.id}">${v.emoji} ${v.verb} (${S.inv[v.id]})</button>`).join('');
+}
+function openKiosk() {
+  bigModal(`<h2>🏪 Späti</h2><p class="small">„Was darf's sein, Chef?“ · Dein Geld: <b>${fmtMoney(S.money)}</b></p>
+    <div class="items" id="kioskModalList">${viceShopHTML()}</div>`, [{ label: 'Raus hier 🚪' }]);
+}
+function buyVice(id) {
+  const v = VICES.find(x => x.id === id);
+  if (!v || S.money < v.price) return;
+  S.money -= v.price;
+  S.inv[id] = (S.inv[id] || 0) + 1;
+  toast(`${v.emoji} ${v.name} gekauft`, 'Benutzen kannst du sie in der Stadt (Knopf oben links).', '', 2500);
+  refreshViceUI();
+  save();
+}
+function useVice(id) {
+  const v = VICES.find(x => x.id === id);
+  if (!v || !(S.inv[id] > 0)) return;
+  S.inv[id]--;
+  S.vice += v.penalty;
+  addEffect(v.effect, false);
+  renderCharacter();
+  toast(`${v.emoji} ${v.verb} …`, `${pick(v.msgs)} <b>-${v.penalty} Glow-Score</b> (erholt sich langsam wieder)`, 'bad');
+  refreshViceUI();
+  save();
+}
+// Kaufen & Benutzen: ein gemeinsamer Klick-Empfänger für alle Knöpfe
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-vice]');
+  if (b && !b.disabled) buyVice(b.dataset.vice);
+  const u = e.target.closest('[data-usevice]');
+  if (u) useVice(u.dataset.usevice);
+});
+
+/* ===================== CASINO ===================== */
+// Einsatz lesen & abziehen (0 = ungültig)
+function getBet() {
+  const v = Math.floor(Number($('betInput').value));
+  if (!v || v < 1) { toast('🎰 Einsatz?', 'Gib einen Einsatz von mindestens 1 € ein.', 'bad', 2500); return 0; }
+  if (v > S.money) { toast('💸 Zu wenig Geld', `Du hast nur ${fmtMoney(S.money)}. Ab zur Arbeit! 💼`, 'bad', 3000); return 0; }
+  S.money -= v;
+  S.casinoNet -= v;
+  return v;
+}
+function casinoPay(amount) {
+  S.money += amount;
+  S.casinoNet += amount;
+  if (amount > S.biggestWin) S.biggestWin = amount;
+  save();
+}
+$('betBar').addEventListener('click', e => {
+  const b = e.target.closest('[data-bet]');
+  if (!b) return;
+  const t = b.dataset.bet;
+  $('betInput').value = t === 'half' ? Math.max(1, Math.floor(S.money / 2)) : t === 'max' ? Math.max(1, Math.floor(S.money)) : t;
+});
+
+function renderCasino() {
+  if (!mb) newMogBet();
+  renderBJ();
+}
+
+// ----- Spielautomat -----
+// [Symbol, Häufigkeit, Gewinn-Faktor bei 3 gleichen]
+const SLOT_SYMBOLS = [['🍒', 30, 5], ['💅', 25, 10], ['🧴', 20, 15], ['🗿', 13, 25], ['💎', 8, 50], ['👑', 4, 100]];
+function slotRoll() {
+  let r = Math.random() * 100;
+  for (const sym of SLOT_SYMBOLS) { r -= sym[1]; if (r < 0) return sym; }
+  return SLOT_SYMBOLS[0];
+}
+let slotBusy = false;
+$('slotBtn').addEventListener('click', () => {
+  if (slotBusy) return;
+  const bet = getBet();
+  if (!bet) return;
+  slotBusy = true;
+  $('slotBtn').disabled = true;
+  $('slotMsg').textContent = '';
+  const result = [slotRoll(), slotRoll(), slotRoll()];
+  const stopped = [false, false, false];
+  const spin = setInterval(() => {
+    for (let i = 0; i < 3; i++) if (!stopped[i]) $('reel' + i).textContent = pick(SLOT_SYMBOLS)[0];
+  }, 70);
+  [700, 1000, 1300].forEach((ms, i) => setTimeout(() => {
+    stopped[i] = true;
+    $('reel' + i).textContent = result[i][0];
+    if (i < 2) return;
+    clearInterval(spin);
+    const syms = result.map(r => r[0]);
+    let win = 0, msg;
+    if (syms[0] === syms[1] && syms[1] === syms[2]) {
+      win = bet * result[0][2];
+      msg = `🎉 JACKPOT ${syms[0]}${syms[0]}${syms[0]}! +${fmtMoney(win)}`;
+    } else if (syms[0] === syms[1] || syms[1] === syms[2] || syms[0] === syms[2]) {
+      win = bet;
+      msg = 'Zwei gleiche – Einsatz zurück.';
+    } else {
+      msg = '😩 Nichts. Das Haus bedankt sich.';
+    }
+    casinoPay(win);
+    $('slotMsg').innerHTML = `<span style="color:${win > bet ? 'var(--green)' : win ? 'var(--text)' : 'var(--red)'}">${msg}</span>`;
+    slotBusy = false;
+    $('slotBtn').disabled = false;
+  }, ms));
+});
+
+// ----- Roulette -----
+const RED_NUMBERS = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+let rouBusy = false;
+function showRou(n) {
+  const el = $('rouNum');
+  el.textContent = n;
+  el.style.background = n === 0 ? '#1b7a3a' : RED_NUMBERS.includes(n) ? '#c1121f' : '#111';
+}
+$('gRoulette').addEventListener('click', e => {
+  const b = e.target.closest('[data-rou]');
+  if (!b || rouBusy) return;
+  const type = b.dataset.rou;
+  const pickNum = Math.floor(Number($('rouPick').value));
+  if (type === 'zahl' && !(pickNum >= 0 && pickNum <= 36)) { toast('🎡 Ungültige Zahl', 'Wähle eine Zahl von 0 bis 36.', 'bad', 2500); return; }
+  const bet = getBet();
+  if (!bet) return;
+  rouBusy = true;
+  $('rouMsg').textContent = 'Die Kugel rollt … 🎱';
+  let delay = 40;
+  const step = () => {
+    const n = Math.floor(Math.random() * 37);
+    showRou(n);
+    delay *= 1.15;
+    if (delay < 420) { setTimeout(step, delay); return; }
+    const red = RED_NUMBERS.includes(n);
+    const win = {
+      rot: red, schwarz: n > 0 && !red, gerade: n > 0 && n % 2 === 0, ungerade: n % 2 === 1,
+      low: n >= 1 && n <= 18, high: n >= 19, zahl: n === pickNum,
+    }[type];
+    const pay = win ? bet * (type === 'zahl' ? 36 : 2) : 0;
+    casinoPay(pay);
+    $('rouMsg').innerHTML = win
+      ? `<span style="color:var(--green)">🎉 ${n}! Gewonnen: +${fmtMoney(pay)}</span>`
+      : `<span style="color:var(--red)">${n} – leider verloren.</span>`;
+    rouBusy = false;
+  };
+  step();
+});
+
+// ----- Blackjack -----
+const SUITS = ['♠', '♥', '♦', '♣'];
+const RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+let bj = null;   // aktuelle Runde
+function newDeck() {
+  const d = [];
+  SUITS.forEach(s => RANKS.forEach(r => d.push({ r, s, v: r === 'A' ? 11 : 'JQK'.includes(r) ? 10 : Number(r) })));
+  return shuffle(d);
+}
+function handVal(h) {
+  let v = 0, aces = 0;
+  h.forEach(c => { v += c.v; if (c.r === 'A') aces++; });
+  while (v > 21 && aces) { v -= 10; aces--; }   // Ass zählt dann 1 statt 11
+  return v;
+}
+function cardHTML(c, hidden) {
+  if (hidden) return '<div class="pcard back"></div>';
+  return `<div class="pcard ${c.s === '♥' || c.s === '♦' ? 'red' : ''}">${c.r}<span>${c.s}</span></div>`;
+}
+function renderBJ(msg) {
+  const running = bj && !bj.done;
+  $('bjDealer').innerHTML = bj ? bj.dealer.map((c, i) => cardHTML(c, running && i === 1)).join('') : '';
+  $('bjYou').innerHTML = bj ? bj.you.map(c => cardHTML(c)).join('') : '';
+  $('bjYouVal').textContent = bj ? `(${handVal(bj.you)})` : '';
+  $('bjDealerVal').textContent = bj && bj.done ? `(${handVal(bj.dealer)})` : '';
+  $('bjBtns').innerHTML = !running
+    ? '<button class="casino-btn" data-bj="deal">🃏 Austeilen</button>'
+    : `<button class="casino-btn" data-bj="hit">Karte ziehen</button><button class="casino-btn" data-bj="stand">Halten</button>
+       ${bj.you.length === 2 && S.money >= bj.bet ? '<button class="casino-btn" data-bj="double">Verdoppeln</button>' : ''}`;
+  if (msg !== undefined) $('bjMsg').innerHTML = msg;
+}
+function bjStand() {
+  while (handVal(bj.dealer) < 17) bj.dealer.push(bj.deck.pop());   // Dealer zieht bis 17
+  bjFinish();
+}
+function bjFinish() {
+  bj.done = true;
+  const y = handVal(bj.you), d = handVal(bj.dealer);
+  const natural = y === 21 && bj.you.length === 2;
+  const dealerNatural = d === 21 && bj.dealer.length === 2;
+  let pay = 0, msg;
+  if (y > 21) msg = '💥 Überkauft! Verloren.';
+  else if (natural && !dealerNatural) { pay = bj.bet * 2.5; msg = '🌟 BLACKJACK!'; }
+  else if (d > 21) { pay = bj.bet * 2; msg = '🎉 Dealer überkauft – du gewinnst!'; }
+  else if (y > d) { pay = bj.bet * 2; msg = '🎉 Gewonnen!'; }
+  else if (y === d) { pay = bj.bet; msg = '🤝 Unentschieden – Einsatz zurück.'; }
+  else msg = '😩 Der Dealer gewinnt.';
+  casinoPay(pay);
+  renderBJ(`${msg}${pay ? ` <span style="color:var(--green)">+${fmtMoney(pay)}</span>` : ''}`);
+}
+$('bjBtns').addEventListener('click', e => {
+  const b = e.target.closest('[data-bj]');
+  if (!b) return;
+  const a = b.dataset.bj;
+  if (a === 'deal') {
+    const bet = getBet();
+    if (!bet) return;
+    bj = { deck: newDeck(), bet, you: [], dealer: [], done: false };
+    bj.you.push(bj.deck.pop(), bj.deck.pop());
+    bj.dealer.push(bj.deck.pop(), bj.deck.pop());
+    if (handVal(bj.you) === 21) bjStand(); else renderBJ('');
+  } else if (!bj || bj.done) {
+    return;
+  } else if (a === 'hit') {
+    bj.you.push(bj.deck.pop());
+    const v = handVal(bj.you);
+    if (v > 21) bjFinish(); else if (v === 21) bjStand(); else renderBJ();
+  } else if (a === 'stand') {
+    bjStand();
+  } else if (a === 'double' && S.money >= bj.bet) {
+    S.money -= bj.bet;
+    S.casinoNet -= bj.bet;
+    bj.bet *= 2;
+    bj.you.push(bj.deck.pop());
+    if (handVal(bj.you) > 21) bjFinish(); else bjStand();
+  }
+});
+
+// ----- Mog-Wetten -----
+const MB_PREFIX = ['Gym-Bro', 'Sigma', 'Drip-Lord', 'Model', 'Jawline', 'Rizz-Gott', 'Mewing-Mönch', 'Skincare-King'];
+const MB_NAMES = ['Dennis', 'Marco', 'Tobi', 'Jonas', 'Can', 'Elias', 'Finn', 'Ben', 'Yusuf', 'Mehmet', 'Niklas', 'Tim', 'Malte', 'Kevin', 'Justin', 'Ole'];
+let mb = null;   // aktueller Wett-Kampf
+
+function randomFighter(tier = rand(2, 22)) {
+  const lv = {};
+  UPGRADES.forEach(u => { lv[u.id] = clamp(Math.round(tier * rand(0.3, 1.5)), 0, MAX_LEVEL); });
+  return {
+    id: 'mb_' + makeId(),
+    name: pick(MB_PREFIX) + ' ' + pick(MB_NAMES),
+    L: id => lv[id] || 0,
+    stars: Math.random() < 0.3 ? 1 + Math.floor(Math.random() * 3) : 0,
+    look: { hair: pick(OPTIONS.hair).id, hairColor: pick(OPTIONS.hairColor), skin: pick(OPTIONS.skin), eyes: pick(OPTIONS.eyes), outfit: pick(OPTIONS.outfit).id },
+  };
+}
+// Gewinnchance schätzen, indem wir den Kampf 300x simulieren
+function winProb(A, B) {
+  let w = 0;
+  for (let i = 0; i < 300; i++) if (simulateBattle(A, B).won) w++;
+  return clamp(w / 300, 0.03, 0.97);
+}
+function newMogBet() {
+  // ähnlich starke Gegner, damit es spannend bleibt
+  const tier = rand(3, 20);
+  const A = randomFighter(tier * rand(0.75, 1.3)), B = randomFighter(tier * rand(0.75, 1.3));
+  const p = winProb(A, B);
+  const odds = q => Math.round(clamp(0.92 / q, 1.05, 25) * 100) / 100;   // 8 % gehen ans Haus
+  mb = { A, B, oa: odds(p), ob: odds(1 - p), busy: false };
+  $('mbMsg').innerHTML = '';
+  renderMogBet();
+}
+function renderMogBet() {
+  const f = (F, o, side) => `<div>${characterSVG(F.look, F.L, { glow: glowOf(F.L), stars: F.stars, uid: 'mb' + (svgCounter++) })}
+    <b>${escapeHtml(F.name)}</b><div class="small">${fmt(glowOf(F.L))} Glow · ${F.stars} ⭐</div>
+    <button class="mb-btn" data-mb="${side}" ${mb.busy ? 'disabled' : ''}>Wetten · Quote ${o.toLocaleString('de-DE')}</button></div>`;
+  $('mbFighters').innerHTML = `<div class="mb-fighters">${f(mb.A, mb.oa, 'A')}${f(mb.B, mb.ob, 'B')}</div>`;
+}
+$('gMogBet').addEventListener('click', e => {
+  if (e.target.closest('[data-mbnew]')) { newMogBet(); return; }
+  const b = e.target.closest('[data-mb]');
+  if (!b || !mb || mb.busy) return;
+  const side = b.dataset.mb;
+  const bet = getBet();
+  if (!bet) return;
+  mb.busy = true;
+  renderMogBet();
+  const res = simulateBattle(mb.A, mb.B);
+  $('mbMsg').innerHTML = '<div class="rounds" id="mbRounds"></div><div id="mbVerdict"></div>';
+  let i = 0;
+  const step = () => {
+    if (!$('mbRounds')) return;
+    if (i < res.rounds.length) {
+      $('mbRounds').insertAdjacentHTML('beforeend', roundHTML(res.rounds[i], i + 1));
+      i++;
+      setTimeout(step, 600);
+      return;
+    }
+    const winner = res.won ? mb.A : mb.B;
+    const won = (side === 'A') === res.won;
+    const pay = won ? Math.floor(bet * (side === 'A' ? mb.oa : mb.ob)) : 0;
+    casinoPay(pay);
+    $('mbVerdict').innerHTML = `<div class="verdict" style="color:${won ? 'var(--green)' : 'var(--red)'}">
+      ${escapeHtml(winner.name)} moggt! ${won ? `+${fmtMoney(pay)} 🎉` : 'Wette verloren 💸'}</div>
+      <button class="casino-btn" data-mbnew="1">⚔️ Nächster Kampf</button>`;
+  };
+  setTimeout(step, 300);
+});
+
+/* ===================== ENDBOSS LEON ===================== */
+const BOSS = {
+  id: 'boss_leon', name: 'LEON', boss: true, stars: 25, glow: 9999,
+  look: { hair: 'scheitel', hairColor: '#e8e8e8', skin: '#f1c27d', eyes: '#8e44ad', outfit: 'anzug', color: '#c9a227' },
+  lv: Object.fromEntries(UPGRADES.map(u => [u.id, MAX_LEVEL])),
+};
+const BOSS_TAUNTS = [
+  'Du bist nicht mal auf meinem Radar.',
+  'Ich mewe seit 2009.',
+  'Mein Spiegelbild fragt MICH nach Autogrammen.',
+  'Komm wieder, wenn du ein Kinn hast.',
+  'Ich hab Gigachad Sven das Mewing beigebracht.',
+];
+
+/* ===================== LEADERBOARD ===================== */
+const LB_CATS = [
+  { id: 'power',    name: '✨ Glow-Power', show: v => fmt(v) },
+  { id: 'money',    name: '💵 Vermögen',   show: v => fmtMoney(v) },
+  { id: 'wins',     name: '⚔️ Mog-Siege',  show: v => fmt(v) },
+  { id: 'contacts', name: '💌 Kontakte',   show: v => fmt(v) },
+];
+// Werte der Stadt-Bewohner (die spielen ja nicht wirklich)
+const NPC_STATS = {
+  r_dennis: { money: 1200, wins: 14, contacts: 2 },
+  r_luca: { money: 25000, wins: 41, contacts: 31 },
+  r_kai: { money: 8000, wins: 77, contacts: 3 },
+  r_sven: { money: 500000, wins: 420, contacts: 150 },
+  boss_leon: { money: 99999999, wins: 9999, contacts: 999 },
+};
+let lbCat = 'power';
+// Glow-Power = Glow-Score mit Bonus durch Glow-Sterne
+function glowPower(glow, stars) { return Math.round(glow * (1 + stars * 0.1)); }
+
+function renderLeaderboard() {
+  $('lbTabs').innerHTML = LB_CATS.map(c =>
+    `<button class="tab ${c.id === lbCat ? 'active' : ''}" data-lb="${c.id}">${c.name}</button>`).join('');
+  const rows = [{
+    name: S.name + ' (Du)', look: S.look, L: lvl, stars: S.stars, me: true,
+    power: glowPower(glowScore(), S.stars), money: S.money, wins: S.mogWins, contacts: S.contacts.length,
+  }];
+  S.friends.forEach(f => {
+    const L = friendL(f);
+    rows.push({ name: f.name, look: f.look, L, stars: f.stars, tag: '👥 Freund',
+      power: glowPower(glowOf(L), f.stars), money: f.money || 0, wins: f.mogWins || 0, contacts: f.contacts || 0 });
+  });
+  [...RIVALS, BOSS].forEach(r => {
+    const L = id => r.lv[id] || 0;
+    rows.push(Object.assign({ name: r.name, look: r.look, L, stars: r.stars, boss: !!r.boss,
+      tag: r.boss ? '👑 Endboss' : '⚔️ Rivale', power: glowPower(glowOf(L), r.stars) }, NPC_STATS[r.id]));
+  });
+  rows.sort((a, b) => b[lbCat] - a[lbCat]);
+  const cat = LB_CATS.find(c => c.id === lbCat);
+  const medals = ['🥇', '🥈', '🥉'];
+  $('lbList').innerHTML = rows.map((r, i) => `
+    <div class="lb-row ${r.me ? 'me' : ''} ${r.boss ? 'boss' : ''}">
+      <div class="rank">${medals[i] || (i + 1) + '.'}</div>
+      ${characterSVG(r.look, r.L, { glow: r.boss ? 9999 : glowOf(r.L), stars: r.stars, uid: 'lb' + (svgCounter++) })}
+      <div><b>${escapeHtml(r.name)}</b><div class="small">${r.tag || 'Das bist du!'}</div></div>
+      <div class="val">${cat.show(r[lbCat])}</div>
+    </div>`).join('');
+}
+$('lbTabs').addEventListener('click', e => {
+  const b = e.target.closest('[data-lb]');
+  if (b) { lbCat = b.dataset.lb; renderLeaderboard(); }
+});
+
+/* ---------------------------------------------------------------
    3.7 SPIELSCHLEIFE & START
    --------------------------------------------------------------- */
 let lastTick = performance.now();
@@ -2537,6 +3344,9 @@ function tick() {
   const dt = Math.min(1, (now - lastTick) / 1000);  // vergangene Sekunden (max. 1)
   lastTick = now;
   if (!S.created) return;
+
+  // Glow-Abzug durch Laster erholt sich langsam
+  if (S.vice > 0) S.vice = Math.max(0, S.vice - dt * VICE_DECAY);
 
   // passive Aura
   gainAura(totalAps() * dt);

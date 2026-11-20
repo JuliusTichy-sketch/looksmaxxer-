@@ -1,6 +1,6 @@
 // Service Worker: speichert die Spieldateien, damit die App auch offline läuft.
 // Strategie: zuerst aus dem Internet laden (für Updates), sonst aus dem Speicher.
-const CACHE = 'looksmaxxer-v2';
+const CACHE = 'looksmaxxer-v3';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
