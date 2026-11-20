@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>Looksmaxxer 3000 – Das Glow-Up-Idle-Game</title>
+<!-- App-Einstellungen: damit man das Spiel wie eine echte App installieren kann -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#3a0f5c">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Looksmaxxer">
 <!--
   ==========================================================================
   LOOKSMAXXER 3000
@@ -18,6 +27,7 @@
        3.4 Figur zeichnen (SVG, verändert sich mit den Upgrades)
        3.5 Oberfläche   (Shop, Anzeigen, Pop-ups)
        3.6 Events, Meilensteine, Prestige
+       3.6b Freunde, Stadt, Mog Battles, Ansprechen, App-Installation
        3.7 Spielschleife & Start
   ==========================================================================
 -->
@@ -418,6 +428,117 @@
     0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); }
   }
 
+  /* ---------- Hauptnavigation (Glow-Up / Stadt / Freunde) ---------- */
+  .mainnav {
+    display: flex; justify-content: center; gap: 8px;
+    margin: 10px auto 0; padding: 0 12px; flex-wrap: wrap;
+  }
+  .mainnav button {
+    padding: 10px 18px; border-radius: 999px;
+    background: rgba(255,255,255,.1); font-weight: 800; font-size: 1rem;
+    border: 1px solid var(--card-border);
+  }
+  .mainnav button.active { background: linear-gradient(135deg, var(--pink), #9b5cff); border-color: transparent; }
+
+  .view { max-width: 1200px; margin: 0 auto; padding: 0 12px 30px; display: flex; flex-direction: column; gap: 14px; }
+
+  /* ---------- Stadt ---------- */
+  #townViewport {
+    position: relative; width: 100%; height: min(65vh, 620px); min-height: 360px;
+    overflow: hidden; border-radius: 14px; background: #2b2540;
+    touch-action: none; user-select: none; cursor: pointer;
+  }
+  #townWorld { position: absolute; left: 0; top: 0; will-change: transform; }
+  .sprite { position: absolute; left: 0; top: 0; width: 54px; height: 70px; pointer-events: none; }
+  .sprite .body { width: 100%; height: 100%; }
+  .sprite .body svg { width: 100%; height: 100%; display: block; }
+  .sprite.walking .body { animation: walk .35s ease-in-out infinite; }
+  @keyframes walk { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-3px) rotate(2deg); } }
+  .sprite .tag {
+    position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+    white-space: nowrap; font-size: 11px; font-weight: 800;
+    padding: 2px 7px; border-radius: 999px; background: rgba(20,5,35,.8);
+  }
+  .tag.t-player { color: var(--gold); border: 1px solid var(--gold); }
+  .tag.t-woman  { color: #ff9ad5; }
+  .tag.t-friend { color: var(--cyan); }
+  .tag.t-rival  { color: #ffb36b; }
+  .tag.t-done   { color: var(--green); }
+  .tap-marker {
+    position: absolute; width: 20px; height: 10px; margin: -5px 0 0 -10px;
+    border: 2px solid var(--gold); border-radius: 50%;
+    animation: tapfade .6s ease-out forwards; pointer-events: none;
+  }
+  @keyframes tapfade { from { opacity: 1; transform: scale(.5); } to { opacity: 0; transform: scale(1.8); } }
+  #interactBar {
+    position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%);
+    background: rgba(20,5,35,.92); border: 1px solid var(--card-border);
+    border-radius: 16px; padding: 10px 14px; display: flex; gap: 10px; align-items: center;
+    box-shadow: 0 6px 20px rgba(0,0,0,.5); width: max-content; max-width: 94%;
+    cursor: default; z-index: 5000;
+  }
+  #interactBar .who { font-weight: 800; font-size: .95rem; }
+  #interactBar .who small { display: block; color: var(--muted); font-weight: 600; }
+  .act-btn {
+    padding: 10px 14px; border-radius: 12px; font-weight: 900; white-space: nowrap;
+    background: linear-gradient(135deg, var(--pink), #9b5cff);
+  }
+  .act-btn.mog { background: linear-gradient(135deg, #ff8c42, var(--red)); }
+  .act-btn:disabled { background: rgba(255,255,255,.12); color: rgba(255,255,255,.5); cursor: not-allowed; }
+  .town-help { font-size: .85rem; color: var(--muted); margin: 0 0 10px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .chip { padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,.1); font-size: .85rem; font-weight: 700; }
+
+  /* ---------- Modals für Mog Battle, Ansprechen, Vergleich ---------- */
+  .modal.wide { width: min(96vw, 560px); max-height: 92vh; overflow-y: auto; }
+  .versus { display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .versus .fighter { flex: 1; text-align: center; min-width: 0; }
+  .versus .fighter svg { width: 100%; max-width: 150px; height: auto; }
+  .versus .fighter b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .versus .vs { font-size: 1.8rem; font-weight: 900; color: var(--gold); }
+  .rounds { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; text-align: left; }
+  .round {
+    display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center;
+    padding: 8px 10px; border-radius: 10px; background: rgba(255,255,255,.07);
+    animation: pop .3s ease-out; font-size: .9rem;
+  }
+  .round .mid { text-align: center; font-weight: 800; font-size: .8rem; color: var(--muted); }
+  .round .l { text-align: left; } .round .r { text-align: right; }
+  .round .win { color: var(--green); font-weight: 900; }
+  .round .lose { color: var(--red); opacity: .8; }
+  .verdict { font-size: 1.4rem; font-weight: 900; margin-top: 12px; animation: pop .4s ease-out; }
+  .cmp-row { margin: 6px 0; text-align: left; font-size: .85rem; }
+  .cmp-bars { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+  .cmp-bar { height: 10px; border-radius: 999px; background: rgba(255,255,255,.1); overflow: hidden; }
+  .cmp-bar > div { height: 100%; border-radius: 999px; }
+  .cmp-bar.left > div { background: var(--gold); margin-left: auto; }
+  .cmp-bar.right > div { background: var(--cyan); }
+  .opener { display: block; width: 100%; margin-top: 8px; padding: 12px; border-radius: 12px;
+    background: rgba(255,255,255,.1); font-weight: 700; text-align: left; border: 1px solid var(--card-border); }
+  .opener:hover { background: rgba(255,79,216,.25); }
+  .chance { font-size: 1.1rem; font-weight: 900; margin: 6px 0; }
+
+  /* ---------- Freunde ---------- */
+  .code-box {
+    width: 100%; min-height: 70px; padding: 10px; border-radius: 12px;
+    border: 2px solid var(--card-border); background: rgba(0,0,0,.25);
+    color: var(--text); font-family: monospace; font-size: .8rem; resize: vertical; word-break: break-all;
+  }
+  .row-btns { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .row-btns button { flex: 1; min-width: 120px; }
+  .friend {
+    display: grid; grid-template-columns: 34px 64px 1fr; gap: 10px; align-items: center;
+    padding: 10px; border-radius: 14px; background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1); margin-top: 8px;
+  }
+  .friend.me { border-color: var(--gold); }
+  .friend .rank { font-size: 1.3rem; font-weight: 900; text-align: center; }
+  .friend svg { width: 64px; height: auto; display: block; }
+  .friend .fname { font-weight: 800; }
+  .friend .fbtns { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+  .friend .fbtns button { padding: 6px 10px; border-radius: 10px; background: rgba(255,255,255,.12); font-weight: 700; font-size: .8rem; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
   /* ---------- Handy-Ansicht ---------- */
   @media (max-width: 800px) {
     main { grid-template-columns: minmax(0, 1fr); }
@@ -426,6 +547,8 @@
     .preview-card svg { max-width: 200px; }
     .stats { grid-template-columns: repeat(2, 1fr); }
     .char-wrap { max-width: 230px; }
+    .two-col { grid-template-columns: 1fr; }
+    .mainnav button { padding: 9px 12px; font-size: .9rem; }
   }
   @media (max-width: 420px) {
     .item { grid-template-columns: 36px 1fr; }
@@ -469,6 +592,12 @@
   <header>
     <h1>LOOKSMAXXER 3000</h1>
     <p>Vom NPC zum Gigachad – eine Hautpflege-Routine nach der anderen.</p>
+    <!-- Hauptnavigation -->
+    <nav class="mainnav" id="mainnav">
+      <button data-view="home" class="active">🪞 Glow-Up</button>
+      <button data-view="town">🏙️ Stadt</button>
+      <button data-view="friends">👥 Freunde</button>
+    </nav>
   </header>
 
   <section class="stats">
@@ -478,7 +607,7 @@
     <div class="card stat mult"><div class="label">Multiplikator</div><div class="value" id="sMult">x1</div></div>
   </section>
 
-  <main>
+  <main id="viewHome">
     <!-- Linke Spalte: Figur & Klick-Button -->
     <div class="left">
       <div class="card char-card">
@@ -527,12 +656,64 @@
         <h3>⚙️ Einstellungen</h3>
         <div class="row">
           <button class="ghost-btn" id="editCharBtn">🎨 Aussehen ändern</button>
+          <button class="ghost-btn" id="installBtn">📲 Als App installieren</button>
           <button class="ghost-btn danger-btn" id="resetBtn">🗑️ Spielstand löschen</button>
         </div>
         <div class="stat-list" id="statList"></div>
       </div>
     </div>
   </main>
+
+  <!-- ===== Bereich: STADT ===== -->
+  <section class="view hidden" id="viewTown">
+    <div class="card">
+      <h2 style="margin:0 0 4px">🏙️ Glow City</h2>
+      <p class="town-help">👆 Tippe auf eine Stelle, um dorthin zu laufen (am PC auch Pfeiltasten / WASD).
+        Geh nah an Leute heran, um sie anzusprechen oder zum <b>Mog Battle</b> herauszufordern.</p>
+      <div id="townViewport">
+        <div id="townWorld"></div>
+        <div id="interactBar" class="hidden"></div>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h3 style="margin:0">📱 Deine Kontakte <span id="contactCount"></span></h3>
+        <div class="small">Nummern, die du in der Stadt bekommen hast.</div>
+        <div class="chips" id="contactList"></div>
+      </div>
+      <div class="card">
+        <h3 style="margin:0">⚔️ Mog-Bilanz</h3>
+        <div class="small" id="mogStats"></div>
+        <div class="small" style="margin-top:6px">Rivalen in der Stadt: Gym-Bro Dennis, Influencer Leon, Mewing-Meister Kai und der legendäre Gigachad Sven. Deine Freunde laufen hier auch herum!</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Bereich: FREUNDE ===== -->
+  <section class="view hidden" id="viewFriends">
+    <div class="two-col">
+      <div class="card">
+        <h3 style="margin:0 0 6px">🔑 Dein Freundescode</h3>
+        <div class="small">Schick diesen Code deinen Freunden (z. B. per WhatsApp). Wenn du stärker geworden bist, schick einfach einen neuen Code – dann sehen sie deinen aktuellen Stand.</div>
+        <textarea class="code-box" id="myCode" readonly></textarea>
+        <div class="row-btns">
+          <button class="ghost-btn" id="copyCodeBtn">📋 Kopieren</button>
+          <button class="ghost-btn" id="shareCodeBtn">📤 Teilen</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin:0 0 6px">➕ Freund hinzufügen</h3>
+        <div class="small">Füge hier den Code ein, den dir dein Freund geschickt hat.</div>
+        <textarea class="code-box" id="friendCodeInput" placeholder="LMX-…"></textarea>
+        <div class="row-btns"><button class="ghost-btn" id="addFriendBtn" style="background:linear-gradient(135deg,var(--pink),#9b5cff)">Hinzufügen</button></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="margin:0">🏆 Rangliste</h3>
+      <div class="small">Du und deine Freunde, sortiert nach Glow-Score.</div>
+      <div id="friendList"></div>
+    </div>
+  </section>
 </div>
 
 <!-- Container für kleine Pop-up-Nachrichten -->
@@ -700,6 +881,7 @@ const OPTIONS = {
     { id: 'scheitel', label: 'Seitenscheitel' },
     { id: 'lang',    label: 'Lang' },
     { id: 'glatze',  label: 'Glatze' },
+    { id: 'dutt',    label: 'Dutt' },
   ],
   hairColor: ['#1c1c1c', '#4a2f1b', '#8b5a2b', '#d8b45a', '#a8431f', '#e8e8e8', '#3a6df0', '#ff6fb5'],
   skin:      ['#ffe0c4', '#f1c27d', '#e0ac69', '#c68642', '#8d5524', '#5c3a1e'],
@@ -718,6 +900,9 @@ const OPTIONS = {
    --------------------------------------------------------------- */
 const SAVE_KEY = 'looksmaxxer3000_save_v1';
 
+// Zufällige Spieler-ID
+function makeId() { return Math.random().toString(36).slice(2, 10); }
+
 // So sieht ein brandneuer Spielstand aus
 function newState() {
   return {
@@ -735,6 +920,11 @@ function newState() {
     buyAmount: 1,            // x1 / x10 / max
     tab: 'skin',             // aktuell geöffneter Shop-Reiter
     lastSave: Date.now(),
+    id: makeId(),            // eigene Spieler-ID (für Freundescodes)
+    friends: [],             // Freundesliste (aus Freundescodes)
+    contacts: [],            // Nummern aus der Stadt
+    mogWins: 0,              // gewonnene Mog Battles
+    mogLosses: 0,            // verlorene Mog Battles
   };
 }
 
@@ -921,12 +1111,15 @@ function characterSVG(look, L, opts = {}) {
   // --- Farben ---
   const skin = look.skin, skinD = shade(skin, -0.15), skinDD = shade(skin, -0.35);
   const hairC = look.hairColor;
-  const oc = OUTFIT_COLORS[look.outfit] || OUTFIT_COLORS.hoodie;
+  // NPCs können eine eigene Outfit-Farbe haben (look.color)
+  const oc = look.color ? { main: look.color, dark: shade(look.color, -0.3) }
+                        : (OUTFIT_COLORS[look.outfit] || OUTFIT_COLORS.hoodie);
+  const fem = !!look.fem;   // weibliche Figur (für die Frauen in der Stadt)
 
   // --- Körpermaße ---
-  const sw = 28 + Math.min(24, fitT * 0.5);                          // halbe Schulterbreite
-  const armW = 11 + Math.min(9, fitT * 0.2);                         // Armdicke
-  const waist = 30 - Math.min(7, fitT * 0.25) - (L('kleidung') > 0 ? 2 : 0); // halbe Taillenbreite
+  const sw = fem ? 22 + Math.min(5, fitT * 0.1) : 28 + Math.min(24, fitT * 0.5);                          // halbe Schulterbreite
+  const armW = fem ? 9 : 11 + Math.min(9, fitT * 0.2);                         // Armdicke
+  const waist = fem ? 19 : 30 - Math.min(7, fitT * 0.25) - (L('kleidung') > 0 ? 2 : 0); // halbe Taillenbreite
   const tilt = Math.max(0, 12 - postT * 0.8);                        // Vorbeugen (schlechte Haltung)
   const smile = -0.4 + Math.min(1.4, confT * 0.12);                  // -0.4 = mürrisch, 1 = strahlend
 
@@ -950,7 +1143,7 @@ function characterSVG(look, L, opts = {}) {
   s += `<g class="breathe">`;
 
   // ===== Beine & Schuhe =====
-  const pants = look.outfit === 'anzug' ? oc.main : '#2f3e5c';
+  const pants = look.outfit === 'anzug' ? oc.main : look.outfit === 'kleid' ? skinD : '#2f3e5c';
   s += `<rect x="${100 - waist + 3}" y="196" width="${waist - 4}" height="52" rx="4" fill="${pants}"/>`;
   s += `<rect x="${101}" y="196" width="${waist - 4}" height="52" rx="4" fill="${pants}"/>`;
   s += `<ellipse cx="${100 - waist / 2}" cy="249" rx="${waist / 2 + 3}" ry="5" fill="#222"/>`;
@@ -981,7 +1174,12 @@ function characterSVG(look, L, opts = {}) {
   s += `<path d="${torso}" fill="${oc.main}"/>`;
 
   // Outfit-Details
-  if (look.outfit === 'hoodie') {
+  if (look.outfit === 'kleid') {
+    s += `<path d="M${100 - waist},186 L${100 - waist - 16},224 Q100,230 ${100 + waist + 16},224 L${100 + waist},186 Z" fill="${oc.main}"/>`;
+    s += `<path d="M90,110 Q100,122 110,110" fill="${skinD}"/>`;
+  } else if (look.outfit === 'top') {
+    s += `<path d="M88,110 Q100,126 112,110" fill="${skinD}"/>`;
+  } else if (look.outfit === 'hoodie') {
     s += `<path d="M84,110 Q100,124 116,110" fill="none" stroke="${oc.dark}" stroke-width="5"/>`;
     s += `<line x1="95" y1="116" x2="94" y2="138" stroke="#eee" stroke-width="1.5"/>`;
     s += `<line x1="105" y1="116" x2="106" y2="138" stroke="#eee" stroke-width="1.5"/>`;
@@ -1001,7 +1199,7 @@ function characterSVG(look, L, opts = {}) {
   }
 
   // Ketchup-Fleck, solange keine "Sauberen Basics" gekauft wurden
-  if (L('basics') === 0) {
+  if (L('basics') === 0 && !fem) {
     s += `<circle cx="112" cy="150" r="4.5" fill="#b5341f" opacity=".75"/><circle cx="116" cy="154" r="2" fill="#b5341f" opacity=".75"/>`;
   }
   // Gürtel, wenn die Kleidung passt
@@ -1033,7 +1231,7 @@ function characterSVG(look, L, opts = {}) {
   s += `<ellipse cx="100" cy="70" rx="30" ry="34" fill="${skin}"/>`;
 
   // Kantiger Kiefer durch Mewing
-  if (mewT >= 3) {
+  if (mewT >= 3 && !fem) {
     const k = Math.min(1, mewT / 25);                 // 0..1 – wie kantig
     s += `<path d="M70,72 L${72 - k * 3},${92 + k * 2} Q${78 - k * 2},${102 + k * 2} 92,104 L100,${105 + k * 3} L108,104 Q${122 + k * 2},${102 + k * 2} ${128 + k * 3},${92 + k * 2} L130,72 Z" fill="${skin}"/>`;
     s += `<path d="M${72 - k * 3},${92 + k * 2} Q${78 - k * 2},${102 + k * 2} 92,104" fill="none" stroke="${skinD}" stroke-width="1.5"/>`;
@@ -1041,7 +1239,7 @@ function characterSVG(look, L, opts = {}) {
     if (mewT >= 15) s += `<line x1="100" y1="${103 + k * 3}" x2="100" y2="${107 + k * 3}" stroke="${skinD}" stroke-width="1.2"/>`; // Kinngrübchen
   }
   // Doppelkinn (ohne Mewing & mit schlechter Haltung – oder beim Event)
-  if ((mewT === 0 && postT < 5) || flags.doublechin) {
+  if ((mewT === 0 && postT < 5 && !fem) || flags.doublechin) {
     s += `<path d="M86,104 Q100,116 114,104" fill="none" stroke="${skinD}" stroke-width="2"/>`;
   }
 
@@ -1081,7 +1279,12 @@ function characterSVG(look, L, opts = {}) {
   // Augenbrauen (selbstbewusster = höher & gerader)
   const browY = 60 - Math.min(2, confT * 0.15);
   const worry = Math.max(0, 3 - confT * 0.3);
-  s += `<path d="M81,${browY} L94,${browY - worry} M106,${browY - worry} L119,${browY}" stroke="${look.hair === 'glatze' ? shade(hairC, -0.1) : hairC}" stroke-width="2.6" stroke-linecap="round"/>`;
+  s += `<path d="M81,${browY} L94,${browY - worry} M106,${browY - worry} L119,${browY}" stroke="${look.hair === 'glatze' ? shade(hairC, -0.1) : hairC}" stroke-width="${fem ? 1.8 : 2.6}" stroke-linecap="round"/>`;
+  // Wimpern & Ohrringe (weibliche Figur)
+  if (fem) {
+    s += `<path d="M82.5,66 l-3,-2 M83.5,64.6 l-2,-3 M117.5,66 l3,-2 M116.5,64.6 l2,-3" stroke="#111" stroke-width="1.2" stroke-linecap="round"/>`;
+    if (look.earrings) s += `<circle cx="70" cy="80" r="2.5" fill="#ffd166"/><circle cx="130" cy="80" r="2.5" fill="#ffd166"/>`;
+  }
 
   // Nase
   s += `<path d="M100,70 Q96,82 100,84 Q102,84.5 104,83" fill="none" stroke="${skinDD}" stroke-width="1.4" stroke-linecap="round"/>`;
@@ -1092,7 +1295,7 @@ function characterSVG(look, L, opts = {}) {
   const braces = L('zahnspange') >= 1 && L('zahnspange') < 10;
   if (smile >= 0.4) {
     const d = 4 + smile * 6;
-    s += `<path d="M88,91 Q100,${91 + d * 1.6} 112,91 Z" fill="${teethColor}" stroke="#7a1f2b" stroke-width="1.5" stroke-linejoin="round"/>`;
+    s += `<path d="M88,91 Q100,${91 + d * 1.6} 112,91 Z" fill="${teethColor}" stroke="${fem ? '#c2185b' : '#7a1f2b'}" stroke-width="${fem ? 2.2 : 1.5}" stroke-linejoin="round"/>`;
     if (braces) {
       s += `<line x1="90" y1="93" x2="110" y2="93" stroke="#9aa4b1" stroke-width="1.2"/>`;
       for (let x = 92; x <= 108; x += 4) s += `<rect x="${x - 1}" y="92" width="2" height="2" fill="#c0c8d2"/>`;
@@ -1100,7 +1303,7 @@ function characterSVG(look, L, opts = {}) {
     // Strahlendes Lächeln mit perfekten Zähnen
     if (L('zahnspange') >= 10) s += `<path class="twinkle" d="M116,88 l1.5,3 l3,1.5 l-3,1.5 l-1.5,3 l-1.5,-3 l-3,-1.5 l3,-1.5 Z" fill="#fff"/>`;
   } else {
-    s += `<path d="M90,93 Q100,${93 + smile * 10} 110,93" fill="none" stroke="#7a1f2b" stroke-width="2" stroke-linecap="round"/>`;
+    s += `<path d="M90,93 Q100,${93 + smile * 10} 110,93" fill="none" stroke="${fem ? '#c2185b' : '#7a1f2b'}" stroke-width="${fem ? 3 : 2}" stroke-linecap="round"/>`;
   }
 
   // ===== Haare vorne =====
@@ -1116,6 +1319,9 @@ function characterSVG(look, L, opts = {}) {
     [[70, 58], [75, 45], [85, 36], [100, 32], [115, 36], [125, 45], [130, 58], [92, 44], [108, 44]].forEach(([x, y]) => {
       s += `<circle cx="${x}" cy="${y}" r="9" fill="${hairC}"/>`;
     });
+  } else if (hs === 'dutt') {
+    s += `<circle cx="100" cy="26" r="12" fill="${hairC}"/>`;
+    s += `<path d="M69,66 Q66,32 100,31 Q134,32 131,66 Q126,46 100,44 Q74,46 69,66 Z" fill="${hairC}"/>`;
   } else if (hs === 'lang') {
     s += `<path d="M68,74 Q62,29 100,29 Q138,29 132,74 Q128,48 100,44 Q72,48 68,74 Z" fill="${hairC}"/>`;
   }
@@ -1401,7 +1607,9 @@ function updateUI() {
     📊 Klicks insgesamt: <b>${fmt(S.clicks)}</b><br>
     ✨ Aura in diesem Durchlauf: <b>${fmt(S.runAura)}</b><br>
     🌌 Aura insgesamt (für immer): <b>${fmt(S.lifetimeAura)}</b><br>
-    🌟 Glow Ups gemacht: <b>${S.glowUps}</b>`;
+    🌟 Glow Ups gemacht: <b>${S.glowUps}</b><br>
+    ⚔️ Mog Battles: <b>${S.mogWins}</b> gewonnen / <b>${S.mogLosses}</b> verloren<br>
+    📱 Kontakte: <b>${S.contacts.length}</b> · 👥 Freunde: <b>${S.friends.length}</b>`;
 }
 
 // --- Toast (kleine Nachricht oben) ---
@@ -1544,6 +1752,781 @@ function doPrestige(st) {
 }
 
 /* ---------------------------------------------------------------
+   3.6b FREUNDE, STADT, MOG BATTLES & ANSPRECHEN
+   --------------------------------------------------------------- */
+
+// ---------- kleine Hilfsfunktionen ----------
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+// Glow-Score für irgendeine Figur (L = Funktion, die Stufen liefert)
+function glowOf(L) { return UPGRADES.reduce((sum, u) => sum + L(u.id) * u.glow, 0); }
+
+// Punkte einer Figur in einer Kategorie (für Vergleiche & Mog Battles)
+function catScore(L, cat, stars) {
+  return UPGRADES.filter(u => u.cat === cat).reduce((sum, u) => sum + L(u.id) * u.glow, 0) * (1 + (stars || 0) * 0.1);
+}
+function confOf(L) { return L('augenkontakt') + L('smalltalk') + L('laecheln'); }
+function titleOf(glow) { return MILESTONES[milestoneIndex(glow)].title; }
+
+// Wie die Kategorien im Mog Battle heißen
+const CAT_BATTLE_NAMES = {
+  skin: 'Hautbild', hair: 'Frisur', fit: 'Physique', sleep: 'Ausgeschlafenheit',
+  posture: 'Kieferlinie', style: 'Drip', teeth: 'Lächeln', conf: 'Ausstrahlung',
+};
+
+// ---------- Großes Fenster (für Battles, Vergleiche, Ansprechen) ----------
+function bigModal(html, buttons) {
+  $('modalRoot').innerHTML = `<div class="overlay"><div class="modal wide">${html}<div class="row" id="bigModalBtns"></div></div></div>`;
+  setModalButtons(buttons);
+}
+function setModalButtons(buttons) {
+  const row = $('bigModalBtns');
+  if (!row) return;
+  row.innerHTML = buttons.map((b, i) =>
+    `<button class="${b.primary ? 'btn-primary' : 'btn-secondary'}" data-i="${i}">${b.label}</button>`).join('');
+  row.querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => {
+    $('modalRoot').innerHTML = '';
+    const cb = buttons[btn.dataset.i].action;
+    if (cb) cb();
+  }));
+}
+function modalOpen() { return $('modalRoot').innerHTML !== ''; }
+
+// Zwei Figuren nebeneinander ("VS")
+let svgCounter = 0;
+function versusHTML(a, b) {
+  const fig = p => `<div class="fighter">${characterSVG(p.look, p.L, { glow: p.glow !== undefined ? p.glow : glowOf(p.L), stars: p.stars, uid: 'v' + (svgCounter++) })}
+    <b>${escapeHtml(p.name)}</b><span class="small">${fmt(glowOf(p.L))} Glow</span></div>`;
+  return `<div class="versus">${fig(a)}<div class="vs">VS</div>${fig(b)}</div>`;
+}
+
+// Mich selbst als "Kämpfer" beschreiben
+function meAsFighter() {
+  return { name: S.name, look: S.look, L: lvl, stars: S.stars, glow: glowScore() };
+}
+
+/* ===================== FREUNDE ===================== */
+
+// Der eigene Freundescode: Name, Aussehen und Upgrade-Stufen, verpackt als Text
+function myCode() {
+  const lv = {};
+  UPGRADES.forEach(u => { if (lvl(u.id)) lv[u.id] = lvl(u.id); });
+  const data = { v: 1, id: S.id, n: S.name, l: S.look, lv, s: S.stars };
+  return 'LMX-' + btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+}
+
+// Aussehen aus einem fremden Code prüfen – nur erlaubte Werte übernehmen (Sicherheit!)
+function sanitizeLook(l) {
+  l = l || {};
+  const d = newState().look;
+  return {
+    hair:      OPTIONS.hair.some(o => o.id === l.hair) ? l.hair : d.hair,
+    hairColor: OPTIONS.hairColor.includes(l.hairColor) ? l.hairColor : d.hairColor,
+    skin:      OPTIONS.skin.includes(l.skin) ? l.skin : d.skin,
+    eyes:      OPTIONS.eyes.includes(l.eyes) ? l.eyes : d.eyes,
+    outfit:    OPTIONS.outfit.some(o => o.id === l.outfit) ? l.outfit : d.outfit,
+  };
+}
+
+// Freundescode entschlüsseln
+function parseCode(code) {
+  code = (code || '').replace(/\s+/g, '');
+  const start = code.indexOf('LMX-');
+  if (start < 0) throw new Error('Das ist kein Looksmaxxer-Code. Er fängt mit „LMX-“ an.');
+  let data;
+  try {
+    data = JSON.parse(decodeURIComponent(escape(atob(code.slice(start + 4)))));
+  } catch (e) {
+    throw new Error('Der Code ist kaputt. Wurde er vollständig kopiert?');
+  }
+  const levels = {};
+  UPGRADES.forEach(u => {
+    const v = Math.floor(Number(data.lv && data.lv[u.id]) || 0);
+    if (v > 0) levels[u.id] = clamp(v, 0, MAX_LEVEL);
+  });
+  const id = String(data.id || '').replace(/[^a-z0-9]/gi, '').slice(0, 20);
+  if (!id) throw new Error('In diesem Code fehlt die Spieler-ID.');
+  return {
+    id,
+    name: String(data.n || 'Unbekannt').slice(0, 20),
+    look: sanitizeLook(data.l),
+    levels,
+    stars: clamp(Math.floor(Number(data.s) || 0), 0, 9999),
+    updated: Date.now(),
+  };
+}
+
+// Stufen-Funktion für einen Freund
+function friendL(f) { return id => f.levels[id] || 0; }
+
+// Freund hinzufügen
+$('addFriendBtn').addEventListener('click', () => {
+  try {
+    const f = parseCode($('friendCodeInput').value);
+    if (f.id === S.id) {
+      toast('Das bist du selbst 😅', 'Du kannst dich nicht selbst hinzufügen. Auch wenn du dich sehr magst.', 'bad');
+      return;
+    }
+    const i = S.friends.findIndex(x => x.id === f.id);
+    if (i >= 0) {
+      S.friends[i] = f;
+      toast('🔄 Freund aktualisiert', `${escapeHtml(f.name)} ist jetzt auf dem neuesten Stand.`, 'good');
+    } else {
+      S.friends.push(f);
+      toast('👥 Neuer Freund!', `${escapeHtml(f.name)} ist in deiner Freundesliste – und läuft ab jetzt in der Stadt herum.`, 'good');
+    }
+    $('friendCodeInput').value = '';
+    save();
+    renderFriends();
+  } catch (e) {
+    toast('Hoppla!', e.message, 'bad');
+  }
+});
+
+// Code kopieren / teilen
+$('copyCodeBtn').addEventListener('click', async () => {
+  const box = $('myCode');
+  box.value = myCode();
+  try { await navigator.clipboard.writeText(box.value); }
+  catch (e) { box.select(); document.execCommand('copy'); }
+  toast('📋 Kopiert!', 'Jetzt einfach deinem Freund schicken.', 'good', 2500);
+});
+$('shareCodeBtn').addEventListener('click', async () => {
+  const text = `Füg mich in Looksmaxxer 3000 hinzu! Mein Freundescode:\n${myCode()}`;
+  if (navigator.share) {
+    try { await navigator.share({ title: 'Looksmaxxer 3000', text }); } catch (e) { /* abgebrochen */ }
+  } else {
+    $('copyCodeBtn').click();
+  }
+});
+
+// Freundesliste / Rangliste anzeigen
+function renderFriends() {
+  $('myCode').value = myCode();
+  const me = { id: S.id, name: S.name + ' (Du)', look: S.look, L: lvl, stars: S.stars, me: true };
+  const all = [me, ...S.friends.map(f => Object.assign({}, f, { L: friendL(f) }))];
+  all.forEach(p => { p.glow = glowOf(p.L); });
+  all.sort((a, b) => b.glow - a.glow);
+  const medals = ['🥇', '🥈', '🥉'];
+  $('friendList').innerHTML = all.map((p, i) => `
+    <div class="friend ${p.me ? 'me' : ''}">
+      <div class="rank">${medals[i] || (i + 1) + '.'}</div>
+      ${characterSVG(p.look, p.L, { glow: p.glow, stars: p.stars, uid: 'fr' + (svgCounter++) })}
+      <div>
+        <div class="fname">${escapeHtml(p.name)}</div>
+        <div class="small">${titleOf(p.glow)} · ${fmt(p.glow)} Glow · ${p.stars} ⭐</div>
+        ${p.me ? '' : `<div class="fbtns">
+          <button data-cmp="${p.id}">🔍 Vergleichen</button>
+          <button data-mog="${p.id}">⚔️ Mog Battle</button>
+          <button data-del="${p.id}">🗑️ Entfernen</button></div>`}
+      </div>
+    </div>`).join('') +
+    (S.friends.length ? '' : '<p class="small" style="margin-top:10px">Noch keine Freunde. Schick deinen Code herum! 📤</p>');
+}
+
+$('friendList').addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  const id = b.dataset.cmp || b.dataset.del || b.dataset.mog;
+  const f = S.friends.find(x => x.id === id);
+  if (!f) return;
+  if (b.dataset.cmp) compareWith(f);
+  if (b.dataset.mog) mogBattle(friendAsFighter(f));
+  if (b.dataset.del) {
+    modal('Freund entfernen?', `${escapeHtml(f.name)} wirklich aus deiner Freundesliste löschen?`, [
+      { label: 'Abbrechen' },
+      { label: 'Entfernen', primary: true, action: () => { S.friends = S.friends.filter(x => x.id !== id); save(); renderFriends(); } },
+    ]);
+  }
+});
+
+function friendAsFighter(f) {
+  const L = friendL(f);
+  return { id: 'f_' + f.id, name: f.name, look: f.look, L, stars: f.stars, glow: glowOf(L) };
+}
+
+// Zwei Charaktere Kategorie für Kategorie vergleichen
+function compareWith(f) {
+  const me = meAsFighter(), other = friendAsFighter(f);
+  const rows = CATEGORIES.map(c => {
+    const a = catScore(me.L, c.id, me.stars), b = catScore(other.L, c.id, other.stars);
+    const max = Math.max(a, b, 1);
+    return `<div class="cmp-row">${c.emoji} <b>${c.name}</b>: ${fmt(a)} vs. ${fmt(b)} ${a > b ? '👈 du' : b > a ? '👉 ' + escapeHtml(f.name) : '🤝'}
+      <div class="cmp-bars"><div class="cmp-bar left"><div style="width:${a / max * 100}%"></div></div>
+      <div class="cmp-bar right"><div style="width:${b / max * 100}%"></div></div></div></div>`;
+  }).join('');
+  const verdict = me.glow > other.glow ? `😎 Du moggst ${escapeHtml(f.name)}!`
+                : other.glow > me.glow ? `😳 ${escapeHtml(f.name)} moggt dich!` : '🤝 Absoluter Gleichstand!';
+  bigModal(`<h2>🔍 Vergleich</h2>${versusHTML(me, other)}<div class="verdict">${verdict}</div>
+    <div class="small">Gelb = du, Türkis = ${escapeHtml(f.name)}</div>${rows}`,
+    [{ label: 'Schließen', primary: true }]);
+}
+
+/* ===================== MOG BATTLE ===================== */
+const mogCooldown = {};   // damit man nicht im Sekundentakt battlet
+
+const MOG_WIN = [
+  '{n} wurde komplett gemoggt und überlegt jetzt, sich einen Bart wachsen zu lassen.',
+  '{n} schaut ab heute Skincare-Tutorials. Wegen dir.',
+  'Totaler Mog! Die Zuschauer klatschen. Ein Hund bellt anerkennend.',
+  '{n} hat kurz in den Spiegel geschaut und still „gg“ gesagt.',
+];
+const MOG_LOSE = [
+  'Du wurdest gemoggt. Ab ins Gym. 💪',
+  '{n} hat dich mit einem einzigen Seitenprofil besiegt.',
+  'Autsch. Selbst dein Spiegelbild schaut weg.',
+  'Verloren. Aber hey – Charakter zählt auch. Sagt man.',
+];
+
+function mogBattle(opp) {
+  const now = Date.now();
+  if (mogCooldown[opp.id] > now) {
+    toast('⏳ Verschnaufpause', `${escapeHtml(opp.name)} muss sich noch ${Math.ceil((mogCooldown[opp.id] - now) / 1000)} s vom letzten Battle erholen.`, '', 2500);
+    return;
+  }
+  mogCooldown[opp.id] = now + 30000;
+
+  const me = meAsFighter();
+  // 5 zufällige Kategorien, jeweils mit etwas Glück (±25 %)
+  const rounds = shuffle(CATEGORIES.slice()).slice(0, 5).map(c => ({
+    c,
+    a: catScore(me.L, c.id, me.stars) * rand(0.75, 1.25) + rand(0, 4),
+    b: catScore(opp.L, c.id, opp.stars) * rand(0.75, 1.25) + rand(0, 4),
+  }));
+  const wins = rounds.filter(r => r.a > r.b).length;
+  const won = wins >= 3;
+
+  bigModal(`<h2>⚔️ MOG BATTLE ⚔️</h2>${versusHTML(me, opp)}
+    <div class="rounds" id="mogRounds"></div><div id="mogVerdict"></div>`, []);
+
+  // Runden nacheinander aufdecken (Spannung!)
+  let i = 0;
+  const step = () => {
+    if (!$('mogRounds')) return;
+    if (i < rounds.length) {
+      const r = rounds[i++];
+      const aw = r.a > r.b;
+      $('mogRounds').insertAdjacentHTML('beforeend', `<div class="round">
+        <div class="l ${aw ? 'win' : 'lose'}">${aw ? '✅ ' : ''}${fmt(r.a)}</div>
+        <div class="mid">Runde ${i}<br>${r.c.emoji} ${CAT_BATTLE_NAMES[r.c.id]}</div>
+        <div class="r ${aw ? 'lose' : 'win'}">${fmt(r.b)}${aw ? '' : ' ✅'}</div></div>`);
+      setTimeout(step, 750);
+      return;
+    }
+    const name = escapeHtml(opp.name);
+    let html;
+    if (won) {
+      const reward = Math.max(50, totalAps() * 45);
+      gainAura(reward);
+      S.mogWins++;
+      html = `<div class="verdict" style="color:var(--green)">🏆 DU MOGGST! (${wins}:${5 - wins})</div>
+        <p>${pick(MOG_WIN).replace('{n}', name)}</p><p><b style="color:var(--gold)">+${fmt(reward)} Aura</b></p>`;
+    } else {
+      S.mogLosses++;
+      html = `<div class="verdict" style="color:var(--red)">💀 GEMOGGT! (${wins}:${5 - wins})</div>
+        <p>${pick(MOG_LOSE).replace('{n}', name)}</p>
+        <p class="small">Tipp: Kauf mehr Upgrades in den Kategorien, in denen du verloren hast.</p>`;
+    }
+    $('mogVerdict').innerHTML = html;
+    setModalButtons([{ label: won ? 'Ehrenrunde 😎' : 'Ab ins Gym 💪', primary: true }]);
+    save();
+    renderTownInfo();
+  };
+  setTimeout(step, 600);
+}
+
+/* ===================== FRAUEN IN DER STADT ===================== */
+const WOMAN_NAMES = ['Lena', 'Sophie', 'Mia', 'Emma', 'Hannah', 'Lea', 'Anna', 'Laura', 'Marie', 'Chiara',
+  'Jana', 'Selin', 'Aylin', 'Nele', 'Clara', 'Zoe', 'Amira', 'Paula', 'Ida', 'Luisa', 'Sara', 'Elif', 'Nina', 'Maja'];
+// Wie viel "Rizz" man für Ausstrahlung 1–10 ungefähr braucht
+const BEAUTY_REQ = [20, 50, 100, 180, 300, 450, 700, 1000, 1500, 2200];
+const DRESS_COLORS = ['#e63946', '#ff8fab', '#9b5cff', '#3a86ff', '#2a9d8f', '#ffb703', '#f1faee', '#222222', '#06d6a0'];
+
+function makeWoman(usedNames) {
+  const beauty = 1 + Math.floor(Math.random() * 10);   // Ausstrahlung 1–10
+  // Je höher die Ausstrahlung, desto gepflegter (Haut, Haare, Style …)
+  const base = Math.round(Math.pow(beauty, 1.5) * 0.8);
+  const L = id => (id === 'mewing' || id === 'meisterklasse') ? 0 : Math.min(MAX_LEVEL, base);
+  const free = WOMAN_NAMES.filter(n => !usedNames.includes(n));
+  return {
+    kind: 'woman',
+    id: 'w_' + makeId(),
+    name: pick(free.length ? free : WOMAN_NAMES),
+    beauty, L, stars: 0,
+    glow: beauty * beauty * 25,     // nur für Glitzer & Aura in der Zeichnung
+    look: {
+      fem: true,
+      hair: pick(['lang', 'lang', 'locken', 'dutt', 'kurz', 'scheitel']),
+      hairColor: pick(OPTIONS.hairColor),
+      skin: pick(OPTIONS.skin),
+      eyes: pick(OPTIONS.eyes),
+      outfit: pick(['kleid', 'kleid', 'top', 'hemd', 'lederjacke', 'hoodie']),
+      color: pick(DRESS_COLORS),
+      earrings: beauty >= 6,
+    },
+    got: false,       // Nummer schon bekommen?
+    cooldown: 0,      // nach einem Korb kurz genervt
+  };
+}
+
+// Dein "Rizz": Glow-Score + Selbstbewusstsein (zählt extra!) + Glow-Sterne
+function rizzScore() { return glowScore() + confOf(lvl) * 10 + S.stars * 30; }
+
+function dateChance(w, mod = 0) {
+  const req = BEAUTY_REQ[w.beauty - 1];
+  return clamp(0.5 + 0.45 * (rizzScore() - req) / req + mod, 0.03, 0.97);
+}
+
+// Mögliche Anmachsprüche (mod = Bonus/Malus auf die Chance)
+const OPENERS = [
+  { t: '„Hi, ich bin {me}. Wie läuft dein Tag so?“', mod: 0.10 },
+  { t: '„Bist du WLAN? Ich spüre da eine Verbindung.“', mod: () => rand(-0.25, 0.2) },
+  { t: '„Übrigens: Mein Kiefer ist gemewt.“', mod: -0.15 },
+  { t: '„Coole Jacke! Wo hast du die her?“', mod: 0.08 },
+  { t: '*Augenkontakt halten und lächeln* 😏', mod: () => confOf(lvl) >= 10 ? 0.15 : -0.1 },
+  { t: '„Ich hab heute 8 Stunden geschlafen und 3 Liter Wasser getrunken.“', mod: -0.08 },
+  { t: '„Kennst du hier ein gutes Café? Ich lad dich ein.“', mod: 0.06 },
+  { t: '*Nervös winken und schnell weitergehen* 👋', mod: -0.3 },
+  { t: '„Darf ich was sagen? Du hast ein echt schönes Lachen.“', mod: 0.12 },
+  { t: '„Willst du meine Skincare-Routine hören? Sie hat 14 Schritte.“', mod: -0.12 },
+];
+const DATE_YES = [
+  '„Haha, du bist lustig. Hier ist meine Nummer!“ 📱',
+  '„Okay, du hast Aura. Kaffee am Samstag?“ ☕',
+  '„Ich mag dein Selbstbewusstsein. Schreib mir!“ 💌',
+  '„Na gut, überredet. Aber du zahlst die Pommes.“ 🍟',
+];
+const DATE_NO = [
+  'Sie tut so, als würde sie telefonieren. Das Handy ist aus.',
+  '„Ich hab einen Freund.“ – Der Freund ist ihr Hund. Er heißt Bruno.',
+  'Sie sagt „Nein danke“ – so freundlich, dass es doppelt wehtut.',
+  'Sie hat dich nicht mal bemerkt. Mehr Aura nötig.',
+  '„Sorry, ich muss los.“ Sie läuft in die falsche Richtung. Schnell.',
+];
+
+function approach(w) {
+  if (w.got) return;
+  const now = Date.now();
+  if (w.cooldown > now) {
+    toast('🙄 Lieber nicht', `${escapeHtml(w.name)} ist noch genervt. Probier es in ${Math.ceil((w.cooldown - now) / 1000)} s nochmal.`, '', 2500);
+    return;
+  }
+  const ops = shuffle(OPENERS.slice()).slice(0, 3);
+  const ch = Math.round(dateChance(w) * 100);
+  bigModal(`<h2>💬 ${escapeHtml(w.name)} ansprechen</h2>
+    <div class="versus"><div class="fighter">${characterSVG(w.look, w.L, { glow: w.glow, uid: 'w' + (svgCounter++) })}
+      <b>${escapeHtml(w.name)}</b><span class="small">Ausstrahlung ${w.beauty}/10 ⭐</span></div></div>
+    <div id="approachBody">
+      <div class="chance">Deine Chance: ~${ch} %</div>
+      <div class="small">Dein Rizz: ${fmt(rizzScore())} · gebraucht: ca. ${fmt(BEAUTY_REQ[w.beauty - 1])}<br>
+        (Rizz = Glow-Score + Selbstbewusstsein ×10 + Glow-Sterne ×30)</div>
+      <div style="margin-top:10px;font-weight:800">Was sagst du?</div>
+      ${ops.map((o, i) => `<button class="opener" data-op="${i}">${o.t.replace('{me}', escapeHtml(S.name))}</button>`).join('')}
+    </div>`, [{ label: 'Lieber doch nicht 🙈' }]);
+
+  $('approachBody').addEventListener('click', e => {
+    const b = e.target.closest('[data-op]');
+    if (!b) return;
+    const op = ops[b.dataset.op];
+    resolveApproach(w, typeof op.mod === 'function' ? op.mod() : op.mod);
+  });
+}
+
+function resolveApproach(w, mod) {
+  const chance = dateChance(w, mod);
+  const success = Math.random() < chance;
+  let html;
+  if (success) {
+    w.got = true;
+    S.contacts.push({ name: w.name, stars: w.beauty, t: Date.now() });
+    if (S.contacts.length > 200) S.contacts.shift();
+    const reward = Math.max(30, totalAps() * 15 * w.beauty);
+    gainAura(reward);
+    html = `<div class="verdict" style="color:var(--green)">💘 Erfolg!</div>
+      <p>${pick(DATE_YES)}</p>
+      <p>${escapeHtml(w.name)} ist jetzt in deinen Kontakten. <b style="color:var(--gold)">+${fmt(reward)} Aura</b></p>`;
+  } else {
+    w.cooldown = Date.now() + 45000;
+    html = `<div class="verdict" style="color:var(--red)">💔 Korb!</div>
+      <p>${pick(DATE_NO)}</p>
+      ${chance < 0.35 ? '<p class="small">Tipp: Mehr Glow-Score und vor allem Selbstbewusstsein (Augenkontakt, Smalltalk, Lächeln) erhöhen deine Chancen.</p>' : ''}`;
+  }
+  $('approachBody').innerHTML = html;
+  setModalButtons([{ label: success ? 'Nice! 😎' : 'Weiter geht\'s', primary: true }]);
+  if (w.el) updateTag(w);
+  save();
+  renderTownInfo();
+}
+
+/* ===================== RIVALEN ===================== */
+const RIVALS = [
+  { id: 'r_dennis', name: 'Gym-Bro Dennis', stars: 0,
+    look: { hair: 'kurz', hairColor: '#1c1c1c', skin: '#e0ac69', eyes: '#6b3e1f', outfit: 'tshirt' },
+    lv: { liegestuetze: 20, gym: 12, reinigung: 3, friseur: 4, schlaf: 5, haltung: 3, basics: 2, zahnseide: 2, augenkontakt: 6 } },
+  { id: 'r_leon', name: 'Influencer Leon', stars: 1,
+    look: { hair: 'scheitel', hairColor: '#d8b45a', skin: '#ffe0c4', eyes: '#3a7bd5', outfit: 'lederjacke' },
+    lv: { reinigung: 15, feuchtigkeit: 12, sonnencreme: 8, friseur: 12, styling: 10, basics: 15, kleidung: 10, parfum: 3,
+          zahnseide: 10, bleaching: 5, augenkontakt: 10, smalltalk: 6, liegestuetze: 6, schlaf: 4 } },
+  { id: 'r_kai', name: 'Mewing-Meister Kai', stars: 2,
+    look: { hair: 'glatze', hairColor: '#4a2f1b', skin: '#c68642', eyes: '#3c9a5f', outfit: 'hemd' },
+    lv: { haltung: 25, mewing: 25, meisterklasse: 6, reinigung: 10, feuchtigkeit: 8, friseur: 10, liegestuetze: 15, gym: 8,
+          schlaf: 15, wasser: 10, basics: 10, kleidung: 5, zahnseide: 10, augenkontakt: 15, smalltalk: 3 } },
+  { id: 'r_sven', name: 'Gigachad Sven', stars: 4,
+    look: { hair: 'scheitel', hairColor: '#8b5a2b', skin: '#f1c27d', eyes: '#8a96a3', outfit: 'anzug' },
+    lv: Object.fromEntries(UPGRADES.map(u => [u.id, 20])) },
+];
+
+/* ===================== DIE STADT ===================== */
+const TOWN_W = 1400, TOWN_H = 1000;
+
+// Gebäude (man kann nicht durch sie hindurchlaufen)
+const BUILDINGS = [
+  { x: 60,   y: 70,  w: 250, h: 170, color: '#5b5f97', roof: '#3d3f6b', sign: '💪 IRON GYM' },
+  { x: 380,  y: 90,  w: 220, h: 150, color: '#f28482', roof: '#c25b5a', sign: '✂️ Salon Glow' },
+  { x: 800,  y: 80,  w: 230, h: 160, color: '#c08552', roof: '#8c5a33', sign: '☕ Café Mewing' },
+  { x: 1090, y: 50,  w: 260, h: 190, color: '#4d908e', roof: '#2f6664', sign: '🛍️ Drip Mall' },
+  { x: 820,  y: 620, w: 220, h: 150, color: '#7fc8d8', roof: '#3f8fa8', sign: '🦷 Dr. Strahleweiß' },
+  { x: 1110, y: 640, w: 220, h: 140, color: '#b388ff', roof: '#7c4dff', sign: '🪞 Selfie-Studio' },
+];
+const FOUNTAIN = { x: 330, y: 780, r: 50 };
+const TREES = [[90, 640], [180, 920], [560, 640], [560, 910], [90, 860], [440, 930], [250, 640], [470, 700]];
+
+// Ist an dieser Stelle ein Hindernis?
+function blocked(x, y) {
+  if (BUILDINGS.some(b => x > b.x - 12 && x < b.x + b.w + 12 && y > b.y && y < b.y + b.h + 8)) return true;
+  return Math.hypot(x - FOUNTAIN.x, y - FOUNTAIN.y) < FOUNTAIN.r + 14;
+}
+
+// Bewegen, aber nicht in Hindernisse (rutscht an Wänden entlang)
+function tryMove(p, nx, ny) {
+  nx = clamp(nx, 25, TOWN_W - 25);
+  ny = clamp(ny, 75, TOWN_H - 10);
+  if (!blocked(nx, p.y)) p.x = nx;
+  if (!blocked(p.x, ny)) p.y = ny;
+}
+
+// Zufälliger freier Punkt (optional in der Nähe eines anderen Punktes)
+function randomSpot(near) {
+  for (let i = 0; i < 40; i++) {
+    const x = near ? clamp(near.x + rand(-260, 260), 30, TOWN_W - 30) : rand(30, TOWN_W - 30);
+    const y = near ? clamp(near.y + rand(-200, 200), 80, TOWN_H - 15) : rand(80, TOWN_H - 15);
+    if (!blocked(x, y)) return { x, y };
+  }
+  return { x: 700, y: 500 };
+}
+
+// Hintergrund der Stadt als großes SVG-Bild
+function townSVG() {
+  let s = `<svg width="${TOWN_W}" height="${TOWN_H}" viewBox="0 0 ${TOWN_W} ${TOWN_H}" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">`;
+  s += `<defs><pattern id="tiles" width="40" height="40" patternUnits="userSpaceOnUse">
+    <rect width="40" height="40" fill="#d9d0e4"/><path d="M40 0H0V40" fill="none" stroke="#c8bdd6" stroke-width="2"/></pattern></defs>`;
+  s += `<rect width="${TOWN_W}" height="${TOWN_H}" fill="url(#tiles)"/>`;
+
+  // Straßen mit Mittellinie und Zebrastreifen
+  s += `<rect x="0" y="450" width="${TOWN_W}" height="100" fill="#3d3a4a"/><rect x="650" y="0" width="100" height="${TOWN_H}" fill="#3d3a4a"/>`;
+  s += `<line x1="0" y1="500" x2="${TOWN_W}" y2="500" stroke="#ffd166" stroke-width="4" stroke-dasharray="30 25"/>`;
+  s += `<line x1="700" y1="0" x2="700" y2="${TOWN_H}" stroke="#ffd166" stroke-width="4" stroke-dasharray="30 25"/>`;
+  s += `<rect x="650" y="450" width="100" height="100" fill="#3d3a4a"/>`;
+  for (let i = 0; i < 6; i++) {
+    s += `<rect x="${655 + i * 16}" y="${425}" width="9" height="22" fill="#fff" opacity=".85"/>`;
+    s += `<rect x="${655 + i * 16}" y="${553}" width="9" height="22" fill="#fff" opacity=".85"/>`;
+  }
+
+  // Park mit Bäumen und Brunnen
+  s += `<rect x="40" y="590" width="570" height="390" rx="30" fill="#7cc47f"/>`;
+  s += `<text x="325" y="625" text-anchor="middle" font-size="18" font-weight="800" fill="#2d6a30">🌳 Glow-Park</text>`;
+  s += `<circle cx="${FOUNTAIN.x}" cy="${FOUNTAIN.y}" r="${FOUNTAIN.r}" fill="#9ad1d4" stroke="#e8e8e8" stroke-width="10"/>`;
+  s += `<circle cx="${FOUNTAIN.x}" cy="${FOUNTAIN.y}" r="14" fill="#cfeff1"/><circle cx="${FOUNTAIN.x}" cy="${FOUNTAIN.y - 18}" r="6" fill="#fff" opacity=".8"/>`;
+  TREES.forEach(([x, y]) => {
+    s += `<rect x="${x - 5}" y="${y}" width="10" height="22" fill="#7a4e2d"/>`;
+    s += `<circle cx="${x}" cy="${y - 8}" r="26" fill="#3f8f45"/><circle cx="${x - 9}" cy="${y - 16}" r="12" fill="#58a85e"/>`;
+  });
+
+  // Gebäude
+  BUILDINGS.forEach(b => {
+    s += `<rect x="${b.x + 6}" y="${b.y + 8}" width="${b.w}" height="${b.h}" rx="8" fill="rgba(0,0,0,.18)"/>`;
+    s += `<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="8" fill="${b.color}"/>`;
+    s += `<rect x="${b.x}" y="${b.y}" width="${b.w}" height="22" rx="8" fill="${b.roof}"/>`;
+    for (let wx = b.x + 20; wx < b.x + b.w - 40; wx += 50) {
+      s += `<rect x="${wx}" y="${b.y + 70}" width="30" height="28" rx="3" fill="#fff6c9" opacity=".85"/>`;
+    }
+    s += `<rect x="${b.x + b.w / 2 - 18}" y="${b.y + b.h - 44}" width="36" height="44" rx="4" fill="${b.roof}"/>`;
+    s += `<rect x="${b.x + 14}" y="${b.y + 30}" width="${b.w - 28}" height="30" rx="8" fill="rgba(20,5,35,.85)"/>`;
+    s += `<text x="${b.x + b.w / 2}" y="${b.y + 51}" text-anchor="middle" font-size="17" font-weight="800" fill="#fff">${b.sign}</text>`;
+  });
+
+  // Laternen & Bänke (Deko)
+  [[620, 300], [780, 300], [620, 700], [780, 700], [200, 420], [1200, 420], [200, 580], [1200, 580]].forEach(([x, y]) => {
+    s += `<rect x="${x - 2}" y="${y - 40}" width="4" height="40" fill="#555"/><circle cx="${x}" cy="${y - 42}" r="7" fill="#ffe08a"/>`;
+  });
+  [[930, 840], [1200, 840], [470, 300]].forEach(([x, y]) => {
+    s += `<rect x="${x - 25}" y="${y}" width="50" height="8" rx="2" fill="#8d5a2b"/><rect x="${x - 25}" y="${y - 10}" width="50" height="5" rx="2" fill="#a86b3c"/>`;
+  });
+  return s + '</svg>';
+}
+
+let town = null;            // alles, was in der Stadt passiert
+let townActive = false;     // ist die Stadt gerade sichtbar?
+let camX = 0, camY = 0;     // Kamera-Position
+let currentNear = null;     // Person in deiner Nähe
+let lastInteractHTML = '';
+const keys = {};
+
+// Stadt (neu) aufbauen – beim Betreten
+function buildTown() {
+  const world = $('townWorld');
+  world.style.width = TOWN_W + 'px';
+  world.style.height = TOWN_H + 'px';
+
+  if (!town) {
+    town = { people: [], player: { kind: 'player', x: 700, y: 610 } };
+    for (let i = 0; i < 7; i++) town.people.push(makeWoman(town.people.map(p => p.name)));
+    RIVALS.forEach(r => town.people.push(Object.assign({ kind: 'rival', L: id => r.lv[id] || 0 }, r)));
+  } else {
+    // Frauen, deren Nummer du schon hast, gehen nach Hause – neue Leute kommen
+    town.people = town.people.map(p => (p.kind === 'woman' && p.got)
+      ? makeWoman(town.people.map(q => q.name)) : p);
+  }
+
+  // Freunde in die Stadt holen (aktuelle Freundesliste)
+  town.people = town.people.filter(p => p.kind !== 'friend');
+  S.friends.slice(0, 10).forEach(f => {
+    const F = friendAsFighter(f);
+    town.people.push(Object.assign({ kind: 'friend' }, F));
+  });
+
+  world.innerHTML = townSVG();
+  [town.player, ...town.people].forEach(p => {
+    if (p.x === undefined) { const pt = randomSpot(); p.x = pt.x; p.y = pt.y; p.wait = rand(0, 2); }
+    p.el = makeSprite(p);
+    world.appendChild(p.el);
+  });
+  currentNear = null;
+  lastInteractHTML = '';
+}
+
+// Eine Figur als kleines "Sprite" für die Stadt
+function makeSprite(p) {
+  const el = document.createElement('div');
+  el.className = 'sprite';
+  const isMe = p.kind === 'player';
+  const look = isMe ? S.look : p.look;
+  const L = isMe ? lvl : p.L;
+  const glow = isMe ? glowScore() : (p.glow !== undefined ? p.glow : glowOf(L));
+  el.innerHTML = `<div class="tag"></div><div class="body">${characterSVG(look, L, { glow, stars: isMe ? S.stars : p.stars, uid: 't' + (svgCounter++) })}</div>`;
+  p.el = el;
+  updateTag(p);
+  return el;
+}
+
+// Namensschild über der Figur
+function updateTag(p) {
+  const tag = p.el.querySelector('.tag');
+  if (p.kind === 'player') { tag.className = 'tag t-player'; tag.textContent = '👑 ' + S.name; }
+  else if (p.kind === 'woman') {
+    tag.className = 'tag ' + (p.got ? 't-done' : 't-woman');
+    tag.textContent = (p.got ? '💚 ' : '') + p.name + ' · ' + p.beauty + '⭐';
+  }
+  else if (p.kind === 'friend') { tag.className = 'tag t-friend'; tag.textContent = '👥 ' + p.name; }
+  else { tag.className = 'tag t-rival'; tag.textContent = '⚔️ ' + p.name; }
+}
+
+// Die Stadt-Schleife: bewegt alle Figuren ~60x pro Sekunde
+let lastT = 0;
+function townLoop(t) {
+  if (!townActive) return;
+  const dt = lastT ? Math.min(0.05, (t - lastT) / 1000) : 0;
+  lastT = t;
+  const P = town.player;
+  const paused = modalOpen();
+
+  // --- Spieler ---
+  let dx = 0, dy = 0;
+  if (!paused) {
+    if (keys.left) dx -= 1;
+    if (keys.right) dx += 1;
+    if (keys.up) dy -= 1;
+    if (keys.down) dy += 1;
+    if (dx || dy) P.target = null;
+    else if (P.target) {
+      const vx = P.target.x - P.x, vy = P.target.y - P.y, d = Math.hypot(vx, vy);
+      if (d < 4) P.target = null; else { dx = vx / d; dy = vy / d; }
+    }
+  }
+  const len = Math.hypot(dx, dy);
+  P.moving = len > 0;
+  if (len) {
+    const sp = 190 * dt / len, ox = P.x, oy = P.y;
+    tryMove(P, P.x + dx * sp, P.y + dy * sp);
+    if (P.target && dt > 0 && P.x === ox && P.y === oy) P.target = null;   // festgelaufen
+  }
+
+  // --- andere Figuren laufen zufällig herum ---
+  town.people.forEach(p => {
+    p.moving = false;
+    if (paused || Math.hypot(p.x - P.x, p.y - P.y) < 80) return;   // bleiben stehen, wenn du nah bist
+    if (p.wait > 0) { p.wait -= dt; return; }
+    if (!p.target) p.target = randomSpot(p);
+    const vx = p.target.x - p.x, vy = p.target.y - p.y, d = Math.hypot(vx, vy);
+    if (d < 4) { p.target = null; p.wait = rand(1, 4); return; }
+    const ox = p.x, oy = p.y;
+    tryMove(p, p.x + vx / d * 60 * dt, p.y + vy / d * 60 * dt);
+    if (dt > 0 && p.x === ox && p.y === oy) { p.target = null; p.wait = rand(0.5, 1.5); }
+    else p.moving = true;
+  });
+
+  // --- Kamera folgt dem Spieler ---
+  const vp = $('townViewport');
+  camX = clamp(P.x - vp.clientWidth / 2, 0, Math.max(0, TOWN_W - vp.clientWidth));
+  camY = clamp(P.y - 30 - vp.clientHeight / 2, 0, Math.max(0, TOWN_H - vp.clientHeight));
+  $('townWorld').style.transform = `translate(${-camX}px, ${-camY}px)`;
+
+  // --- Figuren zeichnen (weiter unten = weiter vorne) ---
+  [P, ...town.people].forEach(p => {
+    p.el.style.transform = `translate(${p.x - 27}px, ${p.y - 68}px)`;
+    p.el.style.zIndex = Math.floor(p.y);
+    p.el.classList.toggle('walking', !!p.moving);
+  });
+
+  updateInteract();
+  requestAnimationFrame(townLoop);
+}
+
+// Wer ist in deiner Nähe? → Aktions-Leiste unten anzeigen
+function updateInteract() {
+  const P = town.player;
+  let best = null, bd = 75;
+  town.people.forEach(p => {
+    const d = Math.hypot(p.x - P.x, p.y - P.y);
+    if (d < bd) { bd = d; best = p; }
+  });
+  currentNear = best;
+
+  let html = '';
+  if (best) {
+    const now = Date.now();
+    const name = escapeHtml(best.name);
+    if (best.kind === 'woman') {
+      const cd = best.cooldown > now ? Math.ceil((best.cooldown - now) / 1000) : 0;
+      const info = best.got ? 'Ihr habt schon Nummern getauscht 💚'
+        : cd ? `Ist gerade genervt … (${cd} s)` : `Ausstrahlung ${best.beauty}/10 · Chance ~${Math.round(dateChance(best) * 100)} %`;
+      html = `<div class="who">${name}<small>${info}</small></div>
+        <button class="act-btn" data-act="talk" ${best.got || cd ? 'disabled' : ''}>💬 Ansprechen</button>`;
+    } else {
+      const cd = mogCooldown[best.id] > now ? Math.ceil((mogCooldown[best.id] - now) / 1000) : 0;
+      const g = glowOf(best.L);
+      html = `<div class="who">${best.kind === 'friend' ? '👥 ' : '⚔️ '}${name}<small>${titleOf(g)} · ${fmt(g)} Glow</small></div>
+        <button class="act-btn mog" data-act="mog" ${cd ? 'disabled' : ''}>⚔️ Mog Battle${cd ? ` (${cd} s)` : ''}</button>`;
+    }
+  }
+  // nur neu zeichnen, wenn sich etwas geändert hat (sonst gehen Klicks verloren)
+  if (html !== lastInteractHTML) {
+    lastInteractHTML = html;
+    $('interactBar').innerHTML = html;
+    $('interactBar').classList.toggle('hidden', !html);
+  }
+}
+
+$('interactBar').addEventListener('click', e => {
+  const b = e.target.closest('[data-act]');
+  if (!b || !currentNear) return;
+  if (b.dataset.act === 'talk') approach(currentNear);
+  if (b.dataset.act === 'mog') mogBattle(currentNear);
+});
+
+// Antippen/Klicken in der Stadt = dorthin laufen
+$('townViewport').addEventListener('pointerdown', e => {
+  if (e.target.closest('#interactBar') || !town) return;
+  const r = $('townViewport').getBoundingClientRect();
+  const x = e.clientX - r.left + camX, y = e.clientY - r.top + camY;
+  town.player.target = { x, y };
+  const m = document.createElement('div');
+  m.className = 'tap-marker';
+  m.style.left = x + 'px';
+  m.style.top = y + 'px';
+  $('townWorld').appendChild(m);
+  setTimeout(() => m.remove(), 600);
+});
+
+// Tastatur: Pfeiltasten / WASD laufen, E / Enter / Leertaste = Aktion
+const KEYMAP = {
+  ArrowLeft: 'left', a: 'left', A: 'left', ArrowRight: 'right', d: 'right', D: 'right',
+  ArrowUp: 'up', w: 'up', W: 'up', ArrowDown: 'down', s: 'down', S: 'down',
+};
+document.addEventListener('keydown', e => {
+  if (!townActive || modalOpen() || /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+  const k = KEYMAP[e.key];
+  if (k) { keys[k] = true; e.preventDefault(); }
+  if (e.key === 'e' || e.key === 'E' || e.key === 'Enter' || e.key === ' ') {
+    const b = document.querySelector('#interactBar .act-btn:not([disabled])');
+    if (b) { b.click(); e.preventDefault(); }
+  }
+});
+document.addEventListener('keyup', e => { const k = KEYMAP[e.key]; if (k) keys[k] = false; });
+window.addEventListener('blur', () => Object.keys(keys).forEach(k => { keys[k] = false; }));
+
+// Kontakte & Mog-Bilanz unter der Stadt
+function renderTownInfo() {
+  $('contactCount').textContent = `(${S.contacts.length})`;
+  $('contactList').innerHTML = S.contacts.length
+    ? S.contacts.slice().reverse().map(c => `<span class="chip">💌 ${escapeHtml(c.name)} · ${c.stars}⭐</span>`).join('')
+    : '<span class="small">Noch keine Nummern. Trau dich! 😅</span>';
+  $('mogStats').innerHTML = `✅ Siege: <b>${S.mogWins}</b> &nbsp; ❌ Niederlagen: <b>${S.mogLosses}</b>`;
+}
+
+/* ===================== NAVIGATION ===================== */
+function setView(v) {
+  $('viewHome').classList.toggle('hidden', v !== 'home');
+  $('viewTown').classList.toggle('hidden', v !== 'town');
+  $('viewFriends').classList.toggle('hidden', v !== 'friends');
+  document.querySelectorAll('#mainnav button').forEach(b => b.classList.toggle('active', b.dataset.view === v));
+  if (v === 'town') {
+    buildTown();
+    renderTownInfo();
+    if (!townActive) { townActive = true; lastT = 0; requestAnimationFrame(townLoop); }
+  } else {
+    townActive = false;
+  }
+  if (v === 'friends') renderFriends();
+}
+$('mainnav').addEventListener('click', e => {
+  const b = e.target.closest('[data-view]');
+  if (b) setView(b.dataset.view);
+});
+
+/* ===================== ALS APP INSTALLIEREN ===================== */
+let installPrompt = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installPrompt = e; });
+if (window.matchMedia('(display-mode: standalone)').matches) $('installBtn').classList.add('hidden');
+
+$('installBtn').addEventListener('click', async () => {
+  if (installPrompt) {
+    installPrompt.prompt();
+    installPrompt = null;
+    return;
+  }
+  if (location.protocol === 'file:') {
+    modal('📲 Als App installieren',
+      'Das geht nur, wenn das Spiel über eine <b>Internetadresse</b> geöffnet wird (nicht als Datei vom Computer).<br><br>Lade das Spiel dafür einmal ins Internet hoch (Anleitung in der README) und öffne dann die Adresse.',
+      [{ label: 'Okay', primary: true }]);
+    return;
+  }
+  const ios = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  modal('📲 Als App installieren', ios
+    ? 'Tippe in Safari unten auf <b>Teilen</b> (□↑) und dann auf <b>„Zum Home-Bildschirm“</b>.'
+    : 'Öffne das Browser-Menü (<b>⋮</b> oben rechts) und tippe auf <b>„App installieren“</b> bzw. <b>„Zum Startbildschirm hinzufügen“</b>.',
+    [{ label: 'Okay', primary: true }]);
+});
+
+/* ---------------------------------------------------------------
    3.7 SPIELSCHLEIFE & START
    --------------------------------------------------------------- */
 let lastTick = performance.now();
@@ -1605,6 +2588,11 @@ function init() {
     openCreator();
   }
   setInterval(tick, 100);                         // 10x pro Sekunde
+  // "Service Worker" anmelden: macht das Spiel installierbar & offline spielbar
+  // (funktioniert nur, wenn das Spiel über eine Internetadresse geöffnet wird)
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
   window.addEventListener('beforeunload', save);  // beim Schließen speichern
   document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
 }

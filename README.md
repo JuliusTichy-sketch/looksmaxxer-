@@ -2,17 +2,37 @@
 
 Ein augenzwinkerndes Idle-/Aufbauspiel im Browser: Bring deinen Charakter vom **NPC** zum **Kosmischen Glow-Wesen**.
 
-## So startest du das Spiel
-1. Lade die Datei `index.html` herunter.
-2. Doppelklicke darauf. Sie öffnet sich in deinem Browser (Chrome, Firefox, Safari, Edge).
-3. Fertig! Du musst nichts installieren.
+## Dateien
+| Datei | Wofür |
+|---|---|
+| `index.html` | Das komplette Spiel |
+| `manifest.webmanifest`, `sw.js`, `icon-192.png`, `icon-512.png` | Damit man das Spiel als **App** installieren kann |
+
+## Schnell spielen (ohne Internet)
+Doppelklicke auf `index.html`. Fertig.
+
+## Als App installieren
+Dafür muss das Spiel einmal **ins Internet hochgeladen** werden (kostenlos):
+
+**Variante A – Netlify Drop (am einfachsten)**
+1. Gehe auf https://app.netlify.com/drop und lege dir ein kostenloses Konto an.
+2. Ziehe den Ordner mit allen Spieldateien (oder das entpackte ZIP) auf die Seite.
+3. Du bekommst eine Adresse wie `https://irgendwas.netlify.app`.
+
+**Variante B – GitHub Pages** (dafür muss das Repository öffentlich sein)
+1. Auf GitHub: *Settings → Pages → Branch* auswählen → *Save*.
+2. Nach ca. 1 Minute erscheint dort die Adresse.
+
+Dann die Adresse auf dem Handy öffnen:
+- **Android (Chrome):** Menü ⋮ → *App installieren*
+- **iPhone (Safari):** Teilen □↑ → *Zum Home-Bildschirm*
+- **PC (Chrome/Edge):** Installieren-Symbol in der Adresszeile
+
+Die App hat dann ein eigenes Symbol, startet im Vollbild und funktioniert auch offline.
 
 ## So spielst du
-- **Charakter erstellen**: Wähle Name, Frisur, Haar-, Haut- und Augenfarbe und ein Outfit.
-- **🪞 Daily Routine** klicken, damit du Aura-Punkte bekommst.
-- Im **Shop** kaufst du Upgrades (Skincare, Haare, Fitness, Mewing …). Sie bringen dir Aura pro Sekunde und erhöhen deinen **Glow-Score**.
-- Deine Figur verändert sich mit jedem Upgrade.
-- Ab einem bestimmten Glow-Score bekommst du neue **Titel**.
-- **Zufällige Events** bringen dir Boni oder kleine Rückschläge.
-- Ab 600 Glow-Score kannst du einen **Glow Up** (Prestige) machen. Dann fängst du neu an, bekommst aber dauerhaft mehr Aura.
-- Der Spielstand wird automatisch im Browser gespeichert.
+- **🪞 Glow-Up:** *Daily Routine* klicken, Upgrades kaufen, Titel freischalten, Glow Up (Prestige) machen.
+- **🏙️ Stadt:** Herumlaufen (antippen oder Pfeiltasten/WASD). Frauen ansprechen: Ob du ihre Nummer bekommst, hängt von deinem Glow-Score, deinem Selbstbewusstsein und deinem Spruch ab. Rivalen und Freunde zum **Mog Battle** herausfordern.
+- **👥 Freunde:** Deinen Freundescode verschicken, Codes von Freunden einfügen, Rangliste ansehen und Charaktere vergleichen.
+
+Der Spielstand wird automatisch im Browser gespeichert.
