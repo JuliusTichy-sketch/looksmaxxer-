@@ -216,4 +216,97 @@ function Logic.worldUnlocked(data, index)
 	return index == 1 or (data.worlds and data.worlds[tostring(index)] == true)
 end
 
+----------------------------------------------------------------------------
+-- Zähler für Aufträge & Erfolge
+----------------------------------------------------------------------------
+function Logic.statValue(data, stat)
+	if stat == "clicks" then return data.clicks or 0 end
+	if stat == "eggs" then return data.eggsOpened or 0 end
+	if stat == "mogWins" then return data.mogWins or 0 end
+	if stat == "rebirths" then return data.rebirths or 0 end
+	if stat == "worlds" then
+		local n = 0
+		for i = 1, #Config.Worlds do
+			if Logic.worldUnlocked(data, i) then n = n + 1 end
+		end
+		return n
+	end
+	if stat == "index" then
+		local n = 0
+		for _ in pairs(data.index or {}) do n = n + 1 end
+		return n
+	end
+	return (data.stats and data.stats[stat]) or 0
+end
+
+-- Fortschritt eines Tagesauftrags
+function Logic.questProgress(data, q)
+	return math.max(0, Logic.statValue(data, q.stat) - (q.start or 0))
+end
+
+function Logic.achievementReward(tier)
+	return { cash = 150 * 4 ^ (tier - 1), auraSeconds = 120 * tier }
+end
+
+----------------------------------------------------------------------------
+-- Fans: Charisma & Chance
+----------------------------------------------------------------------------
+function Logic.charisma(data)
+	return Logic.baseGlow(data.levels) + Logic.catLevels(data.levels, "conf") * 10 + (data.rebirths or 0) * 100
+end
+
+-- Wie viel Charisma ein Fan mit Promi-Level 1–10 in Welt w braucht
+function Logic.fanReq(world, fame)
+	local base = Config.FanBaseReq[world] or Config.FanBaseReq[#Config.FanBaseReq]
+	return math.floor(base * (0.4 + fame * 0.16))
+end
+
+function Logic.fanChance(data, world, fame, mod)
+	local req = Logic.fanReq(world, fame)
+	return math.clamp(0.5 + 0.45 * (Logic.charisma(data) - req) / req + (mod or 0), 0.03, 0.97)
+end
+
+----------------------------------------------------------------------------
+-- Jobs
+----------------------------------------------------------------------------
+function Logic.jobPayMult(data)
+	return (1 + Logic.baseGlow(data.levels) / 2000) * (1 + (data.rebirths or 0) * 0.1)
+end
+function Logic.jobPay(data, job)
+	return math.floor(job.pay * Logic.jobPayMult(data))
+end
+
+----------------------------------------------------------------------------
+-- Waffen & Kampf
+----------------------------------------------------------------------------
+Logic.weaponById = {}
+for _, w in ipairs(Config.Weapons) do
+	Logic.weaponById[w.id] = w
+end
+
+function Logic.weaponLevel(data, id)
+	return (data.weapons and data.weapons[id]) or 0
+end
+
+-- Schaden eines Schlags (ohne Krit)
+function Logic.weaponDamage(data, id)
+	local w = Logic.weaponById[id]
+	if not w then return 0 end
+	local level = math.max(1, Logic.weaponLevel(data, id))
+	return w.damage * (1 + (level - 1) * Config.WEAPON_LEVEL_BONUS)
+		* (1 + Logic.baseGlow(data.levels) / 500) * (1 + (data.rebirths or 0) * 0.3)
+end
+
+function Logic.weaponUpgradeCost(id, level)
+	local w = Logic.weaponById[id]
+	local base = (w and w.price > 0) and w.price or 1e7
+	return math.floor(math.max(200, base) * 0.5 * 1.6 ^ level)
+end
+
+-- Selbstbewusstsein = Lebensbalken im Bosskampf
+function Logic.maxConfidence(data)
+	return math.floor(100 + Logic.baseGlow(data.levels) / 50)
+end
+
+
 return Logic

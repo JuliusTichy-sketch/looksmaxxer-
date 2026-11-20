@@ -44,6 +44,12 @@ local function defaultData()
 		potions = {},                -- [potionId] = Ende (os.time)
 		settings = { music = true, sfx = true },
 		lastOnline = 0,
+		stats = {},                  -- Zähler für Aufträge & Erfolge
+		quests = { day = 0, list = {}, bonus = false },
+		achievements = {},           -- [erfolgId] = abgeholte Stufen
+		jobCd = {},                  -- [jobId] = Ende der Pause (os.time)
+		weapons = { zahnbuerste = 1 }, -- [waffeId] = Stufe
+		weapon = "zahnbuerste",      -- ausgerüstete Waffe
 	}
 end
 DataService.defaultData = defaultData

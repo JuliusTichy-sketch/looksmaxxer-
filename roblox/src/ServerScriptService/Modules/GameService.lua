@@ -16,6 +16,14 @@ local DataService = require(script.Parent.DataService)
 
 local GameService = {}
 GameService.characterHooks = {}   -- andere Module können sich hier für "Charakter erschienen" eintragen
+GameService.joinHooks = {}        -- … und für "Spieler hat das Spiel betreten"
+
+-- Zähler erhöhen (für Aufträge & Erfolge)
+function GameService.track(player, stat, amount)
+	local data = DataService.get(player)
+	if not data then return end
+	data.stats[stat] = (data.stats[stat] or 0) + (amount or 1)
+end
 
 ----------------------------------------------------------------------------
 -- Hilfsfunktionen
@@ -289,6 +297,9 @@ function GameService.playerAdded(player)
 		task.spawn(onCharacterAdded, player, player.Character)
 	end
 
+	for _, hook in ipairs(GameService.joinHooks) do
+		task.spawn(hook, player, data)
+	end
 	GameService.sendFull(player)
 	task.delay(3, function()
 		if not player.Parent then return end
@@ -340,6 +351,7 @@ Remotes.BuyUpgrade.OnServerEvent:Connect(function(player, id, amount)
 	end
 	data.aura = data.aura - cost
 	data.levels[id] = level + count
+	GameService.track(player, "upgrades", count)
 	if data.levels[id] >= Config.MAX_LEVEL then
 		GameService.notify(player, u.emoji .. " " .. u.name .. " gemeistert!", "Maximale Stufe erreicht.", "good")
 	end
@@ -401,6 +413,15 @@ end)
 -- Die Schleife: jede Sekunde Aura gutschreiben
 ----------------------------------------------------------------------------
 function GameService.start()
+	-- jede Minute Spielzeit zählen
+	task.spawn(function()
+		while true do
+			task.wait(60)
+			for _, player in ipairs(Players:GetPlayers()) do
+				GameService.track(player, "playMinutes", 1)
+			end
+		end
+	end)
 	task.spawn(function()
 		while true do
 			task.wait(1)

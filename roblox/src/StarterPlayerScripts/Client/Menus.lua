@@ -55,6 +55,7 @@ local BUILDERS = {}
 local TITLES = {
 	upgrades = "💪 Upgrades", pets = "🐾 Pets", worlds = "🌍 Welten", rebirth = "♻️ Rebirth",
 	leaderboard = "🏆 Globale Rangliste", rewards = "🎁 Belohnungen", settings = "⚙️ Einstellungen",
+	quests = "📋 Aufträge & Erfolge", jobs = "💼 Jobs", weapons = "⚔️ Waffen & Bosskampf",
 }
 
 function Menus.open(name)
@@ -579,5 +580,192 @@ BUILDERS.settings = function(root)
 	update()
 	return nil
 end
+
+----------------------------------------------------------------------------
+-- 📋 AUFTRÄGE & ERFOLGE
+----------------------------------------------------------------------------
+local function progressBar(parent, ratio, props)
+	local bg = UI.panel(parent, { Size = props.Size, Position = props.Position, Color = C.dark, Radius = 6 })
+	local fill = UI.panel(bg, { Size = UDim2.new(math.clamp(ratio, 0, 1), 0, 1, 0), Color = C.green, Radius = 6 })
+	UI.gradient(fill, C.pink, C.gold, 0)
+	return bg
+end
+
+BUILDERS.quests = function(root)
+	local list = UI.scroll(root)
+	UI.list(list, false, 6)
+	UI.padding(list, 2)
+
+	local function build()
+		UI.clear(list)
+		local d = data()
+		local order = 0
+		local function nextOrder() order = order + 1; return order end
+		local left = 86400 - (os.time() % 86400)
+		UI.text(list, "📋 Heutige Aufträge  <font size='14' color='" .. UI.hex(C.muted) .. "'>(neue in " .. Util.formatTime(left) .. ")</font>",
+			{ Size = UDim2.new(1, -10, 0, 28), XAlign = Enum.TextXAlignment.Left, MaxText = 20, LayoutOrder = nextOrder() })
+		local allDone = #d.quests.list > 0
+		for i, q in ipairs(d.quests.list) do
+			local prog = Logic.questProgress(d, q)
+			local row = UI.panel(list, { Size = UDim2.new(1, -10, 0, 62), Color = C.panel2, LayoutOrder = nextOrder() })
+			UI.text(row, q.text, { Size = UDim2.new(1, -150, 0.5, 0), Position = UDim2.new(0, 10, 0.04, 0), XAlign = Enum.TextXAlignment.Left, MaxText = 17 })
+			progressBar(row, prog / q.goal, { Size = UDim2.new(1, -170, 0, 10), Position = UDim2.new(0, 10, 0.62, 0) })
+			UI.text(row, math.min(prog, q.goal) .. "/" .. q.goal, { Size = UDim2.new(0, 60, 0.3, 0), Position = UDim2.new(1, -210, 0.55, 0), Color = C.muted, MaxText = 13 })
+			if not q.claimed then allDone = false end
+			local can = prog >= q.goal and not q.claimed
+			UI.button(row, q.claimed and "✅ Erledigt" or (can and "🎁 Abholen" or "💵 " .. Config.QuestReward.cash), can and C.gold or C.grey, function()
+				Remotes.ClaimQuest:FireServer(i)
+			end, { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.new(0, 124, 0, 42), TextColor = can and C.dark or C.text, MaxText = 16 })
+		end
+		local bonusRow = UI.panel(list, { Size = UDim2.new(1, -10, 0, 50), Color = C.purple, LayoutOrder = nextOrder() })
+		UI.text(bonusRow, "🏆 Alle Aufträge geschafft: 💵 " .. Config.QuestBonus.cash .. " + 🎁 gratis Box", { Size = UDim2.new(1, -150, 1, 0), Position = UDim2.new(0, 10, 0, 0),
+			XAlign = Enum.TextXAlignment.Left, MaxText = 16 })
+		local canBonus = allDone and not d.quests.bonus
+		UI.button(bonusRow, d.quests.bonus and "✅ Abgeholt" or "Abholen", canBonus and C.gold or C.grey, function()
+			Remotes.ClaimQuestBonus:FireServer()
+		end, { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.new(0, 124, 0, 38), TextColor = canBonus and C.dark or C.text, MaxText = 16 })
+
+		UI.text(list, "🏅 Erfolge", { Size = UDim2.new(1, -10, 0, 30), XAlign = Enum.TextXAlignment.Left, MaxText = 20, LayoutOrder = nextOrder() })
+		for _, ach in ipairs(Config.Achievements) do
+			local claimed = d.achievements[ach.id] or 0
+			local value = Logic.statValue(d, ach.stat)
+			local goal = ach.tiers[claimed + 1]
+			local row = UI.panel(list, { Size = UDim2.new(1, -10, 0, 64), Color = C.panel2, LayoutOrder = nextOrder() })
+			UI.text(row, ach.emoji, { Size = UDim2.new(0, 50, 1, 0), MaxText = 30 })
+			local stars = string.rep("⭐", claimed) .. string.rep("☆", #ach.tiers - claimed)
+			UI.text(row, ach.name .. "  " .. stars, { Size = UDim2.new(1, -200, 0.45, 0), Position = UDim2.new(0, 54, 0.04, 0), XAlign = Enum.TextXAlignment.Left, MaxText = 17 })
+			if goal then
+				UI.text(row, Util.format(math.min(value, goal)) .. " / " .. Util.format(goal) .. " " .. ach.text, { Size = UDim2.new(1, -200, 0.25, 0), Position = UDim2.new(0, 54, 0.46, 0),
+					XAlign = Enum.TextXAlignment.Left, Font = Enum.Font.GothamBold, Color = C.muted, MaxText = 13 })
+				progressBar(row, value / goal, { Size = UDim2.new(1, -210, 0, 8), Position = UDim2.new(0, 54, 0.8, 0) })
+				local can = value >= goal
+				local r = Logic.achievementReward(claimed + 1)
+				UI.button(row, can and "🎁 Abholen" or ("💵 " .. Util.format(r.cash)), can and C.gold or C.grey, function()
+					Remotes.ClaimAchievement:FireServer(ach.id)
+				end, { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.new(0, 124, 0, 42), TextColor = can and C.dark or C.text, MaxText = 16 })
+			else
+				UI.text(row, "🏆 Alle Stufen geschafft!", { Size = UDim2.new(1, -70, 0.4, 0), Position = UDim2.new(0, 54, 0.5, 0),
+					XAlign = Enum.TextXAlignment.Left, Color = C.gold, MaxText = 15 })
+			end
+		end
+	end
+
+	return function(kind)
+		if kind == "full" then build() end
+	end
+end
+
+----------------------------------------------------------------------------
+-- 💼 JOBS
+----------------------------------------------------------------------------
+BUILDERS.jobs = function(root)
+	local info = UI.text(root, "", { Size = UDim2.new(1, 0, 0, 30), XAlign = Enum.TextXAlignment.Left, Font = Enum.Font.GothamBold, MaxText = 15 })
+	local list = UI.scroll(root, { Size = UDim2.new(1, 0, 1, -36), Position = UDim2.new(0, 0, 0, 36) })
+	UI.list(list, false, 6)
+	UI.padding(list, 2)
+	local rows = {}
+	for i, job in ipairs(Config.Jobs) do
+		local row = UI.panel(list, { Size = UDim2.new(1, -10, 0, 76), Color = C.panel2, LayoutOrder = i })
+		UI.text(row, job.emoji, { Size = UDim2.new(0, 56, 1, 0), MaxText = 38 })
+		UI.text(row, job.name, { Size = UDim2.new(1, -200, 0.36, 0), Position = UDim2.new(0, 60, 0.04, 0), XAlign = Enum.TextXAlignment.Left, MaxText = 18 })
+		UI.text(row, job.desc, { Size = UDim2.new(1, -200, 0.3, 0), Position = UDim2.new(0, 60, 0.4, 0), XAlign = Enum.TextXAlignment.Left,
+			Font = Enum.Font.Gotham, Color = C.muted, MaxText = 13 })
+		local eff = UI.text(row, "", { Size = UDim2.new(1, -200, 0.26, 0), Position = UDim2.new(0, 60, 0.7, 0), XAlign = Enum.TextXAlignment.Left,
+			Font = Enum.Font.GothamBold, Color = C.green, MaxText = 13 })
+		local btn = UI.button(row, "", C.cyan, function()
+			local d = data()
+			if Logic.baseGlow(d.levels) < job.req or (d.jobCd[job.id] or 0) > os.time() then return end
+			Remotes.StartJob:FireServer(job.id)
+			Menus.close()
+			Effects.jobGame(job, function(scores)
+				Remotes.FinishJob:FireServer(job.id, scores)
+			end)
+		end, { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.new(0, 128, 0, 48), MaxText = 16 })
+		rows[job.id] = { eff = eff, btn = btn, job = job }
+	end
+	return function()
+		local d = data()
+		local glow = Logic.baseGlow(d.levels)
+		info.Text = "💵 Lohn-Bonus durch Glow & Rebirths: <font color='" .. UI.hex(C.gold) .. "'>" .. Util.formatMult(Logic.jobPayMult(d)) .. "</font>  ·  Geld gibt's für Waffen & Tränke"
+		local now = os.time()
+		for _, r in pairs(rows) do
+			local job = r.job
+			r.eff.Text = "💵 bis zu " .. Util.format(Logic.jobPay(d, job) * 1.25) .. " · ⏱️ Pause " .. job.cd .. " s · ab " .. Util.format(job.req) .. " Glow"
+			local cd = (d.jobCd[job.id] or 0) - now
+			if glow < job.req then
+				r.btn.Text = "🔒 " .. Util.format(job.req) .. " Glow"
+				r.btn.BackgroundColor3 = C.grey
+				r.btn.TextColor3 = C.muted
+			elseif cd > 0 then
+				r.btn.Text = "⏳ " .. Util.formatTime(cd)
+				r.btn.BackgroundColor3 = C.grey
+				r.btn.TextColor3 = C.text
+			else
+				r.btn.Text = "💼 Arbeiten"
+				r.btn.BackgroundColor3 = C.cyan
+				r.btn.TextColor3 = C.dark
+			end
+		end
+	end
+end
+
+----------------------------------------------------------------------------
+-- ⚔️ WAFFEN
+----------------------------------------------------------------------------
+BUILDERS.weapons = function(root)
+	local top = UI.panel(root, { Size = UDim2.new(1, 0, 0, 74), Color = C.panel2 })
+	UI.padding(top, 8)
+	local topText = UI.text(top, "", { XAlign = Enum.TextXAlignment.Left, Font = Enum.Font.GothamBold, MaxText = 15 })
+	local list = UI.scroll(root, { Size = UDim2.new(1, 0, 1, -82), Position = UDim2.new(0, 0, 0, 82) })
+	UI.list(list, false, 6)
+	UI.padding(list, 2)
+
+	local function build()
+		UI.clear(list)
+		local d = data()
+		local eq = Logic.weaponById[d.weapon]
+		topText.Text = "Ausgerüstet: <font color='" .. UI.hex(C.gold) .. "'>" .. (eq and (eq.emoji .. " " .. eq.name) or "–") .. "</font>  ·  💥 "
+			.. Util.format(eq and Logic.weaponDamage(d, eq.id) or 0) .. " pro Treffer  ·  ❤️ Selbstbewusstsein " .. Util.format(Logic.maxConfidence(d))
+			.. "\n<font color='" .. UI.hex(C.muted) .. "'>So geht's: Waffe unten im Inventar wählen (Taste 1), zum 👑 Boss laufen, klicken/tippen. Rote Kreise = schnell weg!</font>"
+		for i, w in ipairs(Config.Weapons) do
+			local level = Logic.weaponLevel(d, w.id)
+			local rarity = Config.Rarities[w.rarity]
+			local row = UI.panel(list, { Size = UDim2.new(1, -10, 0, 80), Color = C.panel2, LayoutOrder = i })
+			UI.stroke(row, rarity.color, 2, level > 0 and 0.1 or 0.6)
+			UI.text(row, w.emoji, { Size = UDim2.new(0, 56, 1, 0), MaxText = 38 })
+			UI.text(row, w.name .. "  <font size='13' color='" .. UI.hex(rarity.color) .. "'>" .. rarity.name .. (level > 0 and (" · Stufe " .. level .. "/" .. Config.WEAPON_MAX_LEVEL) or "") .. "</font>",
+				{ Size = UDim2.new(1, -330, 0.34, 0), Position = UDim2.new(0, 60, 0.04, 0), XAlign = Enum.TextXAlignment.Left, MaxText = 17 })
+			UI.text(row, w.desc, { Size = UDim2.new(1, -330, 0.3, 0), Position = UDim2.new(0, 60, 0.38, 0), XAlign = Enum.TextXAlignment.Left,
+				Font = Enum.Font.Gotham, Color = C.muted, MaxText = 13 })
+			UI.text(row, "💥 " .. Util.format(w.damage) .. " · ⏱️ " .. w.cooldown .. " s · 📏 " .. w.range .. " · 🎯 " .. math.floor(w.crit * 100) .. " %",
+				{ Size = UDim2.new(1, -330, 0.26, 0), Position = UDim2.new(0, 60, 0.7, 0), XAlign = Enum.TextXAlignment.Left, Font = Enum.Font.GothamBold, Color = C.green, MaxText = 13 })
+			if level > 0 then
+				local isEq = d.weapon == w.id
+				UI.button(row, isEq and "✅ Ausgerüstet" or "Ausrüsten", isEq and C.grey or C.green, function()
+					Remotes.EquipWeapon:FireServer(w.id)
+				end, { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -144, 0.5, 0), Size = UDim2.new(0, 124, 0, 44), TextColor = isEq and C.text or C.dark, MaxText = 15 })
+				if level < Config.WEAPON_MAX_LEVEL then
+					local cost = Logic.weaponUpgradeCost(w.id, level)
+					UI.button(row, "⬆️ " .. Util.format(cost), d.cash >= cost and C.money or C.grey, function()
+						Remotes.UpgradeWeapon:FireServer(w.id)
+					end, { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.new(0, 128, 0, 44), TextColor = C.dark, MaxText = 15 })
+				else
+					UI.text(row, "✅ MAX", { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.new(0, 128, 0, 44), Color = C.gold, MaxText = 18 })
+				end
+			elseif w.price > 0 then
+				UI.button(row, "💵 " .. Util.format(w.price), d.cash >= w.price and C.money or C.grey, function()
+					Remotes.BuyWeapon:FireServer(w.id)
+				end, { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.new(0, 128, 0, 44), TextColor = C.dark, MaxText = 16 })
+			else
+				UI.text(row, "👑 Nur Beute", { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.new(0, 128, 0, 44), Color = C.red, MaxText = 16 })
+			end
+		end
+	end
+
+	return function(kind)
+		if kind == "full" then build() end
+	end
+end
+
 
 return Menus

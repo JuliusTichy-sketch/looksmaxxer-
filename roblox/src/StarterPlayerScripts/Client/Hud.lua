@@ -44,16 +44,17 @@ function Hud.init(gui)
 
 	-- Menü-Knöpfe links
 	local side = UI.new("Frame", { Name = "Side", BackgroundTransparency = 1, AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 8, 0.5, 0),
-		Size = UDim2.new(0.075, 0, 0.7, 0), Parent = gui })
-	UI.new("UISizeConstraint", { MinSize = Vector2.new(50, 300), MaxSize = Vector2.new(82, 640), Parent = side })
+		Size = UDim2.new(0.07, 0, 0.84, 0), Parent = gui })
+	UI.new("UISizeConstraint", { MinSize = Vector2.new(44, 300), MaxSize = Vector2.new(74, 780), Parent = side })
 	UI.list(side, false, 6, Enum.HorizontalAlignment.Center, Enum.VerticalAlignment.Center)
 	local buttons = {
-		{ "upgrades", "💪", "Upgrades", C.pink }, { "pets", "🐾", "Pets", C.purple }, { "worlds", "🌍", "Welten", C.cyan },
-		{ "rebirth", "♻️", "Rebirth", C.green }, { "leaderboard", "🏆", "Rangliste", C.gold }, { "rewards", "🎁", "Belohnung", C.orange },
+		{ "upgrades", "💪", "Upgrades", C.pink }, { "pets", "🐾", "Pets", C.purple }, { "weapons", "⚔️", "Waffen", C.red },
+		{ "worlds", "🌍", "Welten", C.cyan }, { "quests", "📋", "Aufträge", C.orange }, { "jobs", "💼", "Jobs", C.money },
+		{ "rebirth", "♻️", "Rebirth", C.green }, { "leaderboard", "🏆", "Rangliste", C.gold }, { "rewards", "🎁", "Belohnung", C.pink },
 		{ "settings", "⚙️", "Optionen", C.grey },
 	}
 	for i, b in ipairs(buttons) do
-		local btn = UI.new("TextButton", { Text = "", AutoButtonColor = true, BackgroundColor3 = b[4], Size = UDim2.new(1, 0, 1 / 7, -6),
+		local btn = UI.new("TextButton", { Text = "", AutoButtonColor = true, BackgroundColor3 = b[4], Size = UDim2.new(1, 0, 1 / 10, -6),
 			LayoutOrder = i, Parent = side })
 		UI.new("UIAspectRatioConstraint", { AspectRatio = 1, Parent = btn })
 		UI.corner(btn, 14)
@@ -102,6 +103,61 @@ function Hud.init(gui)
 		Effects.floatText("+" .. Util.format(s.click), UDim2.new(0, pos.X + size.X * (0.3 + math.random() * 0.4), 0, pos.Y), C.gold)
 		scale.Scale = 0.93
 		TweenService:Create(scale, TweenInfo.new(0.15, Enum.EasingStyle.Back), { Scale = 1 }):Play()
+	end)
+
+	-- Lebensbalken: Selbstbewusstsein & Boss
+	local bars = UI.new("Frame", { Name = "Bars", BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0.11, 6),
+		Size = UDim2.new(0.42, 0, 0.09, 0), Parent = gui })
+	UI.new("UISizeConstraint", { MinSize = Vector2.new(260, 56), MaxSize = Vector2.new(560, 80), Parent = bars })
+	local bossBg = UI.panel(bars, { Size = UDim2.new(1, 0, 0.5, -2), Color = C.dark, Radius = 8 })
+	local bossFill = UI.panel(bossBg, { Size = UDim2.new(1, 0, 1, 0), Color = C.red, Radius = 8 })
+	local bossText = UI.text(bossBg, "", { MaxText = 16 })
+	bossText.TextStrokeTransparency = 0.3
+	local confBg = UI.panel(bars, { Size = UDim2.new(0.7, 0, 0.42, 0), Position = UDim2.new(0.15, 0, 0.56, 0), Color = C.dark, Radius = 8 })
+	local confFill = UI.panel(confBg, { Size = UDim2.new(1, 0, 1, 0), Color = C.green, Radius = 8 })
+	local confText = UI.text(confBg, "", { MaxText = 14 })
+	confText.TextStrokeTransparency = 0.3
+	bossBg.Visible = false
+	confBg.Visible = false
+
+	local Players = game:GetService("Players")
+	local player = Players.LocalPlayer
+	task.spawn(function()
+		while true do
+			task.wait(0.15)
+			local char = player.Character
+			local hrp = char and char:FindFirstChild("HumanoidRootPart")
+			local nearest, nd = nil, 90
+			local npcs = workspace:FindFirstChild("NPCs")
+			if hrp and npcs then
+				for _, m in ipairs(npcs:GetChildren()) do
+					local maxHp = m:GetAttribute("MaxHP")
+					local root = maxHp and m:FindFirstChild("HumanoidRootPart")
+					if root then
+						local d = (root.Position - hrp.Position).Magnitude
+						if d < nd then nearest, nd = m, d end
+					end
+				end
+			end
+			if nearest then
+				local hp, maxHp = nearest:GetAttribute("HP") or 0, nearest:GetAttribute("MaxHP") or 1
+				bossBg.Visible = true
+				bossFill.Size = UDim2.new(math.clamp(hp / maxHp, 0, 1), 0, 1, 0)
+				bossText.Text = "👑 " .. nearest.Name .. "  ❤️ " .. Util.format(math.max(0, hp)) .. " / " .. Util.format(maxHp)
+			else
+				bossBg.Visible = false
+			end
+			local conf, maxConf = player:GetAttribute("Conf"), player:GetAttribute("MaxConf")
+			if conf and maxConf and (nearest or conf < maxConf) then
+				confBg.Visible = true
+				local r = math.clamp(conf / maxConf, 0, 1)
+				confFill.Size = UDim2.new(r, 0, 1, 0)
+				confFill.BackgroundColor3 = r > 0.5 and C.green or (r > 0.25 and C.gold or C.red)
+				confText.Text = "😎 Selbstbewusstsein " .. Util.format(conf) .. " / " .. Util.format(maxConf)
+			else
+				confBg.Visible = false
+			end
+		end
 	end)
 
 	State.onChange(Hud.update)

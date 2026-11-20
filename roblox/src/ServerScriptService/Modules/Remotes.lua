@@ -15,12 +15,23 @@ local EVENTS = {
 	"BattleResult",   -- Ergebnis eines Mog Battles
 	"BattleRequest",  -- jemand fordert dich heraus
 	"OpenMenu",       -- Menü öffnen (z. B. Welten am Portal)
+	"FanDialog",      -- Fan-Gespräch öffnen
+	"FanResult",      -- Ergebnis des Fan-Gesprächs
+	"DamagePopup",    -- Schadenszahl im Bosskampf
+	"TradeRequest",   -- jemand will mit dir handeln
+	"TradeUpdate",    -- aktueller Stand des Handels
+	"TradeClosed",    -- Handel beendet
 	-- Spieler -> Server
 	"Click", "BuyUpgrade", "Rebirth", "BuyPerk",
 	"EquipPet", "EquipBest", "FusePet", "DeletePet", "HatchEgg",
 	"Teleport", "UnlockWorld",
 	"BattleRespond",
 	"ClaimDaily", "RedeemCode", "BuyPotion", "Setting",
+	"ClaimQuest", "ClaimQuestBonus", "ClaimAchievement",
+	"StartJob", "FinishJob",
+	"FanChoice",
+	"BuyWeapon", "UpgradeWeapon", "EquipWeapon",
+	"TradeRespond", "TradeOffer", "TradeReady", "TradeConfirm", "TradeCancel",
 }
 
 -- Erst alle Leitungen anlegen, dann den Ordner sichtbar machen

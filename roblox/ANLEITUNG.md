@@ -38,6 +38,22 @@
 
 Die Kamera geht nicht durch Wände. Einstellungen dazu (Empfindlichkeit, Zoom-Grenzen) stehen oben in `Client › CameraController`.
 
+## 🕹️ Weitere Tasten & Knöpfe
+| Was | PC | Handy |
+|---|---|---|
+| Geschenkbox öffnen / Mog Battle / Fan begeistern | **E** (gedrückt halten) | Knopf antippen |
+| 3er-Öffnen an der Box | **F** | Knopf antippen |
+| Mit Spieler handeln | **F** beim Spieler | Knopf „Handeln“ |
+| Waffe in die Hand nehmen | **1** | Waffe unten antippen |
+| Zuschlagen (Bosskampf) | Linksklick | Bildschirm antippen |
+
+### Neue Inhalte testen
+- **Bosskampf:** Waffe nehmen (Taste 1), zum Boss laufen (Podest hinter dem Spawn), klicken. Rote Kreise am Boden = schnell rauslaufen!
+- **Fans:** In jeder Welt laufen 6 Leute herum – hingehen, **E** halten, Spruch wählen.
+- **Jobs:** Menü 💼 → Job wählen → im richtigen Moment tippen.
+- **Aufträge & Erfolge:** Menü 📋.
+- **Handel:** mit **2 Spielern** testen (Test → Clients and Servers → 2 Players), beim anderen Spieler **F** halten.
+
 ## 5. Sounds einbauen
 Roblox erlaubt nur Sounds aus der eigenen Bibliothek (wegen Urheberrecht).
 1. Öffne die **Toolbox** (View → Toolbox) → oben **Audio** wählen.
@@ -83,6 +99,11 @@ Die Karte wird per Code gebaut (`Modules › MapBuilder`). Wenn du sie selbst be
 3. Bei **Privacy/Zugriff** auf **Public** stellen.
 
 ## Was ist drin?
+- 📋 Tägliche Aufträge (3 pro Tag + Bonus-Box) und 11 Erfolge mit je 4 Stufen
+- ⭐ Fans in allen 8 Welten (48 Figuren) mit Promi-Level 1–10 und Charisma-System
+- 💼 7 Jobs mit Timing-Minispiel (mehr Glow = bessere Jobs & mehr Lohn)
+- ⚔️ 11 Waffen (kaufen, bis Stufe 10 verbessern) und Echtzeit-Bosskämpfe mit Lebenspunkten, Flächenangriffen, Selbstbewusstseins-Balken und Boss-Beute
+- 🤝 Handel von Pets & Geld zwischen Spielern (doppelte Bestätigung gegen Betrug)
 - 🪞 Daily Routine, 40 Upgrades in 8 Kategorien (bis Stufe 50), Aura/s, Glow-Score
 - 🏷️ 15 Titel als Namensschild über dem Kopf, Glitzer-Aura, breitere Schultern durch Fitness
 - 🌍 8 Welten mit eigener Karte, Licht, Portalen und Multiplikatoren

@@ -18,6 +18,7 @@ local Hud = require(script:WaitForChild("Hud"))
 local PetFollow = require(script:WaitForChild("PetFollow"))
 local WorldFx = require(script:WaitForChild("WorldFx"))
 local CameraController = require(script:WaitForChild("CameraController"))
+local TradeUI = require(script:WaitForChild("TradeUI"))
 local UserInputService = game:GetService("UserInputService")
 
 -- Haupt-Oberfläche
@@ -32,6 +33,7 @@ Hud.init(gui)
 PetFollow.init()
 WorldFx.init()
 CameraController.init()
+TradeUI.init(gui)
 CameraController.onMouseLookChanged(function(on)
 	Effects.toast(on and "🖱️ Maus-Kamera AN" or "🖱️ Maus-Kamera AUS", on and "Die Kamera folgt jetzt deiner Maus. Strg drücken zum Ausschalten (z. B. für Menüs)." or "Kamera drehen: Maustaste gedrückt halten und ziehen.", "")
 end)
@@ -81,6 +83,22 @@ end)
 
 Remotes:WaitForChild("OpenMenu").OnClientEvent:Connect(function(name)
 	Menus.open(name)
+end)
+
+-- Fans
+Remotes:WaitForChild("FanDialog").OnClientEvent:Connect(function(info)
+	Menus.close()
+	Effects.fanDialog(info, function(index)
+		Remotes.FanChoice:FireServer(index)
+	end)
+end)
+Remotes:WaitForChild("FanResult").OnClientEvent:Connect(function(success, text, extra)
+	Effects.fanResult(success, text, extra)
+end)
+
+-- Bosskampf: Schadenszahlen
+Remotes:WaitForChild("DamagePopup").OnClientEvent:Connect(function(amount, crit, position)
+	Effects.damagePopup(amount, crit, position)
 end)
 
 -- Begrüßung

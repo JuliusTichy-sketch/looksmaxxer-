@@ -382,4 +382,125 @@ Config.AuraColors = {
 	Color3.fromRGB(78, 240, 160), Color3.fromRGB(255, 140, 66), Color3.fromRGB(179, 136, 255),
 }
 
+----------------------------------------------------------------------------
+-- 📋 TÄGLICHE AUFTRÄGE
+-- stat = welcher Zähler zählt (siehe Logic.statValue)
+----------------------------------------------------------------------------
+Config.QuestPool = {
+	{ id = "clicks",   stat = "clicks",      goal = 300, text = "Mache %d Daily Routines" },
+	{ id = "upgrades", stat = "upgrades",    goal = 25,  text = "Kaufe %d Upgrade-Stufen" },
+	{ id = "eggs",     stat = "eggs",        goal = 10,  text = "Öffne %d Geschenkboxen" },
+	{ id = "mog",      stat = "mogWins",     goal = 3,   text = "Gewinne %d Mog Battles" },
+	{ id = "fans",     stat = "fans",        goal = 5,   text = "Gewinne %d neue Fans" },
+	{ id = "jobs",     stat = "jobs",        goal = 3,   text = "Erledige %d Jobs" },
+	{ id = "bosshits", stat = "bossHits",    goal = 40,  text = "Triff Bosse %d-mal mit deiner Waffe" },
+	{ id = "play",     stat = "playMinutes", goal = 20,  text = "Spiele %d Minuten" },
+}
+Config.QUESTS_PER_DAY = 3
+Config.QuestReward = { cash = 300, auraSeconds = 180 }
+Config.QuestBonus = { cash = 1000, freeEgg = true }   -- wenn alle Aufträge des Tages geschafft sind
+
+----------------------------------------------------------------------------
+-- 🏅 ERFOLGE (je 4 Stufen)
+-- Belohnung pro Stufe: Geld = 150 * 4^(Stufe-1), Aura = 120 s * Stufe
+----------------------------------------------------------------------------
+Config.Achievements = {
+	{ id = "clicks",   stat = "clicks",    emoji = "🪞", name = "Routine-Profi",   text = "Daily Routines",        tiers = { 100, 1000, 10000, 100000 } },
+	{ id = "upgrades", stat = "upgrades",  emoji = "💪", name = "Shopaholic",      text = "gekaufte Upgrade-Stufen", tiers = { 25, 250, 1000, 5000 } },
+	{ id = "eggs",     stat = "eggs",      emoji = "🎁", name = "Box-Öffner",      text = "geöffnete Boxen",       tiers = { 10, 100, 1000, 5000 } },
+	{ id = "mog",      stat = "mogWins",   emoji = "⚔️", name = "Mogger",          text = "gewonnene Mog Battles", tiers = { 5, 50, 250, 1000 } },
+	{ id = "boss",     stat = "bossKills", emoji = "👑", name = "Boss-Jäger",      text = "besiegte Bosse (Kampf)", tiers = { 1, 10, 50, 200 } },
+	{ id = "rebirth",  stat = "rebirths",  emoji = "♻️", name = "Rebirth-Meister", text = "Rebirths",              tiers = { 1, 5, 10, 15 } },
+	{ id = "fans",     stat = "fans",      emoji = "⭐", name = "Fan-Magnet",      text = "gewonnene Fans",        tiers = { 5, 50, 250, 1000 } },
+	{ id = "jobs",     stat = "jobs",      emoji = "💼", name = "Arbeitstier",     text = "erledigte Jobs",        tiers = { 5, 50, 250, 1000 } },
+	{ id = "trades",   stat = "trades",    emoji = "🤝", name = "Händler",         text = "abgeschlossene Handel", tiers = { 1, 10, 50, 200 } },
+	{ id = "worlds",   stat = "worlds",    emoji = "🌍", name = "Weltenbummler",   text = "freigeschaltete Welten", tiers = { 2, 4, 6, 8 } },
+	{ id = "index",    stat = "index",     emoji = "📖", name = "Sammler",         text = "Pets im Sammelbuch",    tiers = { 10, 25, 40, 57 } },
+}
+
+----------------------------------------------------------------------------
+-- 💼 JOBS (Geld verdienen mit Minispiel)
+-- req = nötiger Glow-Score, pay = Grundlohn, cd = Pause (s), diff = Schwierigkeit
+----------------------------------------------------------------------------
+Config.Jobs = {
+	{ id = "flyer",     emoji = "📄", name = "Flyer verteilen",              req = 0,     pay = 20,    cd = 30,  diff = 0, act = "Flyer geben!",     desc = "Für einen Döner-Laden. Bezahlung in Cash und Knoblauchsoße." },
+	{ id = "barista",   emoji = "☕", name = "Barista im Café Mewing",       req = 100,   pay = 60,    cd = 45,  diff = 1, act = "Milch eingießen!", desc = "Latte Art in Form eines Kieferknochens." },
+	{ id = "statist",   emoji = "🎬", name = "Statist im Werbespot",         req = 500,   pay = 200,   cd = 60,  diff = 2, act = "Lächeln!",         desc = "Du läufst im Hintergrund vorbei. Mit Gefühl." },
+	{ id = "insta",     emoji = "📸", name = "Instagram-Fotoshooting",       req = 1500,  pay = 700,   cd = 90,  diff = 3, act = "Pose!",            desc = "Und jetzt nachdenklich in die Ferne schauen." },
+	{ id = "laufsteg",  emoji = "🕴️", name = "Laufsteg in Mailand",          req = 4000,  pay = 2500,  cd = 120, diff = 4, act = "Schritt!",         desc = "Nicht stolpern. NICHT stolpern." },
+	{ id = "parfum",    emoji = "🌸", name = "Gesicht einer Parfum-Kampagne", req = 9000, pay = 8000,  cd = 180, diff = 5, act = "Blick!",           desc = "Du flüsterst einen französischen Namen am Strand." },
+	{ id = "hollywood", emoji = "🎥", name = "Hollywood-Hauptrolle",         req = 18000, pay = 30000, cd = 300, diff = 6, act = "Action!",          desc = "Du spielst dich selbst. Oscar-verdächtig." },
+}
+
+----------------------------------------------------------------------------
+-- ⭐ FANS IN DEN WELTEN
+----------------------------------------------------------------------------
+Config.FANS_PER_WORLD = 6
+Config.FAN_FAIL_COOLDOWN = 45      -- nach einem Fehlversuch (Sekunden)
+Config.FAN_REPEAT = 300            -- derselbe Fan erst nach 5 Minuten wieder
+-- Grund-Charisma, das Fans in Welt 1–8 erwarten (Promi 5 ≈ x1,2 · Promi 10 = x2)
+Config.FanBaseReq = { 150, 400, 2000, 5000, 9000, 12000, 15000, 18000 }
+Config.FanNames = { "Lena", "Sophie", "Mia", "Emma", "Hannah", "Lea", "Anna", "Laura", "Selin", "Aylin", "Zoe", "Amira",
+	"Paul", "Felix", "Noah", "Elias", "Finn", "Emil", "Luis", "Ben", "Yusuf", "Mats", "Jonas", "Can", "Milan", "Theo" }
+Config.FanRoles = { "Schüler", "Azubi", "Skater", "Gamer", "Barista", "Fitness-Fan", "Fotograf", "TikTok-Creator", "Model", "Mega-Influencer" }
+-- mod = Bonus/Malus auf die Chance. kind: "conf" (gut mit viel Selbstbewusstsein), "glow" (gut mit viel Glow), "rand" (Glückssache)
+Config.FanOpeners = {
+	{ text = "„Hi! Selfie zusammen?“ 🤳", mod = 0.10 },
+	{ text = "„Willst du ein Autogramm?“ ✍️", kind = "glow", mod = 0.15 },
+	{ text = "*Mewing-Pose machen und wissend nicken* 🗿", kind = "rand", mod = 0 },
+	{ text = "„Coole Jacke! Wo hast du die her?“", mod = 0.08 },
+	{ text = "*Augenkontakt halten und freundlich lächeln* 🙂", kind = "conf", mod = 0.15 },
+	{ text = "„Ich hab heute 3 Liter Wasser getrunken.“", mod = -0.08 },
+	{ text = "„Soll ich dir einen Skincare-Tipp geben?“ 🧴", mod = 0.06 },
+	{ text = "*Nervös winken und schnell weitergehen* 👋", mod = -0.3 },
+	{ text = "„Übrigens: Mein Kiefer ist gemewt.“", mod = -0.15 },
+	{ text = "„Meine Skincare-Routine hat 14 Schritte. Willst du alle hören?“", mod = -0.12 },
+}
+Config.FanYes = {
+	"„Krass, du hast ja richtig Aura! Ich folge dir!“ 📲",
+	"„Darf ich ein Selfie mit dir posten?“ 🤳",
+	"„Wie machst du das mit den Haaren?! Ich bin jetzt Fan.“ ⭐",
+	"„Okay, du bist der Main Character. Ich abonniere dich.“ 🔔",
+}
+Config.FanNo = {
+	"%s schaut demonstrativ aufs Handy. Das Handy ist aus.",
+	"„Sorry … kenn ich dich?“ – Autsch.",
+	"%s sagt „Nein danke“ – so freundlich, dass es doppelt wehtut.",
+	"%s hat dich nicht mal bemerkt. Mehr Aura nötig.",
+}
+
+----------------------------------------------------------------------------
+-- ⚔️ WAFFEN (für Echtzeit-Bosskämpfe)
+-- damage = Grundschaden, cooldown = Sekunden zwischen Schlägen, range = Reichweite,
+-- crit = Chance auf kritischen Treffer (x2,5), price = Geld (0 = nicht kaufbar)
+----------------------------------------------------------------------------
+Config.Weapons = {
+	{ id = "zahnbuerste", emoji = "🪥", name = "Zahnbürsten-Dolch",  rarity = "common",    damage = 10,    cooldown = 0.45, range = 9,  crit = 0.05, price = 0,       desc = "Schnelle, schwache Stiche. Jeder fängt so an." },
+	{ id = "foehn",       emoji = "💨", name = "Föhn-Blaster",       rarity = "common",    damage = 22,    cooldown = 0.7,  range = 16, crit = 0.05, price = 600,     desc = "Heißluft aus sicherer Entfernung." },
+	{ id = "lasso",       emoji = "🧵", name = "Zahnseide-Lasso",    rarity = "rare",      damage = 60,    cooldown = 0.8,  range = 20, crit = 0.08, price = 4000,    desc = "Reinigt Zahnzwischenräume UND Bosse." },
+	{ id = "haarspray",   emoji = "🧴", name = "Haarspray-Nebel",    rarity = "rare",      damage = 110,   cooldown = 0.9,  range = 14, crit = 0.1,  price = 15000,   desc = "Extra starker Halt. Extra starker Schaden." },
+	{ id = "katana",      emoji = "🔥", name = "Glätteisen-Katana",  rarity = "epic",      damage = 320,   cooldown = 0.6,  range = 10, crit = 0.15, price = 60000,   desc = "230 Grad. Zischt bei jedem Treffer." },
+	{ id = "hammer",      emoji = "🏋️", name = "Hantel-Hammer",      rarity = "epic",      damage = 900,   cooldown = 1.4,  range = 10, crit = 0.1,  price = 250000,  desc = "Langsam, aber BONK." },
+	{ id = "spiegel",     emoji = "🪞", name = "Spiegel-Schild",     rarity = "epic",      damage = 500,   cooldown = 0.9,  range = 10, crit = 0.1,  price = 400000,  shield = 0.5, desc = "Halbiert den Schaden von Boss-Angriffen." },
+	{ id = "paparazzi",   emoji = "📸", name = "Paparazzi-Blitz",    rarity = "legendary", damage = 2500,  cooldown = 1.0,  range = 24, crit = 0.15, price = 2000000, desc = "Blendet Bosse mit 1000 Blitzen." },
+	{ id = "kiefer",      emoji = "🗿", name = "Kiefer-Kanone",      rarity = "legendary", damage = 6000,  cooldown = 1.2,  range = 30, crit = 0.12, price = 8000000, desc = "Schießt Moai-Köpfe. Ja, wirklich." },
+	{ id = "faust",       emoji = "👊", name = "Gigachad-Faust",     rarity = "mythic",    damage = 18000, cooldown = 0.8,  range = 11, crit = 0.2,  price = 0, drop = 0.03, desc = "Nur als Beute von Bossen ab Welt 4 (3 %)." },
+	{ id = "laser",       emoji = "🌈", name = "Aura-Laser",         rarity = "mythic",    damage = 50000, cooldown = 0.5,  range = 35, crit = 0.25, price = 0, drop = 0.02, desc = "Nur als Beute von LEON (2 %)." },
+}
+Config.STARTER_WEAPON = "zahnbuerste"
+Config.WEAPON_MAX_LEVEL = 10
+Config.WEAPON_LEVEL_BONUS = 0.25      -- +25 % Schaden pro Stufe
+
+-- Lebenspunkte der Bosse im Echtzeit-Kampf (Welt 1–8)
+Config.BossHP = { 2000, 25000, 3e5, 3e6, 1.5e7, 5e7, 4e8, 5e9 }
+Config.BOSS_RESPAWN = 45              -- Sekunden bis der Boss wieder erscheint
+Config.BOSS_ATTACK_EVERY = 5          -- Sekunden zwischen Boss-Angriffen
+Config.BOSS_HIT_PERCENT = 0.35        -- ein Treffer kostet 35 % deines Selbstbewusstseins
+
+----------------------------------------------------------------------------
+-- 🤝 HANDEL
+----------------------------------------------------------------------------
+Config.TRADE_MAX_PETS = 8
+Config.TRADE_COOLDOWN = 15
+
 return Config

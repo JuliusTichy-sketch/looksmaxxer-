@@ -55,6 +55,8 @@ local function give(player, data, reward)
 	end
 	return table.concat(parts, " · ")
 end
+RewardService.give = give
+RewardService.addPotion = addPotion
 
 Remotes.ClaimDaily.OnServerEvent:Connect(function(player)
 	local data = DataService.get(player)

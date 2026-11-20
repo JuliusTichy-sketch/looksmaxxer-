@@ -31,8 +31,11 @@ end
 local function hideOwnPrompt(char)
 	local hrp = char:WaitForChild("HumanoidRootPart", 10)
 	if not hrp then return end
-	local pr = hrp:WaitForChild("MogPrompt", 15)
-	if pr then pr.Enabled = false end
+	-- eigene Knöpfe (Mog Battle, Handeln) am eigenen Körper ausblenden
+	for _, name in ipairs({ "MogPrompt", "TradePrompt" }) do
+		local pr = hrp:WaitForChild(name, 15)
+		if pr then pr.Enabled = false end
+	end
 end
 
 function WorldFx.init()
