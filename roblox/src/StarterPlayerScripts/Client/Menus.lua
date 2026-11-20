@@ -15,6 +15,8 @@ local UI = require(script.Parent:WaitForChild("UI"))
 local State = require(script.Parent:WaitForChild("State"))
 local Sounds = require(script.Parent:WaitForChild("Sounds"))
 local Effects = require(script.Parent:WaitForChild("Effects"))
+local CameraController = require(script.Parent:WaitForChild("CameraController"))
+local UserInputService = game:GetService("UserInputService")
 
 local Menus = {}
 local window, titleLabel, content
@@ -32,6 +34,7 @@ function Menus.init(gui)
 	window = UI.panel(gui, { Name = "Window", AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.52, 0),
 		Size = UDim2.new(0.62, 0, 0.74, 0), Color = C.bg, Transparency = 0.03 })
 	window.Visible = false
+	window.Active = true   -- Ziehen über dem Menü dreht nicht die Kamera
 	UI.new("UISizeConstraint", { MinSize = Vector2.new(330, 300), MaxSize = Vector2.new(880, 620), Parent = window })
 	UI.stroke(window, C.pink, 2, 0.2)
 	local header = UI.panel(window, { Size = UDim2.new(1, 0, 0, 48), Color = C.panel })
@@ -529,9 +532,14 @@ end
 ----------------------------------------------------------------------------
 BUILDERS.settings = function(root)
 	UI.list(root, false, 10)
-	local musicBtn, sfxBtn
+	local musicBtn, sfxBtn, camBtn
 	local function update()
 		local d = data()
+		if camBtn then
+			local on = CameraController.isMouseLook()
+			camBtn.Text = "🖱️ Maus-Kamera (Taste Strg): " .. (on and "AN" or "AUS")
+			camBtn.BackgroundColor3 = on and C.green or C.grey
+		end
 		musicBtn.Text = "🎵 Musik: " .. (d.settings.music and "AN" or "AUS")
 		musicBtn.BackgroundColor3 = d.settings.music and C.green or C.grey
 		sfxBtn.Text = "🔊 Soundeffekte: " .. (d.settings.sfx and "AN" or "AUS")
@@ -551,13 +559,23 @@ BUILDERS.settings = function(root)
 		Remotes.Setting:FireServer("sfx", d.settings.sfx)
 		update()
 	end, { Size = UDim2.new(1, 0, 0, 46), LayoutOrder = 2, TextColor = C.dark })
+	if UserInputService.MouseEnabled then
+		camBtn = UI.button(root, "", C.grey, function()
+			CameraController.setMouseLook(not CameraController.isMouseLook())
+			update()
+		end, { Size = UDim2.new(1, 0, 0, 46), LayoutOrder = 3, TextColor = C.dark })
+	end
+	UI.text(root, UserInputService.TouchEnabled and not UserInputService.MouseEnabled
+		and "📱 Kamera: mit einem Finger wischen = drehen · zwei Finger = zoomen"
+		or "🖱️ Kamera: Maustaste gedrückt halten und ziehen = drehen · Mausrad = zoomen · Strg = Maus-Kamera",
+		{ Size = UDim2.new(1, 0, 0, 40), LayoutOrder = 4, Font = Enum.Font.GothamBold, Color = C.cyan, MaxText = 15 })
 	local s = snap()
 	local d = data()
 	UI.text(root, (s.saving and "💾 Dein Spielstand wird automatisch gespeichert." or "⚠️ Speichern ist gerade aus.")
 		.. "\n\n📊 Klicks: " .. Util.format(d.clicks) .. "  ·  🎁 Boxen geöffnet: " .. Util.format(d.eggsOpened)
 		.. "\n⚔️ Mog-Siege: " .. d.mogWins .. "  ·  Niederlagen: " .. d.mogLosses .. "  ·  👑 Boss-Siege: " .. d.bossWins
 		.. "\n🌌 Aura insgesamt: " .. Util.format(d.totalAura),
-		{ Size = UDim2.new(1, 0, 0, 130), LayoutOrder = 3, Font = Enum.Font.GothamBold, Color = C.muted, MaxText = 16 })
+		{ Size = UDim2.new(1, 0, 0, 130), LayoutOrder = 5, Font = Enum.Font.GothamBold, Color = C.muted, MaxText = 16 })
 	update()
 	return nil
 end

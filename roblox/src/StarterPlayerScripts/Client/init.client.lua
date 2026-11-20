@@ -17,6 +17,8 @@ local Menus = require(script:WaitForChild("Menus"))
 local Hud = require(script:WaitForChild("Hud"))
 local PetFollow = require(script:WaitForChild("PetFollow"))
 local WorldFx = require(script:WaitForChild("WorldFx"))
+local CameraController = require(script:WaitForChild("CameraController"))
+local UserInputService = game:GetService("UserInputService")
 
 -- Haupt-Oberfläche
 local gui = UI.new("ScreenGui", {
@@ -29,6 +31,10 @@ Menus.init(gui)
 Hud.init(gui)
 PetFollow.init()
 WorldFx.init()
+CameraController.init()
+CameraController.onMouseLookChanged(function(on)
+	Effects.toast(on and "🖱️ Maus-Kamera AN" or "🖱️ Maus-Kamera AUS", on and "Die Kamera folgt jetzt deiner Maus. Strg drücken zum Ausschalten (z. B. für Menüs)." or "Kamera drehen: Maustaste gedrückt halten und ziehen.", "")
+end)
 
 -- Spielstand vom Server
 local firstData = true
@@ -80,4 +86,10 @@ end)
 -- Begrüßung
 task.delay(2, function()
 	Effects.toast("✨ Willkommen bei Looksmaxxer 3000!", "Klicke auf Daily Routine, kauf Upgrades und öffne die 🎁 Geschenkbox!", "title")
+	task.wait(1.5)
+	if UserInputService.TouchEnabled and not UserInputService.MouseEnabled then
+		Effects.toast("📱 Kamera", "Mit einem Finger wischen = drehen · zwei Finger = zoomen", "")
+	else
+		Effects.toast("🖱️ Kamera", "Maustaste halten + ziehen = drehen · Mausrad = zoomen · Strg = Maus-Kamera", "")
+	end
 end)

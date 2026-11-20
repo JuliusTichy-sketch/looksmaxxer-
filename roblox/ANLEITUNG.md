@@ -30,6 +30,14 @@
 - Zum Schnell-Testen kannst du dir Aura geben: Im Output-Fenster unten in die Befehlszeile (während Play, Server-Ansicht) eingeben:
   `require(game.ServerScriptService.Modules.DataService).get(game.Players:GetPlayers()[1]).aura = 1e12`
 
+## 🎥 Steuerung der Kamera
+| Gerät | Kamera drehen | Zoomen | Extra |
+|---|---|---|---|
+| PC | **linke oder rechte Maustaste** gedrückt halten und ziehen | Mausrad | **Strg** = Maus-Kamera an/aus (Kamera folgt der Maus ohne Klicken, wie Shift-Lock) |
+| Handy/Tablet | mit **einem Finger** wischen | mit **zwei Fingern** auseinander/zusammen | Joystick & Sprung-Knopf wie gewohnt |
+
+Die Kamera geht nicht durch Wände. Einstellungen dazu (Empfindlichkeit, Zoom-Grenzen) stehen oben in `Client › CameraController`.
+
 ## 5. Sounds einbauen
 Roblox erlaubt nur Sounds aus der eigenen Bibliothek (wegen Urheberrecht).
 1. Öffne die **Toolbox** (View → Toolbox) → oben **Audio** wählen.
