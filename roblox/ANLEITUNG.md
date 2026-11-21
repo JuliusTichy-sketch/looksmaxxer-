@@ -43,6 +43,7 @@ Die Kamera geht nicht durch Wände. Einstellungen dazu (Empfindlichkeit, Zoom-Gr
 |---|---|---|
 | Geschenkbox öffnen / Mog Battle / Fan begeistern | **E** (gedrückt halten) | Knopf antippen |
 | 3er-Öffnen an der Box | **F** | Knopf antippen |
+| Box-Inhalt & Chancen ansehen | **R** an der Box | Knopf „Inhalt ansehen“ |
 | Mit Spieler handeln | **F** beim Spieler | Knopf „Handeln“ |
 | Waffe in die Hand nehmen | **1** | Waffe unten antippen |
 | Zuschlagen (Bosskampf) | Linksklick | Bildschirm antippen |
@@ -99,6 +100,10 @@ Die Karte wird per Code gebaut (`Modules › MapBuilder`). Wenn du sie selbst be
 3. Bei **Privacy/Zugriff** auf **Public** stellen.
 
 ## Was ist drin?
+- 🧟➡️😎 Dein Avatar startet hässlich (Pickel, kränkliche Haut, struppige Haare, Buckel, Augenringe, Ketchup-Fleck, Mundgeruch, Schweißtropfen) und wird mit den Upgrades **langsam** zum Gigachad (glänzende Haut, goldene Strähne, Krone, breite Schultern, Uhr, Goldkette, Sonnenbrille, Umhang, Sterne)
+- 🐾 105 echte 3D-Pets (13 pro Welt + 1 geheimes), 9 Seltenheiten inkl. **Exotisch** und **Göttlich**, 3D-Vorschau in allen Menüs
+- 🎁 5 Pet-Stationen pro Welt (Basis → Silber → Gold → Diamant → Göttlich): teurer = bessere Chancen
+- 👥 18 Fans + 3 Rivalen pro Welt, viel mehr Deko (Autos, Statuen, Brunnen, Boote, Schneemänner, Laternen, Rakete, Wetter-Effekte …)
 - 📋 Tägliche Aufträge (3 pro Tag + Bonus-Box) und 11 Erfolge mit je 4 Stufen
 - ⭐ Fans in allen 8 Welten (48 Figuren) mit Promi-Level 1–10 und Charisma-System
 - 💼 7 Jobs mit Timing-Minispiel (mehr Glow = bessere Jobs & mehr Lohn)

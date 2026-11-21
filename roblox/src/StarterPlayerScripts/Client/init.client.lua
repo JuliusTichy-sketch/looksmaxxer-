@@ -81,8 +81,8 @@ Remotes:WaitForChild("BattleRequest").OnClientEvent:Connect(function(name, userI
 	end)
 end)
 
-Remotes:WaitForChild("OpenMenu").OnClientEvent:Connect(function(name)
-	Menus.open(name)
+Remotes:WaitForChild("OpenMenu").OnClientEvent:Connect(function(name, arg)
+	Menus.open(name, arg)
 end)
 
 -- Fans

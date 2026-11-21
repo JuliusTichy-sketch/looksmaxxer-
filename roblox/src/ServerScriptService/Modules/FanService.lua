@@ -229,10 +229,21 @@ function FanService.init()
 	task.spawn(function()
 		while true do
 			task.wait(4)
+			local active = {}
+			for w = 1, #Config.Worlds do active[w] = worldHasPlayers(w) end
 			for _, fan in ipairs(fans) do
-				if fan.model.Parent and worldHasPlayers(fan.world) and rng:NextNumber() < 0.5 then
-					local target = fan.home + Vector3.new(rng:NextNumber(-35, 35), 0, rng:NextNumber(-35, 35))
-					fan.hum:MoveTo(target)
+				if fan.model.Parent then
+					if active[fan.world] then
+						-- Welt ist besucht: Fan bewegt sich
+						if fan.hrp.Anchored then fan.hrp.Anchored = false end
+						if rng:NextNumber() < 0.5 then
+							local target = fan.home + Vector3.new(rng:NextNumber(-35, 35), 0, rng:NextNumber(-35, 35))
+							fan.hum:MoveTo(target)
+						end
+					elseif not fan.hrp.Anchored then
+						-- niemand da: Fan "einfrieren" (spart Server-Leistung)
+						fan.hrp.Anchored = true
+					end
 				end
 			end
 		end

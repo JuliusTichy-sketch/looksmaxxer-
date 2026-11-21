@@ -13,6 +13,7 @@ local Logic = require(Shared:WaitForChild("Logic"))
 local Util = require(Shared:WaitForChild("Util"))
 local Remotes = require(script.Parent.Remotes)
 local DataService = require(script.Parent.DataService)
+local LookService = require(script.Parent.LookService)
 
 local GameService = {}
 GameService.characterHooks = {}   -- andere Module können sich hier für "Charakter erschienen" eintragen
@@ -167,15 +168,9 @@ function GameService.refreshCharacter(player)
 	tag.NameLabel.Text = player.DisplayName
 	tag.InfoLabel.Text = "✨ " .. Util.format(glow) .. " Glow  ·  ♻️ " .. data.rebirths
 
-	-- Breitere Schultern durch Fitness (funktioniert nur mit R15-Avataren)
-	local fit = Logic.catLevels(data.levels, "fit")
-	local width = 1 + math.min(0.45, fit / 250)
-	pcall(function()
-		local ws = hum:FindFirstChild("BodyWidthScale")
-		local ds = hum:FindFirstChild("BodyDepthScale")
-		if ws then ws.Value = width end
-		if ds then ds.Value = 1 + (width - 1) * 0.7 end
-	end)
+	-- Aussehen verändert sich mit den Upgrades (Pickel, Haare, Haltung, Schultern, Style …)
+	local ok, err = pcall(LookService.apply, player, char, data)
+	if not ok then warn("[Looksmaxxer] LookService:", err) end
 
 	-- Glitzer-Aura (stärker mit Glow, Farbe wechselt mit Rebirths)
 	local aura = hrp:FindFirstChild("GlowAura")

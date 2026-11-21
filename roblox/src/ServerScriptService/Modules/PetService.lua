@@ -15,6 +15,7 @@ local Util = require(Shared:WaitForChild("Util"))
 local Remotes = require(script.Parent.Remotes)
 local DataService = require(script.Parent.DataService)
 local GameService = require(script.Parent.GameService)
+local PetModels = require(Shared:WaitForChild("PetModels"))
 
 local PetService = {}
 local rng = Random.new()
@@ -51,38 +52,14 @@ function PetService.rebuildModels(player)
 			slot = slot + 1
 			local def = Logic.petById[pet.id]
 			if def then
-				local rarity = Config.Rarities[def.rarity]
-				local tier = Config.PetTiers[pet.tier or 1]
-				local p = Instance.new("Part")
-				p.Name = def.name
-				p.Shape = Enum.PartType.Ball
-				p.Size = Vector3.new(2, 2, 2) * (1 + (pet.tier - 1) * 0.15)
-				p.Color = tier.color or rarity.color
-				p.Material = rarity.order >= 5 and Enum.Material.Neon or Enum.Material.SmoothPlastic
-				p.Transparency = 0.15
-				p.Anchored = true
-				p.CanCollide = false
-				p.CanTouch = false
-				p.CanQuery = false
-				p.CastShadow = false
-				p:SetAttribute("Owner", player.UserId)
-				p:SetAttribute("Slot", slot)
-				p:SetAttribute("Tier", pet.tier or 1)
+				local model = PetModels.build(def, pet.tier or 1, true)
+				model:SetAttribute("Owner", player.UserId)
+				model:SetAttribute("Slot", slot)
+				model:SetAttribute("Tier", pet.tier or 1)
 				if hrp then
-					p.CFrame = hrp.CFrame * CFrame.new(slot * 2, 0, 4)
+					model:PivotTo(hrp.CFrame * CFrame.new(slot * 2, 0, 4))
 				end
-				local bb = Instance.new("BillboardGui")
-				bb.Size = UDim2.new(3.2, 0, 3.2, 0)
-				bb.LightInfluence = 0
-				bb.MaxDistance = 90
-				bb.Parent = p
-				local l = Instance.new("TextLabel")
-				l.Size = UDim2.new(1, 0, 1, 0)
-				l.BackgroundTransparency = 1
-				l.TextScaled = true
-				l.Text = def.emoji
-				l.Parent = bb
-				p.Parent = folder
+				model.Parent = folder
 			end
 		end
 	end
@@ -229,7 +206,7 @@ function PetService.hatch(player, eggIndex, count, free)
 		local rarity = Config.Rarities[def.rarity]
 		if rarity.order >= 5 then
 			data.pity = 0
-			PetService.announce(player.DisplayName .. " hat " .. (rarity.order >= 6 and "ein MYTHISCHES" or "ein legendäres") .. " Pet gezogen: " .. def.emoji .. " " .. def.name .. "!")
+			PetService.announce(player.DisplayName .. " hat ein " .. rarity.name .. "es Pet gezogen: " .. def.emoji .. " " .. def.name .. "!")
 		end
 		local pet, isNew = addPet(data, id, 1)
 		table.insert(results, { id = id, uid = pet.uid, new = isNew })

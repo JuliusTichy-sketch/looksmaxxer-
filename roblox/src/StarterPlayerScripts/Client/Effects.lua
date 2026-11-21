@@ -14,6 +14,7 @@ local Logic = require(Shared:WaitForChild("Logic"))
 local Util = require(Shared:WaitForChild("Util"))
 local UI = require(script.Parent:WaitForChild("UI"))
 local Sounds = require(script.Parent:WaitForChild("Sounds"))
+local PetView = require(script.Parent:WaitForChild("PetView"))
 
 local Effects = {}
 local gui, overlayGui, toastHolder
@@ -140,7 +141,7 @@ function Effects.hatch(results)
 		local card = UI.panel(row, { Size = UDim2.new(0, 170, 0, 220), Color = rarity.color:Lerp(Color3.new(0, 0, 0), 0.55) })
 		UI.stroke(card, rarity.color, 4, 0)
 		UI.padding(card, 8)
-		UI.text(card, def.emoji, { Size = UDim2.new(1, 0, 0.5, 0), MaxText = 90 })
+		PetView.make(card, def.id, 1, true, { Size = UDim2.new(1, 0, 0.5, 0) })
 		UI.text(card, def.name, { Size = UDim2.new(1, 0, 0.18, 0), Position = UDim2.new(0, 0, 0.52, 0), MaxText = 20 })
 		UI.text(card, rarity.name, { Size = UDim2.new(1, 0, 0.14, 0), Position = UDim2.new(0, 0, 0.7, 0), Color = rarity.color, MaxText = 18 })
 		UI.text(card, Util.formatPercent(def.boost) .. " Aura", { Size = UDim2.new(1, 0, 0.13, 0), Position = UDim2.new(0, 0, 0.85, 0),

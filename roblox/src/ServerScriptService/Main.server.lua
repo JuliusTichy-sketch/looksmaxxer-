@@ -26,7 +26,11 @@ MapBuilder.build()
 -- 2) Geschenkbox-Stände verbinden
 for _, entry in ipairs(MapBuilder.eggPrompts) do
 	entry.prompt.Triggered:Connect(function(player)
-		PetService.hatch(player, entry.egg.index, entry.count, false)
+		if entry.info then
+			Remotes.OpenMenu:FireClient(player, "egginfo", entry.egg.index)
+		else
+			PetService.hatch(player, entry.egg.index, entry.count, false)
+		end
 	end)
 end
 

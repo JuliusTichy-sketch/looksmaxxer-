@@ -1,5 +1,5 @@
 <roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
-<Item class="ReplicatedStorage" referent="RBX00000005"><Properties><string name="Name">ReplicatedStorage</string></Properties><Item class="Folder" referent="RBX00000004"><Properties><string name="Name">Shared</string></Properties><Item class="ModuleScript" referent="RBX00000001"><Properties><string name="Name">Config</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ReplicatedStorage" referent="RBX00000006"><Properties><string name="Name">ReplicatedStorage</string></Properties><Item class="Folder" referent="RBX00000005"><Properties><string name="Name">Shared</string></Properties><Item class="ModuleScript" referent="RBX00000001"><Properties><string name="Name">Config</string><ProtectedString name="Source"><![CDATA[--[[
 	==========================================================================
 	CONFIG – alle Spieldaten von Looksmaxxer 3000 (Roblox-Version)
 	Hier kannst du Preise, Texte, Welten, Pets usw. ganz einfach ändern.
@@ -175,15 +175,17 @@ Config.RebirthShop = {
 ----------------------------------------------------------------------------
 -- PETS & GESCHENKBOXEN
 ----------------------------------------------------------------------------
--- Seltenheiten: weight = Chance (relativ), mult = Stärke-Faktor
+-- Seltenheiten: weight = Grundchance, mult = Stärke-Faktor
 Config.Rarities = {
-	common    = { order = 1, name = "Gewöhnlich",   color = Color3.fromRGB(200, 200, 210), weight = 55,  mult = 1 },
-	uncommon  = { order = 2, name = "Ungewöhnlich", color = Color3.fromRGB(78, 240, 120),  weight = 27,  mult = 2 },
-	rare      = { order = 3, name = "Selten",       color = Color3.fromRGB(70, 150, 255),  weight = 12,  mult = 4 },
-	epic      = { order = 4, name = "Episch",       color = Color3.fromRGB(170, 90, 255),  weight = 5,   mult = 9 },
-	legendary = { order = 5, name = "Legendär",     color = Color3.fromRGB(255, 200, 40),  weight = 0.9, mult = 25 },
-	mythic    = { order = 6, name = "Mythisch",     color = Color3.fromRGB(255, 60, 90),   weight = 0.1, mult = 80 },
-	secret    = { order = 7, name = "GEHEIM",       color = Color3.fromRGB(255, 255, 255), weight = 0,   mult = 300 },
+	common    = { order = 1, name = "Gewöhnlich",   color = Color3.fromRGB(200, 200, 210), mult = 1 },
+	uncommon  = { order = 2, name = "Ungewöhnlich", color = Color3.fromRGB(78, 240, 120),  mult = 1.7 },
+	rare      = { order = 3, name = "Selten",       color = Color3.fromRGB(70, 150, 255),  mult = 2.8 },
+	epic      = { order = 4, name = "Episch",       color = Color3.fromRGB(170, 90, 255),  mult = 4.5 },
+	legendary = { order = 5, name = "Legendär",     color = Color3.fromRGB(255, 200, 40),  mult = 8 },
+	mythic    = { order = 6, name = "Mythisch",     color = Color3.fromRGB(255, 60, 90),   mult = 14 },
+	exotic    = { order = 7, name = "Exotisch",     color = Color3.fromRGB(0, 255, 200),   mult = 25 },
+	divine    = { order = 8, name = "Göttlich",     color = Color3.fromRGB(255, 240, 150), mult = 45 },
+	secret    = { order = 9, name = "GEHEIM",       color = Color3.fromRGB(255, 255, 255), mult = 80 },
 }
 
 -- Stufen durch Fusionieren (5 gleiche = 1 bessere)
@@ -195,83 +197,208 @@ Config.PetTiers = {
 }
 Config.FUSE_COUNT = 5
 Config.BASE_PET_SLOTS = 3
-Config.MAX_PET_INVENTORY = 60
-Config.PITY = 150                 -- spätestens nach so vielen Boxen ohne Legendär kommt eins
-Config.PET_BASE_BOOST = 0.05      -- Gewöhnliches Pet in Welt 1 = +5 % Aura
+Config.MAX_PET_INVENTORY = 75
+Config.PITY = 150                 -- spätestens nach so vielen Boxen ohne Legendär (oder besser) kommt eins
+Config.PET_BASE_BOOST = 0.03      -- Gewöhnliches Pet in Welt 1 = +3 % Aura
 Config.PET_WORLD_GROWTH = 1.5     -- jede Welt: Pets 1,5x stärker
 
--- Pets pro Welt: { Name, Emoji, Seltenheit }
+-- 5 Stationen pro Welt: je teurer, desto bessere Chancen
+-- costMult = Preis-Faktor, weights = Chancen pro Seltenheit
+Config.EggStations = {
+	{ name = "Basis-Box",    emoji = "📦", costMult = 1,    color = Color3.fromRGB(205, 127, 50),
+	  weights = { common = 55, uncommon = 27, rare = 12, epic = 5, legendary = 0.9, mythic = 0.1 } },
+	{ name = "Silber-Box",   emoji = "🥈", costMult = 6,    color = Color3.fromRGB(200, 205, 215),
+	  weights = { common = 30, uncommon = 32, rare = 22, epic = 11.5, legendary = 3.5, mythic = 0.9, exotic = 0.1 } },
+	{ name = "Gold-Box",     emoji = "🥇", costMult = 40,   color = Color3.fromRGB(255, 205, 60),
+	  weights = { common = 10, uncommon = 28, rare = 32, epic = 20, legendary = 7.5, mythic = 2, exotic = 0.45, divine = 0.05 } },
+	{ name = "Diamant-Box",  emoji = "💎", costMult = 250,  color = Color3.fromRGB(150, 240, 255),
+	  weights = { uncommon = 18, rare = 36, epic = 30, legendary = 11, mythic = 3.8, exotic = 1, divine = 0.2 } },
+	{ name = "Göttliche Box", emoji = "🌈", costMult = 1500, color = Color3.fromRGB(255, 120, 240),
+	  weights = { rare = 28, epic = 40, legendary = 20, mythic = 8, exotic = 3.2, divine = 0.8 } },
+}
+
+local C = Color3.fromRGB
+--[[ Pets pro Welt: { Name, Emoji, Seltenheit, Aussehen }
+	Aussehen (look): plan = Bauplan der 3D-Figur, c1/c2 = Farben, dazu Extras:
+	  quad    = Vierbeiner (ears = round/pointy/long/floppy/big, tail = short/long/fluffy/curl, mane, horn, horns, hump, trunk, stripes, spots, patches, mask)
+	  bird    = Vogel (style = penguin/owl/eagle/longleg/crest/peacock/swan/phoenix)
+	  sea     = Meerestier (style = fish/dolphin/shark/whale)
+	  crab, scorpion, octopus, turtle, snake, frog, dragon, moai, ghost, alien, star, planet, blob
+	  glass = durchsichtig glänzend, neon = leuchtend, gold = golden, halo = Heiligenschein, shades = Sonnenbrille
+]]
 local PET_DATA = {
 	{ -- 1 Glow City
-		{ "Gym-Hamster", "🐹", "common" }, { "Skincare-Katze", "🐱", "common" }, { "Mewing-Mops", "🐶", "uncommon" },
-		{ "Protein-Pinguin", "🐧", "rare" }, { "Sigma-Wolf", "🐺", "epic" }, { "Golden Retriever Chad", "🐕", "legendary" },
-		{ "Mini-Moai", "🗿", "mythic" },
+		{ "Gym-Hamster", "🐹", "common", { plan = "quad", c1 = C(230, 170, 100), c2 = C(255, 235, 210), ears = "round", tail = "short", size = 0.85 } },
+		{ "Skincare-Katze", "🐱", "common", { plan = "quad", c1 = C(240, 240, 240), c2 = C(255, 190, 200), ears = "pointy", tail = "long", cucumber = true } },
+		{ "Straßen-Taube", "🐦", "common", { plan = "bird", c1 = C(140, 140, 155), c2 = C(90, 95, 110) } },
+		{ "Mewing-Mops", "🐶", "uncommon", { plan = "quad", c1 = C(215, 185, 140), c2 = C(60, 50, 45), ears = "floppy", tail = "curl" } },
+		{ "Selfie-Eichhörnchen", "🐿️", "uncommon", { plan = "quad", c1 = C(190, 110, 60), c2 = C(240, 200, 160), ears = "pointy", tail = "fluffy", size = 0.9 } },
+		{ "Protein-Pinguin", "🐧", "rare", { plan = "bird", style = "penguin", c1 = C(30, 30, 35), c2 = C(250, 250, 250) } },
+		{ "Hipster-Fuchs", "🦊", "rare", { plan = "quad", c1 = C(235, 120, 40), c2 = C(255, 255, 255), ears = "pointy", tail = "fluffy", shades = true } },
+		{ "Sigma-Wolf", "🐺", "epic", { plan = "quad", c1 = C(110, 115, 130), c2 = C(220, 220, 230), ears = "pointy", tail = "long" } },
+		{ "Neon-Katze", "😺", "epic", { plan = "quad", c1 = C(255, 79, 216), c2 = C(62, 242, 255), ears = "pointy", tail = "long", neon = true } },
+		{ "Golden Retriever Chad", "🐕", "legendary", { plan = "quad", c1 = C(230, 180, 80), c2 = C(250, 230, 170), ears = "floppy", tail = "long", shades = true, size = 1.1 } },
+		{ "Mini-Moai", "🗿", "mythic", { plan = "moai", c1 = C(130, 125, 120), c2 = C(100, 95, 90) } },
+		{ "Kristall-Drache", "🐉", "exotic", { plan = "dragon", c1 = C(120, 220, 255), c2 = C(255, 255, 255), glass = true } },
+		{ "Glow-Gott-Löwe", "🦁", "divine", { plan = "quad", c1 = C(255, 215, 90), c2 = C(255, 150, 40), ears = "round", tail = "long", mane = true, neon = true, halo = true, size = 1.15 } },
 	},
 	{ -- 2 Miami Beach
-		{ "Pinch-Krabbe", "🦀", "common" }, { "Strand-Möwe", "🐦", "common" }, { "Flex-Delfin", "🐬", "uncommon" },
-		{ "Glow-Mingo", "🦩", "rare" }, { "Jaw-Hai", "🦈", "epic" }, { "Bronze-Schildkröte", "🐢", "legendary" },
-		{ "Sonnengott-Krake", "🐙", "mythic" },
+		{ "Pinch-Krabbe", "🦀", "common", { plan = "crab", c1 = C(230, 70, 50), c2 = C(255, 200, 180) } },
+		{ "Strand-Möwe", "🐦", "common", { plan = "bird", c1 = C(250, 250, 250), c2 = C(150, 155, 165) } },
+		{ "Sand-Schildkröte", "🐢", "common", { plan = "turtle", c1 = C(120, 170, 90), c2 = C(160, 120, 70) } },
+		{ "Flex-Delfin", "🐬", "uncommon", { plan = "sea", style = "dolphin", c1 = C(120, 170, 220), c2 = C(230, 240, 250) } },
+		{ "Kokos-Affe", "🐒", "uncommon", { plan = "quad", c1 = C(130, 90, 60), c2 = C(230, 190, 150), ears = "round", tail = "long" } },
+		{ "Glow-Mingo", "🦩", "rare", { plan = "bird", style = "longleg", c1 = C(255, 130, 170), c2 = C(255, 200, 220) } },
+		{ "Seestern Sam", "⭐", "rare", { plan = "star", c1 = C(255, 150, 80), c2 = C(255, 220, 150) } },
+		{ "Jaw-Hai", "🦈", "epic", { plan = "sea", style = "shark", c1 = C(120, 130, 150), c2 = C(240, 240, 245) } },
+		{ "Papagei Pablo", "🦜", "epic", { plan = "bird", style = "crest", c1 = C(230, 40, 40), c2 = C(40, 120, 255) } },
+		{ "Bronze-Schildkröte", "🐢", "legendary", { plan = "turtle", c1 = C(205, 127, 50), c2 = C(140, 90, 40), gold = true } },
+		{ "Sonnengott-Krake", "🐙", "mythic", { plan = "octopus", c1 = C(255, 120, 60), c2 = C(255, 200, 120) } },
+		{ "Regenbogen-Wal", "🐋", "exotic", { plan = "sea", style = "whale", c1 = C(90, 140, 255), c2 = C(220, 240, 255), glass = true } },
+		{ "Poseidons Delfin", "🔱", "divine", { plan = "sea", style = "dolphin", c1 = C(255, 220, 100), c2 = C(255, 255, 255), neon = true, halo = true } },
 	},
 	{ -- 3 Iron Mountain
-		{ "Hantel-Hase", "🐰", "common" }, { "Bergziege", "🐐", "common" }, { "Eiweiß-Eule", "🦉", "uncommon" },
-		{ "Eisbär-Bro", "🐻", "rare" }, { "Titan-Gorilla", "🦍", "epic" }, { "Gains-Drache", "🐉", "legendary" },
-		{ "Ur-Mammut", "🐘", "mythic" },
+		{ "Hantel-Hase", "🐰", "common", { plan = "quad", c1 = C(240, 240, 240), c2 = C(255, 190, 200), ears = "long", tail = "short", size = 0.85 } },
+		{ "Bergziege", "🐐", "common", { plan = "quad", c1 = C(220, 210, 190), c2 = C(120, 100, 80), ears = "floppy", tail = "short", horns = true } },
+		{ "Murmeltier", "🦫", "common", { plan = "quad", c1 = C(150, 110, 70), c2 = C(210, 180, 140), ears = "round", tail = "short", size = 0.9 } },
+		{ "Eiweiß-Eule", "🦉", "uncommon", { plan = "bird", style = "owl", c1 = C(140, 100, 70), c2 = C(240, 220, 190) } },
+		{ "Schnee-Fuchs", "🦊", "uncommon", { plan = "quad", c1 = C(245, 245, 255), c2 = C(200, 210, 230), ears = "pointy", tail = "fluffy" } },
+		{ "Eisbär-Bro", "🐻", "rare", { plan = "quad", c1 = C(245, 245, 250), c2 = C(40, 40, 45), ears = "round", tail = "short", size = 1.15 } },
+		{ "Adler Arnold", "🦅", "rare", { plan = "bird", style = "eagle", c1 = C(100, 70, 40), c2 = C(255, 255, 255) } },
+		{ "Titan-Gorilla", "🦍", "epic", { plan = "quad", c1 = C(55, 55, 60), c2 = C(120, 110, 105), ears = "round", tail = "none", size = 1.25 } },
+		{ "Yeti-Baby", "❄️", "epic", { plan = "quad", c1 = C(230, 235, 255), c2 = C(150, 180, 230), ears = "round", tail = "fluffy", mane = true } },
+		{ "Gains-Drache", "🐉", "legendary", { plan = "dragon", c1 = C(60, 160, 80), c2 = C(255, 220, 80) } },
+		{ "Ur-Mammut", "🦣", "mythic", { plan = "quad", c1 = C(130, 90, 60), c2 = C(245, 240, 225), ears = "big", tail = "short", trunk = true, size = 1.3 } },
+		{ "Lawinen-Wolf", "🐺", "exotic", { plan = "quad", c1 = C(200, 230, 255), c2 = C(255, 255, 255), ears = "pointy", tail = "long", glass = true } },
+		{ "Berg-Gott-Adler", "🦅", "divine", { plan = "bird", style = "eagle", c1 = C(255, 210, 80), c2 = C(255, 255, 255), neon = true, halo = true } },
 	},
 	{ -- 4 Mewing-Tempel
-		{ "Meditations-Frosch", "🐸", "common" }, { "Tempel-Affe", "🐒", "common" }, { "Jade-Schlange", "🐍", "uncommon" },
-		{ "Zen-Kranich", "🦢", "rare" }, { "Mönch-Panda", "🐼", "epic" }, { "Kiefer-Tiger", "🐯", "legendary" },
-		{ "Ur-Moai-Geist", "👻", "mythic" },
+		{ "Meditations-Frosch", "🐸", "common", { plan = "frog", c1 = C(100, 200, 80), c2 = C(220, 240, 170) } },
+		{ "Tempel-Affe", "🐒", "common", { plan = "quad", c1 = C(160, 110, 70), c2 = C(240, 200, 170), ears = "round", tail = "long" } },
+		{ "Koi-Fisch", "🐟", "common", { plan = "sea", style = "fish", c1 = C(255, 140, 60), c2 = C(255, 255, 255) } },
+		{ "Jade-Schlange", "🐍", "uncommon", { plan = "snake", c1 = C(60, 180, 120), c2 = C(220, 240, 180) } },
+		{ "Glücks-Katze", "😸", "uncommon", { plan = "quad", c1 = C(255, 250, 240), c2 = C(220, 40, 40), ears = "pointy", tail = "short" } },
+		{ "Zen-Kranich", "🦢", "rare", { plan = "bird", style = "longleg", c1 = C(250, 250, 250), c2 = C(30, 30, 30) } },
+		{ "Tempel-Löwe", "🦁", "rare", { plan = "quad", c1 = C(210, 170, 60), c2 = C(170, 60, 40), ears = "round", tail = "long", mane = true } },
+		{ "Mönch-Panda", "🐼", "epic", { plan = "quad", c1 = C(250, 250, 250), c2 = C(25, 25, 25), ears = "round", tail = "short", patches = true, size = 1.15 } },
+		{ "Kirschblüten-Hirsch", "🦌", "epic", { plan = "quad", c1 = C(170, 110, 70), c2 = C(255, 180, 210), ears = "pointy", tail = "short", horns = true } },
+		{ "Kiefer-Tiger", "🐯", "legendary", { plan = "quad", c1 = C(240, 140, 40), c2 = C(30, 25, 20), ears = "round", tail = "long", stripes = true, size = 1.1 } },
+		{ "Ur-Moai-Geist", "👻", "mythic", { plan = "ghost", c1 = C(200, 230, 255), c2 = C(120, 160, 255) } },
+		{ "Jade-Drache", "🐲", "exotic", { plan = "dragon", c1 = C(60, 200, 140), c2 = C(220, 255, 230), glass = true } },
+		{ "Erleuchteter Moai", "🗿", "divine", { plan = "moai", c1 = C(255, 215, 90), c2 = C(255, 255, 200), neon = true, halo = true } },
 	},
 	{ -- 5 Mailand
-		{ "Laufsteg-Pudel", "🐩", "common" }, { "Designer-Maus", "🐭", "common" }, { "Pfau Paolo", "🦚", "uncommon" },
-		{ "Drip-Zebra", "🦓", "rare" }, { "Fashion-Fuchs", "🦊", "epic" }, { "Couture-Schwan", "🦢", "legendary" },
-		{ "Il-Drippo-Einhorn", "🦄", "mythic" },
+		{ "Laufsteg-Pudel", "🐩", "common", { plan = "quad", c1 = C(250, 250, 250), c2 = C(255, 190, 220), ears = "floppy", tail = "fluffy", mane = true } },
+		{ "Designer-Maus", "🐭", "common", { plan = "quad", c1 = C(180, 180, 190), c2 = C(255, 190, 200), ears = "big", tail = "long", size = 0.8 } },
+		{ "Tauben-Model", "🐦", "common", { plan = "bird", c1 = C(170, 170, 190), c2 = C(120, 200, 180) } },
+		{ "Pfau Paolo", "🦚", "uncommon", { plan = "bird", style = "peacock", c1 = C(40, 120, 200), c2 = C(40, 200, 120) } },
+		{ "Seiden-Raupe", "🐛", "uncommon", { plan = "snake", c1 = C(250, 230, 240), c2 = C(255, 150, 200) } },
+		{ "Drip-Zebra", "🦓", "rare", { plan = "quad", c1 = C(250, 250, 250), c2 = C(20, 20, 20), ears = "pointy", tail = "long", stripes = true, mane = true } },
+		{ "Flamingo Fiorella", "🦩", "rare", { plan = "bird", style = "longleg", c1 = C(255, 140, 190), c2 = C(255, 220, 235), shades = true } },
+		{ "Fashion-Fuchs", "🦊", "epic", { plan = "quad", c1 = C(220, 80, 140), c2 = C(255, 255, 255), ears = "pointy", tail = "fluffy", shades = true } },
+		{ "Couture-Chamäleon", "🦎", "epic", { plan = "frog", c1 = C(120, 220, 180), c2 = C(255, 120, 200) } },
+		{ "Couture-Schwan", "🦢", "legendary", { plan = "bird", style = "swan", c1 = C(250, 250, 250), c2 = C(255, 180, 0) } },
+		{ "Il-Drippo-Einhorn", "🦄", "mythic", { plan = "quad", c1 = C(255, 230, 250), c2 = C(200, 120, 255), ears = "pointy", tail = "long", mane = true, horn = true } },
+		{ "Diamant-Pfau", "💎", "exotic", { plan = "bird", style = "peacock", c1 = C(180, 240, 255), c2 = C(255, 255, 255), glass = true } },
+		{ "Vogue-Phönix", "🔥", "divine", { plan = "bird", style = "phoenix", c1 = C(255, 120, 200), c2 = C(255, 220, 120), neon = true, halo = true } },
 	},
 	{ -- 6 Hollywood
-		{ "Paparazzi-Papagei", "🦜", "common" }, { "Popcorn-Waschbär", "🦝", "common" }, { "Oscar-Otter", "🦦", "uncommon" },
-		{ "Stunt-Känguru", "🦘", "rare" }, { "Red-Carpet-Löwe", "🦁", "epic" }, { "Blockbuster-Bär", "🐻", "legendary" },
-		{ "Walk-of-Fame-Phönix", "🔥", "mythic" },
+		{ "Paparazzi-Papagei", "🦜", "common", { plan = "bird", style = "crest", c1 = C(60, 200, 90), c2 = C(255, 220, 60) } },
+		{ "Popcorn-Waschbär", "🦝", "common", { plan = "quad", c1 = C(130, 130, 140), c2 = C(40, 40, 45), ears = "round", tail = "fluffy", mask = true } },
+		{ "Stunt-Frosch", "🐸", "common", { plan = "frog", c1 = C(60, 140, 60), c2 = C(255, 200, 60) } },
+		{ "Oscar-Otter", "🦦", "uncommon", { plan = "quad", c1 = C(120, 85, 60), c2 = C(220, 190, 160), ears = "round", tail = "long" } },
+		{ "Kamera-Krabbe", "📷", "uncommon", { plan = "crab", c1 = C(40, 40, 45), c2 = C(200, 200, 210) } },
+		{ "Stunt-Känguru", "🦘", "rare", { plan = "quad", c1 = C(200, 140, 90), c2 = C(240, 210, 180), ears = "long", tail = "long" } },
+		{ "Starlet-Katze", "🐈", "rare", { plan = "quad", c1 = C(255, 220, 240), c2 = C(255, 120, 180), ears = "pointy", tail = "long", shades = true } },
+		{ "Red-Carpet-Löwe", "🦁", "epic", { plan = "quad", c1 = C(220, 170, 80), c2 = C(150, 70, 40), ears = "round", tail = "long", mane = true, size = 1.15 } },
+		{ "Spotlight-Eule", "🦉", "epic", { plan = "bird", style = "owl", c1 = C(255, 240, 150), c2 = C(255, 255, 230), neon = true } },
+		{ "Blockbuster-Bär", "🐻", "legendary", { plan = "quad", c1 = C(120, 80, 50), c2 = C(200, 160, 120), ears = "round", tail = "short", shades = true, size = 1.25 } },
+		{ "Walk-of-Fame-Phönix", "🔥", "mythic", { plan = "bird", style = "phoenix", c1 = C(255, 120, 40), c2 = C(255, 220, 80) } },
+		{ "Oscar-Statuen-Hund", "🏆", "exotic", { plan = "quad", c1 = C(255, 205, 60), c2 = C(255, 240, 180), ears = "floppy", tail = "long", gold = true } },
+		{ "Hollywood-Drache", "🐉", "divine", { plan = "dragon", c1 = C(255, 60, 60), c2 = C(255, 220, 120), neon = true, halo = true } },
 	},
 	{ -- 7 Dubai
-		{ "Gold-Kamel", "🐫", "common" }, { "Wüsten-Skorpion", "🦂", "common" }, { "Falke Faisal", "🦅", "uncommon" },
-		{ "Luxus-Leopard", "🐆", "rare" }, { "Yacht-Wal", "🐋", "epic" }, { "Diamant-Drache", "🐲", "legendary" },
-		{ "Scheich-Phönix", "✨", "mythic" },
+		{ "Gold-Kamel", "🐫", "common", { plan = "quad", c1 = C(210, 170, 110), c2 = C(240, 210, 160), ears = "round", tail = "short", hump = true } },
+		{ "Wüsten-Skorpion", "🦂", "common", { plan = "scorpion", c1 = C(200, 160, 90), c2 = C(120, 90, 50) } },
+		{ "Fennek", "🦊", "common", { plan = "quad", c1 = C(240, 200, 150), c2 = C(255, 240, 220), ears = "big", tail = "fluffy", size = 0.85 } },
+		{ "Falke Faisal", "🦅", "uncommon", { plan = "bird", style = "eagle", c1 = C(150, 110, 70), c2 = C(240, 230, 210) } },
+		{ "Oryx", "🦌", "uncommon", { plan = "quad", c1 = C(240, 235, 225), c2 = C(40, 35, 30), ears = "pointy", tail = "short", horns = true } },
+		{ "Luxus-Leopard", "🐆", "rare", { plan = "quad", c1 = C(230, 190, 110), c2 = C(50, 35, 20), ears = "round", tail = "long", spots = true } },
+		{ "Perlen-Blob", "🦪", "rare", { plan = "blob", c1 = C(240, 240, 255), c2 = C(255, 220, 240) } },
+		{ "Yacht-Wal", "🐋", "epic", { plan = "sea", style = "whale", c1 = C(60, 90, 160), c2 = C(220, 230, 245) } },
+		{ "Gold-Gepard", "🐆", "epic", { plan = "quad", c1 = C(255, 210, 80), c2 = C(80, 50, 20), ears = "round", tail = "long", spots = true, gold = true } },
+		{ "Diamant-Drache", "🐲", "legendary", { plan = "dragon", c1 = C(180, 230, 255), c2 = C(255, 255, 255), glass = true } },
+		{ "Scheich-Phönix", "✨", "mythic", { plan = "bird", style = "phoenix", c1 = C(255, 205, 60), c2 = C(255, 255, 255), gold = true } },
+		{ "Platin-Kamel", "🐪", "exotic", { plan = "quad", c1 = C(230, 230, 240), c2 = C(255, 255, 255), ears = "round", tail = "short", hump = true, gold = true } },
+		{ "Sultan-Löwe", "👑", "divine", { plan = "quad", c1 = C(255, 215, 90), c2 = C(255, 255, 255), ears = "round", tail = "long", mane = true, neon = true, halo = true, size = 1.2 } },
 	},
 	{ -- 8 Aura-Galaxie
-		{ "Mond-Hamster", "🌙", "common" }, { "Sternen-Katze", "⭐", "common" }, { "Komet-Hund", "💫", "uncommon" },
-		{ "Alien-Bro", "👽", "rare" }, { "Nebula-Wal", "🌌", "epic" }, { "Schwarzes-Loch-Mops", "⚫", "legendary" },
-		{ "Aura-Gott", "🌈", "mythic" },
+		{ "Mond-Hamster", "🌙", "common", { plan = "quad", c1 = C(220, 220, 240), c2 = C(180, 180, 210), ears = "round", tail = "short", size = 0.85 } },
+		{ "Sternen-Katze", "⭐", "common", { plan = "quad", c1 = C(60, 60, 120), c2 = C(255, 240, 150), ears = "pointy", tail = "long", spots = true } },
+		{ "Asteroiden-Blob", "☄️", "common", { plan = "blob", c1 = C(120, 110, 100), c2 = C(255, 150, 80) } },
+		{ "Komet-Hund", "💫", "uncommon", { plan = "quad", c1 = C(120, 200, 255), c2 = C(255, 255, 255), ears = "floppy", tail = "long", neon = true } },
+		{ "Saturn-Schildkröte", "🪐", "uncommon", { plan = "turtle", c1 = C(220, 190, 120), c2 = C(160, 120, 255) } },
+		{ "Alien-Bro", "👽", "rare", { plan = "alien", c1 = C(120, 255, 120), c2 = C(20, 20, 20) } },
+		{ "UFO-Katze", "🛸", "rare", { plan = "quad", c1 = C(150, 150, 170), c2 = C(120, 255, 200), ears = "pointy", tail = "long", halo = true } },
+		{ "Nebula-Wal", "🌌", "epic", { plan = "sea", style = "whale", c1 = C(160, 90, 255), c2 = C(255, 150, 230), neon = true } },
+		{ "Planet-Blob", "🌍", "epic", { plan = "planet", c1 = C(90, 200, 255), c2 = C(120, 230, 120) } },
+		{ "Schwarzes-Loch-Mops", "⚫", "legendary", { plan = "quad", c1 = C(25, 20, 35), c2 = C(160, 90, 255), ears = "floppy", tail = "curl", halo = true } },
+		{ "Aura-Gott", "🌈", "mythic", { plan = "star", c1 = C(255, 120, 240), c2 = C(120, 240, 255), neon = true } },
+		{ "Galaxie-Drache", "🐉", "exotic", { plan = "dragon", c1 = C(120, 60, 255), c2 = C(255, 150, 255), neon = true } },
+		{ "Kosmischer Löwe", "🦁", "divine", { plan = "quad", c1 = C(255, 255, 255), c2 = C(200, 160, 255), ears = "round", tail = "long", mane = true, neon = true, halo = true, size = 1.25 } },
 	},
 }
 
-local EGG_NAMES = { "Glow-City-Box", "Strand-Box", "Gym-Box", "Tempel-Box", "Couture-Box", "Blockbuster-Box", "Gold-Box", "Galaxie-Box" }
-local EGG_COSTS = { 150, 2500, 1.5e6, 1.5e8, 1e10, 3e11, 1e13, 1.5e14 }
+local WORLD_BOX_NAMES = { "Glow City", "Strand", "Gym", "Tempel", "Couture", "Blockbuster", "Gold", "Galaxie" }
+local EGG_COSTS = { 150, 2500, 1.5e6, 1.5e8, 1e10, 3e11, 1e13, 1.5e14 }   -- Preis der Basis-Box je Welt
 
 -- Pets und Boxen werden hier automatisch aus den Listen oben erzeugt
 Config.Pets = {}
 Config.Eggs = {}
+local petsOfWorld = {}
 for w, list in ipairs(PET_DATA) do
-	local egg = { index = w, world = w, name = EGG_NAMES[w], cost = EGG_COSTS[w], pets = {} }
-	local counts = {}
-	for _, p in ipairs(list) do
-		counts[p[3]] = (counts[p[3]] or 0) + 1
-	end
+	petsOfWorld[w] = {}
 	local base = Config.PET_BASE_BOOST * Config.PET_WORLD_GROWTH ^ (w - 1)
 	for i, p in ipairs(list) do
 		local rarity = Config.Rarities[p[3]]
-		local pet = {
-			id = "w" .. w .. "_" .. i, name = p[1], emoji = p[2], rarity = p[3], world = w,
-			boost = base * rarity.mult,
-		}
+		local pet = { id = "w" .. w .. "_" .. i, name = p[1], emoji = p[2], rarity = p[3], world = w, look = p[4], boost = base * rarity.mult }
 		table.insert(Config.Pets, pet)
-		table.insert(egg.pets, { id = pet.id, weight = rarity.weight / counts[p[3]] })
+		table.insert(petsOfWorld[w], pet)
 	end
-	table.insert(Config.Eggs, egg)
 end
+for w = 1, #PET_DATA do
+	for s, station in ipairs(Config.EggStations) do
+		local counts = {}
+		for _, pet in ipairs(petsOfWorld[w]) do
+			if station.weights[pet.rarity] then
+				counts[pet.rarity] = (counts[pet.rarity] or 0) + 1
+			end
+		end
+		local egg = {
+			index = (w - 1) * #Config.EggStations + s, world = w, station = s,
+			name = WORLD_BOX_NAMES[w] .. " · " .. station.name, emoji = station.emoji,
+			cost = EGG_COSTS[w] * station.costMult, pets = {},
+		}
+		for _, pet in ipairs(petsOfWorld[w]) do
+			local wgt = station.weights[pet.rarity]
+			if wgt then
+				table.insert(egg.pets, { id = pet.id, weight = wgt / counts[pet.rarity] })
+			end
+		end
+		table.insert(Config.Eggs, egg)
+	end
+end
+
+-- Box-Nummer aus Welt & Station
+function Config.eggIndex(world, station)
+	return (world - 1) * #Config.EggStations + (station or 1)
+end
+
 -- Das geheime Pet gibt es nur, wenn man Endboss Leon besiegt
 Config.SECRET_PET = "secret_goldfisch"
 table.insert(Config.Pets, {
 	id = Config.SECRET_PET, name = "Leons Goldfisch", emoji = "🐠", rarity = "secret", world = 8,
+	look = { plan = "sea", style = "fish", c1 = C(255, 200, 40), c2 = C(255, 255, 255), gold = true, halo = true },
 	boost = Config.PET_BASE_BOOST * Config.PET_WORLD_GROWTH ^ 7 * Config.Rarities.secret.mult,
 })
 Config.SECRET_CHANCE = 0.05   -- 5 % Chance bei einem Sieg gegen Leon
@@ -300,6 +427,13 @@ Config.Bosses = {
 	{ name = "Scheich Glowmed",      level = 50, rebirths = 16, shirt = Color3.fromRGB(255, 255, 255), pants = Color3.fromRGB(255, 255, 255), skin = Color3.fromRGB(198, 134, 66), scale = 1.35 },
 	{ name = "LEON",                 level = 50, rebirths = 20, shirt = Color3.fromRGB(201, 162, 39), pants = Color3.fromRGB(201, 162, 39), skin = Color3.fromRGB(241, 194, 125), scale = 1.6, final = true },
 }
+-- Zusätzliche (schwächere) Rivalen pro Welt: Stärke = Anteil vom Haupt-Rivalen
+Config.ExtraRivals = {
+	{ prefix = "Azubi", strength = 0.55 },
+	{ prefix = "Möchtegern", strength = 0.75 },
+}
+Config.RivalNames = { "Kevin", "Justin", "Marco", "Tobi", "Can", "Malte", "Ole", "Nico", "Dario", "Yannis", "Jannik", "Luis",
+	"Elias", "Mehmet", "Finn", "Leandro" }
 Config.RIVAL_COOLDOWN = 30   -- Sekunden
 Config.BOSS_COOLDOWN = 120
 Config.PVP_COOLDOWN = 20
@@ -362,7 +496,7 @@ Config.Codes = {
 -- z. B. "rbxassetid://123456789". Leer = kein Sound.
 ----------------------------------------------------------------------------
 Config.Sounds = {
-	Click       = "rbxasset://sounds/electronicpingshort.wav",
+	Click       = "",   -- (absichtlich leer: kein Sound bei der Daily Routine)
 	Buy         = "",   -- Suchbegriff: "cash register" / "ka-ching"
 	TitleUp     = "",   -- "phonk cowbell" / "level up"
 	BattleStart = "",   -- "vine boom" / "bass boom"
@@ -416,7 +550,7 @@ Config.Achievements = {
 	{ id = "jobs",     stat = "jobs",      emoji = "💼", name = "Arbeitstier",     text = "erledigte Jobs",        tiers = { 5, 50, 250, 1000 } },
 	{ id = "trades",   stat = "trades",    emoji = "🤝", name = "Händler",         text = "abgeschlossene Handel", tiers = { 1, 10, 50, 200 } },
 	{ id = "worlds",   stat = "worlds",    emoji = "🌍", name = "Weltenbummler",   text = "freigeschaltete Welten", tiers = { 2, 4, 6, 8 } },
-	{ id = "index",    stat = "index",     emoji = "📖", name = "Sammler",         text = "Pets im Sammelbuch",    tiers = { 10, 25, 40, 57 } },
+	{ id = "index",    stat = "index",     emoji = "📖", name = "Sammler",         text = "Pets im Sammelbuch",    tiers = { 10, 30, 60, 105 } },
 }
 
 ----------------------------------------------------------------------------
@@ -436,7 +570,7 @@ Config.Jobs = {
 ----------------------------------------------------------------------------
 -- ⭐ FANS IN DEN WELTEN
 ----------------------------------------------------------------------------
-Config.FANS_PER_WORLD = 6
+Config.FANS_PER_WORLD = 18
 Config.FAN_FAIL_COOLDOWN = 45      -- nach einem Fehlversuch (Sekunden)
 Config.FAN_REPEAT = 300            -- derselbe Fan erst nach 5 Minuten wieder
 -- Grund-Charisma, das Fans in Welt 1–8 erwarten (Promi 5 ≈ x1,2 · Promi 10 = x2)
@@ -819,7 +953,529 @@ end
 
 return Logic
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000003"><Properties><string name="Name">Util</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000003"><Properties><string name="Name">PetModels</string><ProtectedString name="Source"><![CDATA[--[[
+	PETMODELS – baut aus der Beschreibung eines Pets (Config.Pets[..].look)
+	eine echte 3D-Figur aus Teilen: Körper, Kopf, Augen, Ohren, Beine, Schwanz, Flügel …
+	Wird vom Server (Pets in der Welt) UND vom Client (3D-Vorschau in Menüs) benutzt.
+
+	Die Figur schaut nach vorne (-Z). Der unsichtbare Teil "Root" ist die Mitte.
+]]
+
+local Config = require(script.Parent:WaitForChild("Config"))
+
+local PetModels = {}
+local PET_SCALE = 1.1
+local BLACK = Color3.fromRGB(25, 25, 30)
+local WHITE = Color3.new(1, 1, 1)
+local ORANGE = Color3.fromRGB(255, 170, 40)
+local GOLD = Color3.fromRGB(255, 205, 60)
+
+local function cf(x, y, z, rx, ry, rz)
+	return CFrame.new(x, y, z) * CFrame.Angles(math.rad(rx or 0), math.rad(ry or 0), math.rad(rz or 0))
+end
+
+----------------------------------------------------------------------------
+-- Bauteil erstellen
+-- shape: "ball" (Ellipsoid), "block", "cyl" (Zylinder liegend entlang X), "wedge"
+----------------------------------------------------------------------------
+local function piece(ctx, size, cframe, color, shape, opts)
+	opts = opts or {}
+	local p = Instance.new(shape == "wedge" and "WedgePart" or "Part")
+	p.Anchored = true
+	p.CanCollide = false
+	p.CanQuery = false
+	p.CanTouch = false
+	p.CastShadow = false
+	p.TopSurface = Enum.SurfaceType.Smooth
+	p.BottomSurface = Enum.SurfaceType.Smooth
+	p.Size = size
+	p.CFrame = cframe
+	p.Color = color
+	p.Material = Enum.Material.SmoothPlastic
+	if shape == "ball" then
+		local m = Instance.new("SpecialMesh")
+		m.MeshType = Enum.MeshType.Sphere
+		m.Parent = p
+	elseif shape == "cyl" then
+		p.Shape = Enum.PartType.Cylinder
+	end
+	-- Hauptfarbe: bekommt die Effekte (Glas, Neon, Gold, Fusions-Stufen)
+	if opts.main then
+		p:SetAttribute("Main", true)
+		if ctx.look.glass then
+			p.Material = Enum.Material.Glass
+			p.Transparency = 0.25
+			p.Reflectance = 0.2
+		elseif ctx.look.gold then
+			p.Material = Enum.Material.Foil
+			p.Reflectance = 0.25
+		end
+	end
+	if opts.accent and ctx.look.neon then
+		p.Material = Enum.Material.Neon
+	end
+	if opts.neon then p.Material = Enum.Material.Neon end
+	if opts.transparency then p.Transparency = opts.transparency end
+	p.Parent = ctx.model
+	return p
+end
+
+local function ball(ctx, sx, sy, sz, x, y, z, color, opts, rx, ry, rz)
+	return piece(ctx, Vector3.new(sx, sy, sz), cf(x, y, z, rx, ry, rz), color, "ball", opts)
+end
+
+local function block(ctx, sx, sy, sz, x, y, z, color, opts, rx, ry, rz)
+	return piece(ctx, Vector3.new(sx, sy, sz), cf(x, y, z, rx, ry, rz), color, "block", opts)
+end
+
+-- zwei Augen mit Glanzpunkt
+local function eyes(ctx, x, y, z, size, sideways)
+	size = size or 0.2
+	for _, s in ipairs({ -1, 1 }) do
+		if sideways then
+			ball(ctx, size * 0.6, size, size, s * x, y, z, BLACK)
+			ball(ctx, size * 0.3, size * 0.35, size * 0.35, s * (x + 0.02), y + size * 0.2, z - size * 0.15, WHITE)
+		else
+			ball(ctx, size, size, size * 0.6, s * x, y, z, BLACK)
+			ball(ctx, size * 0.35, size * 0.35, size * 0.3, s * x + size * 0.15, y + size * 0.2, z - size * 0.25, WHITE)
+		end
+	end
+end
+
+-- Heiligenschein aus leuchtenden Kugeln
+local function halo(ctx, y)
+	for i = 0, 9 do
+		local a = i / 10 * math.pi * 2
+		ball(ctx, 0.12, 0.12, 0.12, math.cos(a) * 0.45, y, math.sin(a) * 0.45 - 0.3, GOLD, { neon = true })
+	end
+end
+
+local function shades(ctx, y, z)
+	block(ctx, 0.78, 0.18, 0.06, 0, y, z, BLACK)
+	block(ctx, 0.3, 0.16, 0.04, -0.2, y - 0.03, z - 0.02, Color3.fromRGB(40, 40, 60))
+	block(ctx, 0.3, 0.16, 0.04, 0.2, y - 0.03, z - 0.02, Color3.fromRGB(40, 40, 60))
+end
+
+----------------------------------------------------------------------------
+-- Baupläne
+----------------------------------------------------------------------------
+local PLANS = {}
+
+-- Vierbeiner (Katze, Hund, Hamster, Löwe, Bär, Fuchs, Elefant …)
+PLANS.quad = function(ctx, L)
+	local c1, c2 = L.c1, L.c2
+	ball(ctx, 1.4, 1.1, 1.8, 0, 0, 0.1, c1, { main = true })
+	ball(ctx, 0.9, 0.8, 0.5, 0, -0.05, -0.7, c2, { accent = true })
+	if L.hump then ball(ctx, 0.9, 0.7, 0.9, 0, 0.6, 0.25, c1, { main = true }) end
+	-- Kopf
+	local hy, hz = 0.6, -0.95
+	if L.mane then ball(ctx, 1.55, 1.5, 0.9, 0, hy, hz + 0.3, c2, { accent = true }) end
+	ball(ctx, 1.1, 1.0, 1.0, 0, hy, hz, c1, { main = true })
+	ball(ctx, 0.55, 0.4, 0.4, 0, hy - 0.17, hz - 0.45, c2, { accent = true })
+	ball(ctx, 0.16, 0.12, 0.1, 0, hy - 0.08, hz - 0.65, BLACK)
+	eyes(ctx, 0.24, hy + 0.1, hz - 0.42, 0.2)
+	if L.patches then
+		for _, s in ipairs({ -1, 1 }) do ball(ctx, 0.3, 0.36, 0.1, s * 0.24, hy + 0.08, hz - 0.4, c2, nil, 0, 0, s * 20) end
+		eyes(ctx, 0.24, hy + 0.1, hz - 0.44, 0.16)
+	end
+	if L.mask then block(ctx, 0.85, 0.22, 0.1, 0, hy + 0.1, hz - 0.43, c2) eyes(ctx, 0.24, hy + 0.1, hz - 0.46, 0.17) end
+	if L.cucumber then
+		for _, s in ipairs({ -1, 1 }) do ball(ctx, 0.3, 0.3, 0.06, s * 0.24, hy + 0.1, hz - 0.49, Color3.fromRGB(120, 200, 90)) end
+	end
+	if L.shades then shades(ctx, hy + 0.12, hz - 0.5) end
+	-- Ohren
+	local ears = L.ears or "round"
+	for _, s in ipairs({ -1, 1 }) do
+		if ears == "round" then
+			ball(ctx, 0.36, 0.36, 0.15, s * 0.36, hy + 0.45, hz + 0.05, c1, { main = true })
+		elseif ears == "pointy" then
+			ball(ctx, 0.26, 0.55, 0.18, s * 0.3, hy + 0.55, hz + 0.05, c1, { main = true }, 0, 0, -s * 18)
+		elseif ears == "long" then
+			ball(ctx, 0.24, 0.95, 0.16, s * 0.2, hy + 0.85, hz + 0.1, c1, { main = true }, 0, 0, -s * 8)
+		elseif ears == "floppy" then
+			ball(ctx, 0.26, 0.6, 0.15, s * 0.56, hy - 0.02, hz + 0.05, c2, { accent = true }, 0, 0, s * 20)
+		elseif ears == "big" then
+			ball(ctx, 0.65, 0.65, 0.12, s * 0.55, hy + 0.4, hz + 0.05, c1, { main = true })
+			ball(ctx, 0.45, 0.45, 0.08, s * 0.55, hy + 0.4, hz - 0.01, c2, { accent = true })
+		end
+	end
+	if L.horn then ball(ctx, 0.14, 0.7, 0.14, 0, hy + 0.65, hz - 0.25, GOLD, { neon = true }, -15, 0, 0) end
+	if L.horns then
+		for _, s in ipairs({ -1, 1 }) do ball(ctx, 0.12, 0.6, 0.12, s * 0.25, hy + 0.6, hz + 0.05, Color3.fromRGB(230, 220, 200), nil, -20, 0, -s * 25) end
+	end
+	if L.trunk then
+		ball(ctx, 0.28, 0.9, 0.28, 0, hy - 0.5, hz - 0.55, c1, { main = true }, 25, 0, 0)
+		for _, s in ipairs({ -1, 1 }) do ball(ctx, 0.12, 0.5, 0.12, s * 0.25, hy - 0.45, hz - 0.45, WHITE, nil, 40, 0, 0) end
+	end
+	-- Muster
+	if L.stripes then
+		for _, z in ipairs({ -0.35, 0.15, 0.65 }) do ball(ctx, 1.44, 0.18, 0.2, 0, 0.15, z, c2, nil, 0, 0, 0) end
+	end
+	if L.spots then
+		local spots = { { 0.4, 0.35, -0.2 }, { -0.35, 0.4, 0.3 }, { 0.2, 0.5, 0.6 }, { -0.5, 0.1, -0.3 }, { 0.55, 0.05, 0.45 } }
+		for _, p in ipairs(spots) do ball(ctx, 0.24, 0.24, 0.24, p[1], p[2], p[3], c2) end
+	end
+	-- Beine
+	for _, p in ipairs({ { -0.45, -0.6 }, { 0.45, -0.6 }, { -0.45, 0.75 }, { 0.45, 0.75 } }) do
+		ball(ctx, 0.36, 0.65, 0.36, p[1], -0.55, p[2], c1, { main = true })
+	end
+	-- Schwanz
+	local tail = L.tail or "short"
+	if tail == "short" then
+		ball(ctx, 0.35, 0.35, 0.35, 0, 0.15, 1.0, c2, { accent = true })
+	elseif tail == "long" then
+		ball(ctx, 0.18, 0.18, 1.1, 0, 0.35, 1.35, c1, { main = true }, -30, 0, 0)
+	elseif tail == "fluffy" then
+		ball(ctx, 0.6, 0.6, 1.15, 0, 0.55, 1.3, c1, { main = true }, -45, 0, 0)
+		ball(ctx, 0.4, 0.4, 0.5, 0, 0.95, 1.6, c2, { accent = true })
+	elseif tail == "curl" then
+		ball(ctx, 0.42, 0.42, 0.42, 0, 0.55, 1.0, c2, { accent = true })
+	end
+	if L.halo then halo(ctx, hy + 0.95) end
+end
+
+-- Vögel
+PLANS.bird = function(ctx, L)
+	local c1, c2 = L.c1, L.c2
+	local style = L.style or "default"
+	local hy, hz = 0.85, -0.15
+	if style == "longleg" or style == "swan" then
+		ball(ctx, 0.95, 0.75, 1.2, 0, 0.3, 0.1, c1, { main = true })
+		ball(ctx, 0.18, 0.9, 0.18, 0, 0.95, -0.35, c1, { main = true }, style == "swan" and -25 or -10, 0, 0)
+		hy, hz = 1.45, -0.55
+		ball(ctx, 0.42, 0.42, 0.48, 0, hy, hz, c1, { main = true })
+		ball(ctx, 0.14, 0.12, 0.42, 0, hy - 0.06, hz - 0.36, c2, { accent = true }, 15, 0, 0)
+		eyes(ctx, 0.16, hy + 0.06, hz - 0.12, 0.1, true)
+		if style == "longleg" then
+			for _, s in ipairs({ -1, 1 }) do ball(ctx, 0.08, 1.0, 0.08, s * 0.15, -0.45, 0.05, c1) end
+		else
+			ball(ctx, 0.5, 0.18, 0.5, 0, 1.75, -0.55, GOLD, { neon = true })   -- kleine Krone
+		end
+		for _, s in ipairs({ -1, 1 }) do ball(ctx, 0.2, 0.6, 0.9, s * 0.5, 0.35, 0.2, c2, { accent = true }, 0, 0, s * 15) end
+	else
+		ball(ctx, 1.0, 1.2, 1.0, 0, 0, 0, c1, { main = true })
+		ball(ctx, 0.78, 0.75, 0.75, 0, hy, hz, style == "eagle" and c2 or c1, { main = style ~= "eagle" })
+		local beakColor = (style == "eagle") and Color3.fromRGB(255, 200, 40) or ORANGE
+		ball(ctx, 0.2, 0.16, 0.42, 0, hy - 0.08, hz - 0.42, beakColor, nil, 15, 0, 0)
+		if style == "owl" then
+			for _, s in ipairs({ -1, 1 }) do
+				ball(ctx, 0.34, 0.34, 0.1, s * 0.18, hy + 0.08, hz - 0.33, c2, { accent = true })
+				ball(ctx, 0.16, 0.35, 0.12, s * 0.25, hy + 0.42, hz, c1, { main = true }, 0, 0, -s * 15)
+			end
+			eyes(ctx, 0.18, hy + 0.08, hz - 0.4, 0.18)
+		else
+			eyes(ctx, 0.2, hy + 0.1, hz - 0.33, 0.15)
+		end
+		if style == "penguin" then
+			ball(ctx, 0.75, 1.0, 0.5, 0, -0.05, -0.3, c2, { accent = true })
+		else
+			ball(ctx, 0.7, 0.8, 0.45, 0, -0.1, -0.32, c2, { accent = true })
+		end
+		-- Flügel
+		local spread = (style == "eagle" or style == "phoenix") and 55 or 15
+		local wingLen = (style == "eagle" or style == "phoenix") and 1.2 or 0.75
+		for _, s in ipairs({ -1, 1 }) do
+			ball(ctx, 0.22, wingLen, 0.7, s * (0.5 + (spread > 20 and 0.35 or 0)), 0.1 + (spread > 20 and 0.3 or 0), 0.05, style == "penguin" and c1 or c2,
+				{ accent = style ~= "penguin", main = style == "penguin" }, 0, 0, s * spread)
+		end
+		-- Schwanz
+		if style == "peacock" then
+			for i = -3, 3 do
+				local col = (i % 2 == 0) and c1 or c2
+				local f = ball(ctx, 0.22, 1.3, 0.08, i * 0.24, 0.6, 0.6, col, { accent = true }, -15, 0, -i * 14)
+				ball(ctx, 0.14, 0.14, 0.04, i * 0.38, 1.12, 0.55, GOLD, { neon = true })
+				f.Name = "Feder"
+			end
+		elseif style == "crest" or style == "phoenix" then
+			for i = -1, 1 do ball(ctx, 0.12, 0.45, 0.12, i * 0.1, hy + 0.45, hz + 0.1, c2, { accent = true }, -20, 0, -i * 25) end
+			for i = -1, 1 do ball(ctx, 0.18, 0.12, 0.9, i * 0.15, -0.1, 0.75, i == 0 and c1 or c2, { accent = true }, 15, i * 12, 0) end
+		else
+			ball(ctx, 0.5, 0.15, 0.5, 0, -0.25, 0.6, c2, { accent = true }, 15, 0, 0)
+		end
+		for _, s in ipairs({ -1, 1 }) do ball(ctx, 0.18, 0.12, 0.3, s * 0.22, -0.65, -0.12, ORANGE) end
+		if style == "phoenix" then
+			local f = Instance.new("Fire")
+			f.Size = 3
+			f.Heat = 3
+			f.Color = c1
+			f.SecondaryColor = c2
+			f.Parent = ctx.root
+		end
+	end
+	if L.shades then shades(ctx, hy + 0.1, hz - 0.36) end
+	if L.halo then halo(ctx, hy + 0.65) end
+end
+
+-- Meerestiere (Fisch, Delfin, Hai, Wal)
+PLANS.sea = function(ctx, L)
+	local c1, c2 = L.c1, L.c2
+	local style = L.style or "fish"
+	if style == "fish" then
+		ball(ctx, 0.7, 0.95, 1.4, 0, 0, 0, c1, { main = true })
+		ball(ctx, 0.72, 0.3, 0.5, 0, 0.1, -0.1, c2, { accent = true })
+		ball(ctx, 0.1, 0.95, 0.6, 0, 0, 0.85, c1, { main = true })
+		ball(ctx, 0.1, 0.45, 0.55, 0, 0.5, 0.1, c2, { accent = true }, -20, 0, 0)
+		eyes(ctx, 0.3, 0.15, -0.45, 0.18, true)
+	else
+		local big = style == "whale"
+		local sx, sy, sz = big and 1.5 or 0.85, big and 1.3 or 0.85, big and 2.4 or 2.0
+		ball(ctx, sx, sy, sz, 0, 0, 0, c1, { main = true })
+		ball(ctx, sx * 0.75, sy * 0.55, sz * 0.8, 0, -sy * 0.22, -0.05, c2, { accent = true })
+		if style == "dolphin" then ball(ctx, 0.3, 0.25, 0.55, 0, -0.05, -1.15, c1, { main = true }) end
+		local dorsal = style == "shark" and 0.95 or (big and 0.4 or 0.6)
+		ball(ctx, 0.12, dorsal, 0.55, 0, sy * 0.5 + dorsal * 0.3, 0.1, c1, { main = true }, 20, 0, 0)
+		if style == "shark" then
+			ball(ctx, 0.12, 1.0, 0.55, 0, 0.2, sz * 0.55, c1, { main = true }, 25, 0, 0)
+			block(ctx, 0.45, 0.06, 0.12, 0, -0.25, -0.88, WHITE)
+		else
+			ball(ctx, sx * 1.15, 0.12, 0.55, 0, 0, sz * 0.55, c1, { main = true })
+		end
+		for _, s in ipairs({ -1, 1 }) do ball(ctx, 0.55, 0.1, 0.3, s * sx * 0.55, -0.2, -0.2, c1, { main = true }, 0, 0, s * 25) end
+		eyes(ctx, sx * 0.42, 0.1, -sz * 0.32, big and 0.18 or 0.16, true)
+	end
+	if L.halo then halo(ctx, 0.9) end
+end
+
+PLANS.crab = function(ctx, L)
+	local c1, c2 = L.c1, L.c2
+	ball(ctx, 1.4, 0.65, 1.0, 0, 0, 0, c1, { main = true })
+	ball(ctx, 1.0, 0.3, 0.7, 0, -0.2, 0, c2, { accent = true })
+	for _, s in ipairs({ -1, 1 }) do
+		ball(ctx, 0.08, 0.4, 0.08, s * 0.25, 0.4, -0.3, c1)
+		ball(ctx, 0.2, 0.2, 0.2, s * 0.25, 0.62, -0.3, WHITE)
+		ball(ctx, 0.1, 0.1, 0.06, s * 0.25, 0.63, -0.4, BLACK)
+		ball(ctx, 0.55, 0.42, 0.6, s * 0.95, 0.15, -0.55, c1, { main = true }, 0, s * 20, 0)
+		ball(ctx, 0.2, 0.2, 0.35, s * 1.15, 0.25, -0.85, c2, { accent = true })
+		for k = -1, 1 do ball(ctx, 0.65, 0.12, 0.12, s * 0.85, -0.25, k * 0.3 + 0.1, c1, nil, 0, 0, -s * 30) end
+	end
+end
+
+PLANS.scorpion = function(ctx, L)
+	local c1, c2 = L.c1, L.c2
+	ball(ctx, 1.0, 0.5, 1.4, 0, 0, 0, c1, { main = true })
+	eyes(ctx, 0.15, 0.2, -0.65, 0.12)
+	for _, s in ipairs({ -1, 1 }) do
+		ball(ctx, 0.4, 0.3, 0.55, s * 0.75, 0.05, -0.85, c1, { main = true }, 0, s * 25, 0)
+		for k = -1, 1 do ball(ctx, 0.6, 0.1, 0.1, s * 0.6, -0.2, k * 0.35, c2, nil, 0, 0, -s * 30) end
+	end
+	local pts = { { 0, 0.25, 0.8 }, { 0, 0.6, 1.0 }, { 0, 1.0, 0.95 }, { 0, 1.3, 0.7 } }
+	for i, p in ipairs(pts) do ball(ctx, 0.4 - i * 0.05, 0.4 - i * 0.05, 0.4 - i * 0.05, p[1], p[2], p[3], c1, { main = true }) end
+	ball(ctx, 0.14, 0.35, 0.14, 0, 1.35, 0.42, c2, { accent = true }, 60, 0, 0)
+end
+
+PLANS.octopus = function(ctx, L)
+	local c1, c2 = L.c1, L.c2
+	ball(ctx, 1.25, 1.3, 1.2, 0, 0.45, 0, c1, { main = true })
+	eyes(ctx, 0.28, 0.4, -0.55, 0.24)
+	for i = 0, 7 do
+		local a = i / 8 * math.pi * 2
+		ball(ctx, 0.25, 0.85, 0.25, math.cos(a) * 0.5, -0.35, math.sin(a) * 0.5, i % 2 == 0 and c1 or c2, { main = i % 2 == 0, accent = i % 2 == 1 },
+			math.sin(a) * 25, 0, -math.cos(a) * 25)
+	end
+end
+
+PLANS.turtle = function(ctx, L)
+	local c1, c2 = L.c1, L.c2
+	ball(ctx, 1.5, 0.95, 1.7, 0, 0.15, 0, c2, { accent = true })
+	for _, p in ipairs({ { 0, 0.6, 0 }, { 0.4, 0.45, 0.4 }, { -0.4, 0.45, 0.4 }, { 0.4, 0.45, -0.4 }, { -0.4, 0.45, -0.4 } }) do
+		ball(ctx, 0.42, 0.12, 0.42, p[1], p[2], p[3], c1:Lerp(BLACK, 0.25))
+	end
+	ball(ctx, 1.3, 0.3, 1.5, 0, -0.25, 0, c1, { main = true })
+	ball(ctx, 0.6, 0.55, 0.7, 0, 0.05, -1.0, c1, { main = true })
+	eyes(ctx, 0.18, 0.15, -1.3, 0.14)
+	for _, p in ipairs({ { -0.6, -0.65 }, { 0.6, -0.65 }, { -0.6, 0.65 }, { 0.6, 0.65 } }) do
+		ball(ctx, 0.4, 0.35, 0.45, p[1], -0.35, p[2], c1, { main = true })
+	end
+	if L.halo then halo(ctx, 1.0) end
+end
+
+PLANS.snake = function(ctx, L)
+	local c1, c2 = L.c1, L.c2
+	local pts = { { 0, -0.4, 0.9 }, { 0.35, -0.35, 0.55 }, { 0.1, -0.3, 0.15 }, { -0.3, -0.2, -0.15 }, { -0.15, 0.05, -0.45 } }
+	for i, p in ipairs(pts) do
+		local s = 0.45 + i * 0.06
+		ball(ctx, s, s, s, p[1], p[2], p[3], i % 2 == 0 and c2 or c1, { main = i % 2 == 1, accent = i % 2 == 0 })
+	end
+	ball(ctx, 0.7, 0.55, 0.85, 0, 0.35, -0.75, c1, { main = true })
+	eyes(ctx, 0.2, 0.5, -1.05, 0.15)
+	block(ctx, 0.06, 0.03, 0.35, 0, 0.25, -1.25, Color3.fromRGB(230, 40, 60))
+end
+
+PLANS.frog = function(ctx, L)
+	local c1, c2 = L.c1, L.c2
+	ball(ctx, 1.35, 0.85, 1.25, 0, 0, 0, c1, { main = true })
+	ball(ctx, 1.0, 0.5, 0.9, 0, -0.2, -0.15, c2, { accent = true })
+	for _, s in ipairs({ -1, 1 }) do
+		ball(ctx, 0.42, 0.42, 0.42, s * 0.35, 0.45, -0.4, c1, { main = true })
+		ball(ctx, 0.3, 0.3, 0.2, s * 0.35, 0.5, -0.56, WHITE)
+		ball(ctx, 0.15, 0.15, 0.1, s * 0.35, 0.5, -0.65, BLACK)
+		ball(ctx, 0.45, 0.32, 0.85, s * 0.62, -0.32, 0.3, c1, { main = true })
+		ball(ctx, 0.25, 0.4, 0.25, s * 0.45, -0.4, -0.45, c1, { main = true })
+	end
+	block(ctx, 0.7, 0.05, 0.05, 0, 0.0, -0.62, Color3.fromRGB(60, 30, 30))
+end
+
+PLANS.dragon = function(ctx, L)
+	local L2 = {}
+	for k, v in pairs(L) do L2[k] = v end
+	L2.ears = "none"
+	L2.tail = "long"
+	L2.horns = true
+	PLANS.quad(ctx, L2)
+	for _, s in ipairs({ -1, 1 }) do
+		ball(ctx, 0.12, 1.3, 1.5, s * 0.95, 0.85, 0.25, L.c2, { accent = true }, 0, 0, s * 45)
+	end
+	for i = 0, 3 do ball(ctx, 0.15, 0.35, 0.2, 0, 0.6, -0.25 + i * 0.35, L.c2, { accent = true }) end
+end
+
+PLANS.moai = function(ctx, L)
+	local c1, c2 = L.c1, L.c2
+	block(ctx, 1.15, 0.5, 0.85, 0, -0.75, 0, c1, { main = true })
+	block(ctx, 1.0, 1.6, 0.9, 0, 0.3, 0, c1, { main = true })
+	block(ctx, 1.06, 0.28, 1.0, 0, 0.95, -0.05, c2, { accent = true })
+	block(ctx, 0.28, 0.65, 0.35, 0, 0.35, -0.55, c1, { main = true })
+	for _, s in ipairs({ -1, 1 }) do block(ctx, 0.25, 0.1, 0.05, s * 0.25, 0.7, -0.46, BLACK) end
+	block(ctx, 0.45, 0.06, 0.05, 0, -0.1, -0.46, BLACK)
+	if L.halo then halo(ctx, 1.4) end
+end
+
+PLANS.ghost = function(ctx, L)
+	ball(ctx, 1.2, 1.4, 1.2, 0, 0.1, 0, L.c1, { main = true, transparency = 0.25 })
+	for i = 0, 3 do
+		local a = i / 4 * math.pi * 2
+		ball(ctx, 0.5, 0.5, 0.5, math.cos(a) * 0.35, -0.55, math.sin(a) * 0.35, L.c1, { main = true, transparency = 0.25 })
+	end
+	eyes(ctx, 0.22, 0.25, -0.55, 0.22)
+	ball(ctx, 0.2, 0.25, 0.08, 0, -0.1, -0.58, BLACK)
+	local light = Instance.new("PointLight")
+	light.Color = L.c2
+	light.Range = 8
+	light.Parent = ctx.root
+end
+
+PLANS.alien = function(ctx, L)
+	ball(ctx, 1.3, 1.05, 1.05, 0, 0.55, 0, L.c1, { main = true })
+	for _, s in ipairs({ -1, 1 }) do
+		ball(ctx, 0.38, 0.22, 0.12, s * 0.28, 0.5, -0.48, L.c2, nil, 0, 0, s * 25)
+		ball(ctx, 0.04, 0.5, 0.04, s * 0.25, 1.2, 0, L.c1)
+		ball(ctx, 0.15, 0.15, 0.15, s * 0.25, 1.45, 0, Color3.fromRGB(255, 120, 240), { neon = true })
+	end
+	ball(ctx, 0.6, 0.8, 0.5, 0, -0.35, 0, L.c1, { main = true })
+	for _, s in ipairs({ -1, 1 }) do ball(ctx, 0.18, 0.6, 0.18, s * 0.42, -0.35, 0, L.c1, nil, 0, 0, s * 25) end
+end
+
+PLANS.star = function(ctx, L)
+	for i = 0, 4 do
+		local a = math.rad(i * 72)
+		ball(ctx, 0.42, 1.0, 0.32, math.sin(a) * 0.5, math.cos(a) * 0.5, 0, i % 2 == 0 and L.c1 or L.c2, { main = i % 2 == 0, accent = i % 2 == 1 }, 0, 0, -i * 72)
+	end
+	ball(ctx, 0.75, 0.75, 0.42, 0, 0, 0, L.c1, { main = true })
+	eyes(ctx, 0.15, 0.1, -0.22, 0.14)
+	block(ctx, 0.25, 0.05, 0.05, 0, -0.12, -0.22, BLACK)
+end
+
+PLANS.planet = function(ctx, L)
+	ball(ctx, 1.45, 1.45, 1.45, 0, 0.1, 0, L.c1, { main = true })
+	for _, p in ipairs({ { 0.35, 0.45, -0.45 }, { -0.5, 0.0, -0.4 }, { 0.2, -0.35, -0.55 } }) do ball(ctx, 0.5, 0.4, 0.3, p[1], p[2], p[3], L.c2) end
+	ball(ctx, 2.6, 0.06, 2.6, 0, 0.1, 0, Color3.fromRGB(255, 230, 160), { neon = true, transparency = 0.35 }, 0, 0, 18)
+	eyes(ctx, 0.22, 0.25, -0.68, 0.16)
+end
+
+PLANS.blob = function(ctx, L)
+	ball(ctx, 1.35, 1.0, 1.3, 0, -0.1, 0, L.c1, { main = true })
+	ball(ctx, 0.35, 0.2, 0.2, -0.3, 0.25, -0.5, WHITE, { transparency = 0.3 })
+	ball(ctx, 0.5, 0.5, 0.5, 0.35, 0.45, 0.2, L.c2, { accent = true })
+	eyes(ctx, 0.22, 0.1, -0.6, 0.18)
+end
+
+----------------------------------------------------------------------------
+-- Pet bauen
+----------------------------------------------------------------------------
+-- forWorld = true: Teile fest verschweißen (dann muss nur "Root" bewegt werden – viel schneller)
+function PetModels.build(def, tier, forWorld)
+	tier = tier or 1
+	local look = def.look or { plan = "blob", c1 = Color3.fromRGB(200, 200, 200), c2 = WHITE }
+	local model = Instance.new("Model")
+	model.Name = def.name
+	local root = Instance.new("Part")
+	root.Name = "Root"
+	root.Size = Vector3.new(0.2, 0.2, 0.2)
+	root.Transparency = 1
+	root.Anchored = true
+	root.CanCollide = false
+	root.CanQuery = false
+	root.CanTouch = false
+	root.CFrame = CFrame.new()
+	root.Parent = model
+	model.PrimaryPart = root
+
+	local ctx = { model = model, root = root, look = look }
+	local plan = PLANS[look.plan] or PLANS.blob
+	local ok, err = pcall(plan, ctx, look)
+	if not ok then warn("[PetModels]", def.name, err) end
+
+	-- Fusions-Stufen: Gold, Regenbogen, Diamant
+	local tierInfo = Config.PetTiers[tier]
+	if tier >= 2 then
+		for _, p in ipairs(model:GetDescendants()) do
+			if p:IsA("BasePart") and p:GetAttribute("Main") then
+				if tier == 2 then
+					p.Color = tierInfo.color
+					p.Material = Enum.Material.Foil
+					p.Reflectance = 0.3
+				elseif tier == 3 then
+					p.Color = tierInfo.color      -- der Client lässt diese Teile in Regenbogenfarben leuchten
+					p.Material = Enum.Material.SmoothPlastic
+				elseif tier == 4 then
+					p.Color = tierInfo.color
+					p.Material = Enum.Material.Glass
+					p.Transparency = 0.2
+					p.Reflectance = 0.35
+				end
+			end
+		end
+	end
+
+	-- Glitzer & Licht für seltene Pets
+	local rarity = Config.Rarities[def.rarity]
+	if rarity and (rarity.order >= 5 or tier >= 2) then
+		local light = Instance.new("PointLight")
+		light.Color = tierInfo.color or rarity.color
+		light.Range = 6
+		light.Brightness = 0.8
+		light.Parent = root
+		local sparkle = Instance.new("ParticleEmitter")
+		sparkle.Rate = rarity.order >= 7 and 10 or 4
+		sparkle.Lifetime = NumberRange.new(0.6, 1.2)
+		sparkle.Speed = NumberRange.new(0.5, 1.5)
+		sparkle.SpreadAngle = Vector2.new(180, 180)
+		sparkle.LightEmission = 1
+		sparkle.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.25), NumberSequenceKeypoint.new(1, 0) })
+		sparkle.Color = ColorSequence.new(tierInfo.color or rarity.color)
+		sparkle.Parent = root
+	end
+
+	local scale = PET_SCALE * (look.size or 1) * (1 + (tier - 1) * 0.12)
+	pcall(function() model:ScaleTo(scale) end)
+
+	if forWorld then
+		for _, p in ipairs(model:GetDescendants()) do
+			if p:IsA("BasePart") and p ~= root then
+				local weld = Instance.new("WeldConstraint")
+				weld.Part0 = root
+				weld.Part1 = p
+				weld.Parent = p
+				p.Anchored = false
+				p.Massless = true
+			end
+		end
+	end
+	return model
+end
+
+return PetModels
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX00000004"><Properties><string name="Name">Util</string><ProtectedString name="Source"><![CDATA[--[[
 	UTIL – kleine Hilfsfunktionen (Server & Client)
 ]]
 
@@ -916,7 +1572,7 @@ return Util
 ]]></ProtectedString></Properties></Item>
 </Item>
 </Item>
-<Item class="ServerScriptService" referent="RBX00000015"><Properties><string name="Name">ServerScriptService</string></Properties><Item class="Script" referent="RBX00000006"><Properties><string name="Name">Main</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ServerScriptService" referent="RBX00000017"><Properties><string name="Name">ServerScriptService</string></Properties><Item class="Script" referent="RBX00000007"><Properties><string name="Name">Main</string><ProtectedString name="Source"><![CDATA[--[[
 	MAIN – startet das Spiel auf dem Server.
 	Reihenfolge: Remotes → Karte bauen → Systeme starten → Spieler laden.
 ]]
@@ -944,7 +1600,11 @@ MapBuilder.build()
 -- 2) Geschenkbox-Stände verbinden
 for _, entry in ipairs(MapBuilder.eggPrompts) do
 	entry.prompt.Triggered:Connect(function(player)
-		PetService.hatch(player, entry.egg.index, entry.count, false)
+		if entry.info then
+			Remotes.OpenMenu:FireClient(player, "egginfo", entry.egg.index)
+		else
+			PetService.hatch(player, entry.egg.index, entry.count, false)
+		end
 	end)
 end
 
@@ -982,7 +1642,7 @@ GameService.start()
 
 print("[Looksmaxxer 3000] Server gestartet – viel Spaß beim Glow-Up! ✨")
 ]]></ProtectedString></Properties></Item>
-<Item class="Folder" referent="RBX00000014"><Properties><string name="Name">Modules</string></Properties><Item class="ModuleScript" referent="RBX00000007"><Properties><string name="Name">BattleService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="Folder" referent="RBX00000016"><Properties><string name="Name">Modules</string></Properties><Item class="ModuleScript" referent="RBX00000008"><Properties><string name="Name">BattleService</string><ProtectedString name="Source"><![CDATA[--[[
 	BATTLESERVICE – Mog Battles
 	• gegen andere Spieler (Anfrage → Annehmen/Ablehnen)
 	• gegen den Rivalen und den Boss jeder Welt
@@ -1069,7 +1729,7 @@ function BattleService.fightNPC(player, entry)
 	if not data then return end
 	local def, world, isBoss = entry.def, entry.world, entry.isBoss
 	if not Logic.worldUnlocked(data, world) then return end
-	local key = (isBoss and "boss" or "rival") .. world
+	local key = (isBoss and "boss" or "rival") .. world .. def.name
 	local wait = onCooldown(player, key, isBoss and Config.BOSS_COOLDOWN or Config.RIVAL_COOLDOWN)
 	if wait then
 		GameService.notify(player, "⏳ Verschnaufpause", def.name .. " erholt sich noch " .. wait .. " s.", "")
@@ -1120,7 +1780,7 @@ function BattleService.fightNPC(player, entry)
 				PetService.givePet(player, Config.SECRET_PET)
 				PetService.announce(player.DisplayName .. " hat LEON besiegt und das GEHEIME Pet 🐠 Leons Goldfisch erbeutet!")
 			else
-				PetService.hatch(player, world, 1, true)
+				PetService.hatch(player, Config.eggIndex(world, 2), 1, true)   -- gratis Silber-Box
 			end
 		end)
 	end
@@ -1220,7 +1880,7 @@ end)
 
 return BattleService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000008"><Properties><string name="Name">CombatService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000009"><Properties><string name="Name">CombatService</string><ProtectedString name="Source"><![CDATA[--[[
 	COMBATSERVICE – Waffen & Echtzeit-Bosskämpfe
 
 	Waffen:
@@ -1686,7 +2346,7 @@ end)
 
 return CombatService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000009"><Properties><string name="Name">DataService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000000A"><Properties><string name="Name">DataService</string><ProtectedString name="Source"><![CDATA[--[[
 	DATASERVICE – lädt und speichert den Spielstand jedes Spielers (DataStore).
 
 	Wichtig: Damit das Speichern in Roblox Studio funktioniert, muss das Spiel
@@ -1845,7 +2505,7 @@ end)
 
 return DataService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000000A"><Properties><string name="Name">FanService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000000B"><Properties><string name="Name">FanService</string><ProtectedString name="Source"><![CDATA[--[[
 	FANSERVICE – in jeder Welt laufen Leute herum, die du als Fans gewinnen kannst.
 	• Promi-Level 1–10: je höher, desto mehr Charisma brauchst du
 	• Du wählst einen von 3 Sprüchen/Aktionen (manche helfen, manche nicht 😄)
@@ -2076,10 +2736,21 @@ function FanService.init()
 	task.spawn(function()
 		while true do
 			task.wait(4)
+			local active = {}
+			for w = 1, #Config.Worlds do active[w] = worldHasPlayers(w) end
 			for _, fan in ipairs(fans) do
-				if fan.model.Parent and worldHasPlayers(fan.world) and rng:NextNumber() < 0.5 then
-					local target = fan.home + Vector3.new(rng:NextNumber(-35, 35), 0, rng:NextNumber(-35, 35))
-					fan.hum:MoveTo(target)
+				if fan.model.Parent then
+					if active[fan.world] then
+						-- Welt ist besucht: Fan bewegt sich
+						if fan.hrp.Anchored then fan.hrp.Anchored = false end
+						if rng:NextNumber() < 0.5 then
+							local target = fan.home + Vector3.new(rng:NextNumber(-35, 35), 0, rng:NextNumber(-35, 35))
+							fan.hum:MoveTo(target)
+						end
+					elseif not fan.hrp.Anchored then
+						-- niemand da: Fan "einfrieren" (spart Server-Leistung)
+						fan.hrp.Anchored = true
+					end
 				end
 			end
 		end
@@ -2093,7 +2764,7 @@ end)
 
 return FanService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000000B"><Properties><string name="Name">GameService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000000C"><Properties><string name="Name">GameService</string><ProtectedString name="Source"><![CDATA[--[[
 	GAMESERVICE – das Herzstück auf dem Server:
 	Klicks, Upgrades, Aura pro Sekunde, Rebirth, Welten, Titel,
 	Namensschild & Aussehen des Avatars, Offline-Verdienst.
@@ -2108,6 +2779,7 @@ local Logic = require(Shared:WaitForChild("Logic"))
 local Util = require(Shared:WaitForChild("Util"))
 local Remotes = require(script.Parent.Remotes)
 local DataService = require(script.Parent.DataService)
+local LookService = require(script.Parent.LookService)
 
 local GameService = {}
 GameService.characterHooks = {}   -- andere Module können sich hier für "Charakter erschienen" eintragen
@@ -2262,15 +2934,9 @@ function GameService.refreshCharacter(player)
 	tag.NameLabel.Text = player.DisplayName
 	tag.InfoLabel.Text = "✨ " .. Util.format(glow) .. " Glow  ·  ♻️ " .. data.rebirths
 
-	-- Breitere Schultern durch Fitness (funktioniert nur mit R15-Avataren)
-	local fit = Logic.catLevels(data.levels, "fit")
-	local width = 1 + math.min(0.45, fit / 250)
-	pcall(function()
-		local ws = hum:FindFirstChild("BodyWidthScale")
-		local ds = hum:FindFirstChild("BodyDepthScale")
-		if ws then ws.Value = width end
-		if ds then ds.Value = 1 + (width - 1) * 0.7 end
-	end)
+	-- Aussehen verändert sich mit den Upgrades (Pickel, Haare, Haltung, Schultern, Style …)
+	local ok, err = pcall(LookService.apply, player, char, data)
+	if not ok then warn("[Looksmaxxer] LookService:", err) end
 
 	-- Glitzer-Aura (stärker mit Glow, Farbe wechselt mit Rebirths)
 	local aura = hrp:FindFirstChild("GlowAura")
@@ -2553,7 +3219,7 @@ end)
 
 return GameService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000000C"><Properties><string name="Name">JobService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000000D"><Properties><string name="Name">JobService</string><ProtectedString name="Source"><![CDATA[--[[
 	JOBSERVICE – Geld verdienen mit Jobs.
 	Ablauf: Spieler startet Job → Minispiel läuft auf dem Gerät →
 	Ergebnis (3 Versuche) wird geschickt → Server prüft und zahlt.
@@ -2629,7 +3295,7 @@ end)
 
 return JobService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000000D"><Properties><string name="Name">LeaderboardService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000000E"><Properties><string name="Name">LeaderboardService</string><ProtectedString name="Source"><![CDATA[--[[
 	LEADERBOARDSERVICE – globale Rangliste (Top 500) über ALLE Server.
 	Gespeichert wird die "Glow-Power" jedes Spielers in einem OrderedDataStore.
 	Alle 2 Minuten: eigene Werte hochladen, Top 500 neu laden.
@@ -2748,7 +3414,236 @@ end
 
 return LeaderboardService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000000E"><Properties><string name="Name">MapBuilder</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000000F"><Properties><string name="Name">LookService</string><ProtectedString name="Source"><![CDATA[--[[
+	LOOKSERVICE – dein Avatar verändert sich sichtbar mit den Upgrades.
+	Am Anfang: richtig hässlich. Mit jeder Stufe wird es langsam besser.
+
+	Kategorie (Summe der Stufen, max. 250)   → was man sieht
+	Skincare     → Pickel verschwinden (bis 40), kränklich-grüne Haut wird normal (bis 40), ab 120 glänzende Haut
+	Haare        → struppige Haare verschwinden (bis 42), ab 60 Glanz, ab 150 goldene Strähne, ab 230 Krone
+	Fitness      → von schmächtig (0,85) zu breiten Schultern (1,45)
+	Haltung      → von krummem Buckel zu aufrechter Haltung (bis 55)
+	Schlaf       → Augenringe verschwinden (bis 30)
+	Style        → Ketchup-Fleck weg (ab 3), Uhr (20), Parfum-Wolke (40), Goldkette (60), Sonnenbrille (120), Umhang (200)
+	Zähne        → grüne Mundgeruch-Wolke weg (ab 10), ab 80 blitzendes Lächeln
+	Selbstbewusstsein → nervöse Schweißtropfen weg (ab 15), ab 100 Sterne um den Kopf
+]]
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local Logic = require(Shared:WaitForChild("Logic"))
+
+local LookService = {}
+
+local SICK = Color3.fromRGB(150, 175, 110)     -- kränkliche Hautfarbe am Anfang
+local GOLD = Color3.fromRGB(255, 205, 60)
+local BLACK = Color3.fromRGB(20, 20, 25)
+
+-- Teil erstellen und fest an ein Körperteil schweißen
+local function attach(folder, base, size, offset, color, opts)
+	opts = opts or {}
+	local p = Instance.new("Part")
+	p.Name = opts.name or "Look"
+	p.Size = size
+	p.Color = color
+	p.Material = opts.material or Enum.Material.SmoothPlastic
+	p.Transparency = opts.transparency or 0
+	p.CanCollide = false
+	p.CanQuery = false
+	p.CanTouch = false
+	p.Massless = true
+	p.CastShadow = false
+	p.Anchored = false
+	if opts.ball then
+		local m = Instance.new("SpecialMesh")
+		m.MeshType = Enum.MeshType.Sphere
+		m.Parent = p
+	end
+	p.CFrame = base.CFrame * offset
+	local w = Instance.new("WeldConstraint")
+	w.Part0 = base
+	w.Part1 = p
+	w.Parent = p
+	p.Parent = folder
+	return p
+end
+
+local function emitter(parentPart, color, rate, opts)
+	opts = opts or {}
+	local e = Instance.new("ParticleEmitter")
+	e.Color = ColorSequence.new(color)
+	e.Rate = rate
+	e.Lifetime = opts.lifetime or NumberRange.new(0.8, 1.4)
+	e.Speed = opts.speed or NumberRange.new(0.5, 1.5)
+	e.SpreadAngle = opts.spread or Vector2.new(180, 180)
+	e.Size = opts.size or NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.3), NumberSequenceKeypoint.new(1, 0) })
+	e.LightEmission = opts.light or 0.5
+	e.Acceleration = opts.acceleration or Vector3.new(0, 0, 0)
+	e.EmissionDirection = opts.direction or Enum.NormalId.Top
+	if opts.transparency then e.Transparency = opts.transparency end
+	e.Parent = parentPart
+	return e
+end
+
+-- Körperhaltung über die Gelenke (nur R15)
+local function setMotor(motor, angleDeg)
+	if not motor or not motor:IsA("Motor6D") then return end
+	local orig = motor:GetAttribute("OrigC0")
+	if not orig then
+		orig = motor.C0
+		motor:SetAttribute("OrigC0", orig)
+	end
+	motor.C0 = orig * CFrame.Angles(math.rad(-angleDeg), 0, 0)
+end
+
+function LookService.apply(player, char, data)
+	local head = char:FindFirstChild("Head")
+	local hum = char:FindFirstChildOfClass("Humanoid")
+	local torso = char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso")
+	if not head or not hum or not torso then return end
+
+	local function cat(id) return Logic.catLevels(data.levels, id) end
+	local skin, hair, fit, sleep = cat("skin"), cat("hair"), cat("fit"), cat("sleep")
+	local posture, style, teeth, conf = cat("posture"), cat("style"), cat("teeth"), cat("conf")
+
+	local old = char:FindFirstChild("GlowUpLook")
+	if old then old:Destroy() end
+	local folder = Instance.new("Folder")
+	folder.Name = "GlowUpLook"
+	folder.Parent = char
+
+	local hs = head.Size
+	local front = -hs.Z / 2 - 0.03
+
+	-- 1) SKINCARE: Hautfarbe & Pickel & Glanz
+	if player:HasAppearanceLoaded() then
+		local tint = 0.55 * (1 - math.min(1, skin / 40))
+		for _, p in ipairs(char:GetChildren()) do
+			if p:IsA("BasePart") and p.Name ~= "HumanoidRootPart" then
+				local orig = p:GetAttribute("OrigColor")
+				if not orig then
+					orig = p.Color
+					p:SetAttribute("OrigColor", orig)
+				end
+				p.Color = orig:Lerp(SICK, tint)
+			end
+		end
+	end
+	local pimpleSpots = { { -0.55, 0.3 }, { 0.6, 0.42 }, { -0.4, -0.35 }, { 0.5, -0.3 }, { 0.1, 0.62 }, { -0.7, -0.05 }, { 0.72, 0.05 }, { 0.2, -0.55 } }
+	local pimples = math.max(0, #pimpleSpots - math.floor(skin / 5))
+	for i = 1, pimples do
+		local sp = pimpleSpots[i]
+		attach(folder, head, Vector3.new(0.16, 0.16, 0.1), CFrame.new(sp[1] * hs.X / 2, sp[2] * hs.Y / 2, front), Color3.fromRGB(205, 60, 60), { ball = true, name = "Pickel" })
+	end
+	if skin >= 120 then
+		local glowPart = attach(folder, head, Vector3.new(0.2, 0.2, 0.2), CFrame.new(0, 0, 0), Color3.new(1, 1, 1), { transparency = 1 })
+		emitter(glowPart, Color3.fromRGB(255, 255, 255), math.min(8, (skin - 100) / 20), { size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.18), NumberSequenceKeypoint.new(1, 0) }), light = 1 })
+	end
+
+	-- 2) HAARE: struppig → gepflegt → Glanz → goldene Strähne → Krone
+	local spikes = math.max(0, 7 - math.floor(hair / 6))
+	for i = 1, spikes do
+		local a = (i - (spikes + 1) / 2) * 22
+		attach(folder, head, Vector3.new(0.14, 0.75, 0.14), CFrame.new(0, hs.Y / 2, 0) * CFrame.Angles(math.rad((i % 2 == 0) and 15 or -12), 0, math.rad(a)) * CFrame.new(0, 0.35, 0),
+			Color3.fromRGB(70, 50, 35), { name = "Strähne" })
+	end
+	if hair >= 60 then
+		local shine = attach(folder, head, Vector3.new(0.2, 0.2, 0.2), CFrame.new(0, hs.Y / 2 + 0.2, 0), Color3.new(1, 1, 1), { transparency = 1 })
+		emitter(shine, Color3.fromRGB(255, 255, 255), 2, { size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.15), NumberSequenceKeypoint.new(1, 0) }), light = 1 })
+	end
+	if hair >= 150 then
+		attach(folder, head, Vector3.new(0.25, 0.25, hs.Z * 0.9), CFrame.new(hs.X * 0.18, hs.Y / 2 + 0.08, 0) * CFrame.Angles(0, 0, math.rad(-15)), GOLD, { material = Enum.Material.Neon, ball = true, name = "Goldsträhne" })
+	end
+	if hair >= 230 then
+		for i = 0, 7 do
+			local a = i / 8 * math.pi * 2
+			attach(folder, head, Vector3.new(0.18, 0.4, 0.18), CFrame.new(math.cos(a) * hs.X * 0.4, hs.Y / 2 + 0.55, math.sin(a) * hs.Z * 0.4), GOLD, { material = Enum.Material.Neon, name = "Krone" })
+		end
+	end
+
+	-- 3) FITNESS: schmächtig → breit (nur R15)
+	local width = 0.85 + math.min(0.6, fit / 250 * 0.6)
+	pcall(function()
+		local ws = hum:FindFirstChild("BodyWidthScale")
+		local ds = hum:FindFirstChild("BodyDepthScale")
+		if ws then ws.Value = width end
+		if ds then ds.Value = 0.9 + (width - 0.85) * 0.6 end
+	end)
+
+	-- 4) HALTUNG: Buckel → aufrecht (nur R15)
+	local slouch = math.max(0, 22 - posture * 0.4)
+	pcall(function()
+		local upper = char:FindFirstChild("UpperTorso")
+		setMotor(upper and upper:FindFirstChild("Waist"), slouch)
+		setMotor(head:FindFirstChild("Neck"), slouch * 0.8)
+	end)
+
+	-- 5) SCHLAF: Augenringe
+	if sleep < 30 then
+		local tr = 0.15 + (sleep / 30) * 0.85
+		for _, s in ipairs({ -1, 1 }) do
+			attach(folder, head, Vector3.new(hs.X * 0.22, hs.Y * 0.08, 0.08), CFrame.new(s * hs.X * 0.2, -hs.Y * 0.02, front), Color3.fromRGB(80, 50, 85),
+				{ ball = true, transparency = tr, name = "Augenring" })
+		end
+	end
+
+	-- 6) STYLE
+	if style < 3 then
+		attach(folder, torso, Vector3.new(0.55, 0.45, 0.06), CFrame.new(torso.Size.X * 0.2, torso.Size.Y * 0.15, -torso.Size.Z / 2 - 0.03), Color3.fromRGB(170, 40, 25),
+			{ ball = true, name = "Ketchupfleck" })
+	end
+	local leftArm = char:FindFirstChild("LeftLowerArm") or char:FindFirstChild("Left Arm")
+	if style >= 20 and leftArm then
+		attach(folder, leftArm, Vector3.new(leftArm.Size.X + 0.08, 0.25, leftArm.Size.Z + 0.08), CFrame.new(0, -leftArm.Size.Y * 0.3, 0), GOLD,
+			{ material = Enum.Material.Foil, name = "Uhr" })
+	end
+	if style >= 40 then
+		local scent = attach(folder, torso, Vector3.new(0.2, 0.2, 0.2), CFrame.new(0, torso.Size.Y * 0.4, 0), Color3.new(1, 1, 1), { transparency = 1 })
+		emitter(scent, Color3.fromRGB(255, 150, 220), 3, { speed = NumberRange.new(1, 2), light = 0.3 })
+	end
+	if style >= 60 then
+		for i = 0, 9 do
+			local a = math.rad(200 + i * 14)
+			attach(folder, torso, Vector3.new(0.13, 0.13, 0.13), CFrame.new(math.cos(a) * torso.Size.X * 0.28, torso.Size.Y * 0.42 + math.sin(a) * 0.35, -torso.Size.Z / 2 - 0.05),
+				GOLD, { material = Enum.Material.Neon, ball = true, name = "Kette" })
+		end
+	end
+	if style >= 120 then
+		attach(folder, head, Vector3.new(hs.X * 0.85, 0.2, 0.08), CFrame.new(0, hs.Y * 0.42, -hs.Z * 0.35) * CFrame.Angles(math.rad(-30), 0, 0), BLACK, { name = "Sonnenbrille" })
+	end
+	if style >= 200 then
+		attach(folder, torso, Vector3.new(torso.Size.X * 1.1, torso.Size.Y * 1.7, 0.12), CFrame.new(0, -torso.Size.Y * 0.35, torso.Size.Z / 2 + 0.1) * CFrame.Angles(math.rad(8), 0, 0),
+			Color3.fromRGB(120, 30, 160), { material = Enum.Material.Fabric, name = "Umhang" })
+	end
+
+	-- 7) ZÄHNE: Mundgeruch → blitzendes Lächeln
+	local mouth = attach(folder, head, Vector3.new(0.2, 0.2, 0.2), CFrame.new(0, -hs.Y * 0.25, front - 0.1), Color3.new(1, 1, 1), { transparency = 1 })
+	if teeth < 10 then
+		emitter(mouth, Color3.fromRGB(140, 200, 60), 4, { direction = Enum.NormalId.Front, speed = NumberRange.new(1, 2),
+			size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.25), NumberSequenceKeypoint.new(1, 0.7) }), light = 0,
+			transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.3), NumberSequenceKeypoint.new(1, 1) }) })
+	elseif teeth >= 80 then
+		emitter(mouth, Color3.fromRGB(255, 255, 255), 1.5, { speed = NumberRange.new(0, 0.2), light = 1,
+			size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(0.5, 0.35), NumberSequenceKeypoint.new(1, 0) }),
+			lifetime = NumberRange.new(0.4, 0.6) })
+	end
+
+	-- 8) SELBSTBEWUSSTSEIN: Schweißtropfen → Sterne
+	if conf < 15 then
+		local sweat = attach(folder, head, Vector3.new(0.2, 0.2, 0.2), CFrame.new(hs.X * 0.45, hs.Y * 0.3, 0), Color3.new(1, 1, 1), { transparency = 1 })
+		emitter(sweat, Color3.fromRGB(120, 200, 255), 3, { direction = Enum.NormalId.Bottom, acceleration = Vector3.new(0, -8, 0), speed = NumberRange.new(0.5, 1),
+			size = NumberSequence.new(0.15), light = 0.2 })
+	elseif conf >= 100 then
+		local stars = attach(folder, head, Vector3.new(0.2, 0.2, 0.2), CFrame.new(0, hs.Y * 0.8, 0), Color3.new(1, 1, 1), { transparency = 1 })
+		emitter(stars, Color3.fromRGB(255, 220, 80), math.min(6, conf / 40), { speed = NumberRange.new(1, 2), light = 1,
+			size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.3), NumberSequenceKeypoint.new(1, 0) }) })
+	end
+end
+
+return LookService
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX00000010"><Properties><string name="Name">MapBuilder</string><ProtectedString name="Source"><![CDATA[--[[
 	MAPBUILDER – baut beim Serverstart alle 8 Welten automatisch auf:
 	Boden, Deko je nach Thema, Geschenkbox-Stand, Rivale, Boss, Portale,
 	Ranglisten-Tafel und Info-Tafel.
@@ -2850,8 +3745,8 @@ end
 
 -- Plätze, an denen keine Deko stehen soll (relativ zur Weltmitte)
 local RESERVED = {
-	{ 0, 0, 55 }, { 55, -40, 22 }, { -55, -40, 22 }, { 0, -160, 40 },
-	{ 200, 0, 30 }, { -200, 0, 30 }, { 0, 100, 30 }, { -45, 60, 18 }, { 95, -40, 16 },
+	{ 0, 0, 55 }, { 95, -55, 70 }, { -85, -40, 50 }, { 0, -160, 40 },
+	{ 200, 0, 30 }, { -200, 0, 30 }, { 0, 100, 30 }, { -45, 60, 18 },
 }
 local function isFree(x, z, radius)
 	for _, r in ipairs(RESERVED) do
@@ -3182,6 +4077,432 @@ THEMES.galaxy = function(O, w, rng)
 	end
 end
 
+----------------------------------------------------------------------------
+-- ZUSÄTZLICHE DEKORATION (damit die Welten voller und lebendiger wirken)
+----------------------------------------------------------------------------
+local function ellipsoid(props)
+	local p = part(props)
+	local m = Instance.new("SpecialMesh")
+	m.MeshType = Enum.MeshType.Sphere
+	m.Parent = p
+	return p
+end
+
+local SLOGANS = { "DRINK WATER 💧", "MEWING IS LIFE 🗿", "SKINCARE > ALLES 🧴", "8 STUNDEN SCHLAF 😴", "SMILE MORE 😁",
+	"GLOW UP SEASON ✨", "LEON IST ÜBERALL 👑", "PROTEIN 💪", "SONNENCREME! ☀️", "ZAHNSEIDE RETTET LEBEN 🧵" }
+local FLOWER_COLORS = { Color3.fromRGB(255, 90, 120), Color3.fromRGB(255, 220, 80), Color3.fromRGB(170, 110, 255), Color3.fromRGB(255, 255, 255), Color3.fromRGB(255, 150, 60) }
+local CAR_COLORS = { Color3.fromRGB(230, 57, 70), Color3.fromRGB(58, 134, 255), Color3.fromRGB(255, 200, 40), Color3.fromRGB(40, 40, 45), Color3.fromRGB(240, 240, 240), Color3.fromRGB(42, 157, 143) }
+
+local function cloud(O, rng)
+	local c = O + Vector3.new(rng:NextNumber(-HALF, HALF), rng:NextNumber(95, 150), rng:NextNumber(-HALF, HALF))
+	for k = 1, 5 do
+		local r = rng:NextNumber(12, 22)
+		part({ Shape = Enum.PartType.Ball, Size = Vector3.new(r, r, r), CFrame = CFrame.new(c + Vector3.new((k - 3) * 9, rng:NextNumber(-3, 3), rng:NextNumber(-5, 5))),
+			Color = Color3.fromRGB(255, 255, 255), Material = Enum.Material.SmoothPlastic, Transparency = 0.15, CanCollide = false, CastShadow = false })
+	end
+end
+
+local function bench(O, x, z, rot)
+	local base = CFrame.new(O + Vector3.new(x, 0, z)) * CFrame.Angles(0, rot, 0)
+	part({ Size = Vector3.new(7, 0.5, 2), CFrame = base * CFrame.new(0, 1.6, 0), Color = Color3.fromRGB(150, 95, 55), Material = Enum.Material.WoodPlanks })
+	part({ Size = Vector3.new(7, 1.6, 0.4), CFrame = base * CFrame.new(0, 2.6, 0.8), Color = Color3.fromRGB(150, 95, 55), Material = Enum.Material.WoodPlanks })
+	for _, s in ipairs({ -3, 3 }) do part({ Size = Vector3.new(0.4, 1.6, 1.8), CFrame = base * CFrame.new(s, 0.8, 0), Color = Color3.fromRGB(50, 50, 55), Material = Enum.Material.Metal }) end
+end
+
+local function bush(O, x, z, color, size)
+	size = size or 4
+	ellipsoid({ Size = Vector3.new(size * 1.3, size, size * 1.2), CFrame = CFrame.new(O + Vector3.new(x, size * 0.35, z)), Color = color or Color3.fromRGB(60, 150, 70), Material = Enum.Material.Grass })
+end
+
+local function flowerbed(O, x, z, rng)
+	part({ Size = Vector3.new(7, 0.8, 4), CFrame = CFrame.new(O + Vector3.new(x, 0.4, z)), Color = Color3.fromRGB(110, 75, 45), Material = Enum.Material.Ground })
+	for k = 1, 8 do
+		local col = FLOWER_COLORS[rng:NextInteger(1, #FLOWER_COLORS)]
+		part({ Shape = Enum.PartType.Ball, Size = Vector3.new(0.9, 0.9, 0.9), CFrame = CFrame.new(O + Vector3.new(x + rng:NextNumber(-3, 3), 1.2, z + rng:NextNumber(-1.6, 1.6))), Color = col })
+	end
+end
+
+local function trashcan(O, x, z)
+	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(3, 2.2, 2.2), CFrame = CFrame.new(O + Vector3.new(x, 1.5, z)) * CFrame.Angles(0, 0, math.rad(90)), Color = Color3.fromRGB(60, 120, 80), Material = Enum.Material.Metal })
+	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.3, 2.4, 2.4), CFrame = CFrame.new(O + Vector3.new(x, 3.1, z)) * CFrame.Angles(0, 0, math.rad(90)), Color = Color3.fromRGB(40, 90, 60), Material = Enum.Material.Metal })
+end
+
+local function bigSign(O, x, z, text, rot, color)
+	local base = CFrame.new(O + Vector3.new(x, 0, z)) * CFrame.Angles(0, rot, 0)
+	for _, s in ipairs({ -8, 8 }) do part({ Size = Vector3.new(1, 14, 1), CFrame = base * CFrame.new(s, 7, 0), Color = Color3.fromRGB(60, 60, 70), Material = Enum.Material.Metal }) end
+	local panel = part({ Size = Vector3.new(22, 8, 0.8), CFrame = base * CFrame.new(0, 15, 0), Color = color or Color3.fromRGB(255, 79, 216) })
+	surfaceSign(panel, Enum.NormalId.Front, text, color or Color3.fromRGB(255, 79, 216), WHITE)
+	surfaceSign(panel, Enum.NormalId.Back, text, color or Color3.fromRGB(255, 79, 216), WHITE)
+end
+
+local function car(O, x, z, rot, color, luxury)
+	local base = CFrame.new(O + Vector3.new(x, 0, z)) * CFrame.Angles(0, rot, 0)
+	local mat = luxury and Enum.Material.Foil or Enum.Material.SmoothPlastic
+	part({ Size = Vector3.new(5, 1.8, 10), CFrame = base * CFrame.new(0, 1.7, 0), Color = color, Material = mat, Reflectance = luxury and 0.3 or 0.1 })
+	part({ Size = Vector3.new(4.4, 1.6, 5), CFrame = base * CFrame.new(0, 3.3, 0.6), Color = Color3.fromRGB(150, 200, 230), Material = Enum.Material.Glass, Transparency = 0.3 })
+	for _, p in ipairs({ { -2.4, -3.2 }, { 2.4, -3.2 }, { -2.4, 3.2 }, { 2.4, 3.2 } }) do
+		part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.8, 2, 2), CFrame = base * CFrame.new(p[1], 1, p[2]), Color = Color3.fromRGB(25, 25, 25) })
+	end
+	for _, s in ipairs({ -1.6, 1.6 }) do part({ Size = Vector3.new(0.9, 0.5, 0.2), CFrame = base * CFrame.new(s, 1.9, -5.05), Color = Color3.fromRGB(255, 250, 200), Material = Enum.Material.Neon }) end
+end
+
+local function statue(O, x, z, color, rot)
+	local base = CFrame.new(O + Vector3.new(x, 0, z)) * CFrame.Angles(0, rot or 0, 0)
+	part({ Size = Vector3.new(6, 3, 6), CFrame = base * CFrame.new(0, 1.5, 0), Color = Color3.fromRGB(230, 225, 215), Material = Enum.Material.Marble })
+	local mat = Enum.Material.Foil
+	part({ Size = Vector3.new(4.5, 4, 2), CFrame = base * CFrame.new(0, 8.5, 0), Color = color, Material = mat, Reflectance = 0.3 })   -- Brust (breit!)
+	part({ Size = Vector3.new(2.2, 3.5, 1.6), CFrame = base * CFrame.new(-1, 4.8, 0), Color = color, Material = mat, Reflectance = 0.3 })
+	part({ Size = Vector3.new(2.2, 3.5, 1.6), CFrame = base * CFrame.new(1, 4.8, 0), Color = color, Material = mat, Reflectance = 0.3 })
+	part({ Size = Vector3.new(1.4, 4, 1.4), CFrame = base * CFrame.new(-3.1, 9.5, 0) * CFrame.Angles(0, 0, math.rad(-150)), Color = color, Material = mat, Reflectance = 0.3 })   -- Bizeps-Pose
+	part({ Size = Vector3.new(1.4, 4, 1.4), CFrame = base * CFrame.new(3.1, 9.5, 0) * CFrame.Angles(0, 0, math.rad(150)), Color = color, Material = mat, Reflectance = 0.3 })
+	part({ Size = Vector3.new(2.2, 2.6, 2.4), CFrame = base * CFrame.new(0, 11.8, 0), Color = color, Material = mat, Reflectance = 0.3 })   -- kantiger Kopf
+	part({ Size = Vector3.new(2.4, 0.8, 2.6), CFrame = base * CFrame.new(0, 10.8, -0.1), Color = color, Material = mat, Reflectance = 0.3 })  -- Kiefer
+end
+
+local function fountain(O, x, z)
+	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(2, 18, 18), CFrame = CFrame.new(O + Vector3.new(x, 1, z)) * CFrame.Angles(0, 0, math.rad(90)), Color = Color3.fromRGB(220, 220, 225), Material = Enum.Material.Marble })
+	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.4, 15.5, 15.5), CFrame = CFrame.new(O + Vector3.new(x, 2.05, z)) * CFrame.Angles(0, 0, math.rad(90)), Color = Color3.fromRGB(90, 190, 240), Material = Enum.Material.Glass, Transparency = 0.3 })
+	part({ Size = Vector3.new(1.5, 6, 1.5), CFrame = CFrame.new(O + Vector3.new(x, 4, z)), Color = Color3.fromRGB(220, 220, 225), Material = Enum.Material.Marble })
+	local top = part({ Shape = Enum.PartType.Ball, Size = Vector3.new(2, 2, 2), CFrame = CFrame.new(O + Vector3.new(x, 7.5, z)), Color = Color3.fromRGB(150, 220, 255), Material = Enum.Material.Glass, Transparency = 0.3 })
+	local water = Instance.new("ParticleEmitter")
+	water.Color = ColorSequence.new(Color3.fromRGB(180, 230, 255))
+	water.Rate = 25
+	water.Speed = NumberRange.new(6, 9)
+	water.Lifetime = NumberRange.new(0.8, 1.1)
+	water.SpreadAngle = Vector2.new(25, 25)
+	water.Acceleration = Vector3.new(0, -20, 0)
+	water.Size = NumberSequence.new(0.4)
+	water.EmissionDirection = Enum.NormalId.Top
+	water.Parent = top
+end
+
+-- Wetter / Teilchen in der Luft (Schnee, Blüten, Sterne …)
+local function airParticles(O, color, size, speed, rate)
+	local p = part({ Size = Vector3.new(S, 1, S), CFrame = CFrame.new(O + Vector3.new(0, 70, 0)), Transparency = 1, CanCollide = false, CanQuery = false })
+	local e = Instance.new("ParticleEmitter")
+	e.Color = ColorSequence.new(color)
+	e.Size = NumberSequence.new(size)
+	e.Rate = rate or 40
+	e.Speed = NumberRange.new(speed, speed * 1.5)
+	e.Lifetime = NumberRange.new(10, 14)
+	e.EmissionDirection = Enum.NormalId.Bottom
+	e.SpreadAngle = Vector2.new(15, 15)
+	e.LightEmission = 0.4
+	e.Parent = p
+end
+
+local THEME_DECO = {}
+
+THEME_DECO.city = function(O, w, rng)
+	for k = 1, 12 do
+		local alongX = k % 2 == 0
+		local pos = rng:NextNumber(70, 165) * (rng:NextNumber() < 0.5 and -1 or 1)
+		local lane = (rng:NextNumber() < 0.5 and -6 or 6)
+		if alongX then car(O, pos, lane, math.rad(90), CAR_COLORS[rng:NextInteger(1, #CAR_COLORS)])
+		else car(O, lane, pos, 0, CAR_COLORS[rng:NextInteger(1, #CAR_COLORS)]) end
+	end
+	for _ = 1, 10 do
+		local x, z = freeSpot(rng, 2, 50)
+		if x then
+			part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(2.6, 1.3, 1.3), CFrame = CFrame.new(O + Vector3.new(x, 1.3, z)) * CFrame.Angles(0, 0, math.rad(90)), Color = Color3.fromRGB(220, 40, 40) })
+			part({ Shape = Enum.PartType.Ball, Size = Vector3.new(1.4, 1.4, 1.4), CFrame = CFrame.new(O + Vector3.new(x, 2.7, z)), Color = Color3.fromRGB(220, 40, 40) })
+		end
+	end
+	local x, z = freeSpot(rng, 6, 80)
+	if x then statue(O, x, z, Color3.fromRGB(255, 205, 60), math.atan2(x, z)) end
+	local fx, fz = freeSpot(rng, 10, 80)
+	if fx then fountain(O, fx, fz) end
+end
+
+THEME_DECO.beach = function(O, w, rng)
+	local boardColors = { Color3.fromRGB(255, 90, 120), Color3.fromRGB(0, 200, 220), Color3.fromRGB(255, 220, 60), Color3.fromRGB(120, 220, 90) }
+	for _ = 1, 12 do
+		local x, z = freeSpot(rng, 2, 50)
+		if x and z < 115 then
+			ellipsoid({ Size = Vector3.new(2, 8, 0.4), CFrame = CFrame.new(O + Vector3.new(x, 3.5, z)) * CFrame.Angles(math.rad(-10), rng:NextNumber(0, 6), 0),
+				Color = boardColors[rng:NextInteger(1, #boardColors)] })
+		end
+	end
+	for _ = 1, 7 do
+		local x, z = freeSpot(rng, 5, 50)
+		if x and z < 115 then
+			part({ Size = Vector3.new(6, 2, 6), CFrame = CFrame.new(O + Vector3.new(x, 1, z)), Color = Color3.fromRGB(225, 200, 140), Material = Enum.Material.Sand })
+			for _, p in ipairs({ { -2.5, -2.5 }, { 2.5, -2.5 }, { -2.5, 2.5 }, { 2.5, 2.5 } }) do
+				part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(3.5, 1.6, 1.6), CFrame = CFrame.new(O + Vector3.new(x + p[1], 2.5, z + p[2])) * CFrame.Angles(0, 0, math.rad(90)),
+					Color = Color3.fromRGB(225, 200, 140), Material = Enum.Material.Sand })
+			end
+		end
+	end
+	for k = 1, 5 do
+		local x = rng:NextNumber(-200, 200)
+		local z = rng:NextNumber(150, 225)
+		local base = CFrame.new(O + Vector3.new(x, 0.8, z)) * CFrame.Angles(0, rng:NextNumber(0, 6), 0)
+		part({ Size = Vector3.new(5, 2, 12), CFrame = base, Color = Color3.fromRGB(250, 250, 250) })
+		part({ Size = Vector3.new(0.5, 10, 0.5), CFrame = base * CFrame.new(0, 6, 0), Color = Color3.fromRGB(120, 80, 50), Material = Enum.Material.Wood })
+		part({ Class = "WedgePart", Size = Vector3.new(0.2, 8, 5), CFrame = base * CFrame.new(0, 6, 2.6), Color = k % 2 == 0 and Color3.fromRGB(255, 90, 120) or Color3.fromRGB(255, 255, 255) })
+	end
+	-- Rettungsturm
+	local tx, tz = 60, 100
+	for _, p in ipairs({ { -3, -3 }, { 3, -3 }, { -3, 3 }, { 3, 3 } }) do
+		part({ Size = Vector3.new(0.8, 10, 0.8), CFrame = CFrame.new(O + Vector3.new(tx + p[1], 5, tz + p[2])), Color = Color3.fromRGB(250, 250, 250) })
+	end
+	part({ Size = Vector3.new(8, 5, 8), CFrame = CFrame.new(O + Vector3.new(tx, 12.5, tz)), Color = Color3.fromRGB(230, 50, 50) })
+	part({ Size = Vector3.new(9, 0.8, 9), CFrame = CFrame.new(O + Vector3.new(tx, 15.4, tz)), Color = Color3.fromRGB(250, 250, 250) })
+	for _ = 1, 10 do
+		local x, z = freeSpot(rng, 2, 45)
+		if x and z < 115 then
+			part({ Shape = Enum.PartType.Ball, Size = Vector3.new(2, 2, 2), CFrame = CFrame.new(O + Vector3.new(x, 1, z)), Color = boardColors[rng:NextInteger(1, #boardColors)] })
+		end
+	end
+end
+
+THEME_DECO.mountain = function(O, w, rng)
+	airParticles(O, Color3.fromRGB(255, 255, 255), 0.5, 4, 60)
+	for _ = 1, 7 do
+		local x, z = freeSpot(rng, 5, 60, HALF - 60)
+		if x then
+			local base = CFrame.new(O + Vector3.new(x, 0, z)) * CFrame.Angles(0, rng:NextNumber(0, 6), 0)
+			local col = ({ Color3.fromRGB(230, 90, 60), Color3.fromRGB(60, 130, 220), Color3.fromRGB(240, 200, 60) })[rng:NextInteger(1, 3)]
+			part({ Class = "WedgePart", Size = Vector3.new(6, 4, 3), CFrame = base * CFrame.new(0, 2, -1.5), Color = col })
+			part({ Class = "WedgePart", Size = Vector3.new(6, 4, 3), CFrame = base * CFrame.new(0, 2, 1.5) * CFrame.Angles(0, math.rad(180), 0), Color = col })
+		end
+	end
+	for _ = 1, 5 do
+		local x, z = freeSpot(rng, 3, 60)
+		if x then
+			for k = 0, 2 do
+				part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(3, 0.6, 0.6), CFrame = CFrame.new(O + Vector3.new(x, 0.3, z)) * CFrame.Angles(0, math.rad(k * 60), 0), Color = Color3.fromRGB(110, 70, 40), Material = Enum.Material.Wood })
+			end
+			local fireBase = part({ Size = Vector3.new(1, 1, 1), CFrame = CFrame.new(O + Vector3.new(x, 0.8, z)), Transparency = 1, CanCollide = false })
+			local f = Instance.new("Fire")
+			f.Size = 4
+			f.Parent = fireBase
+		end
+	end
+	for _ = 1, 7 do
+		local x, z = freeSpot(rng, 3, 50)
+		if x then
+			for k, r in ipairs({ 3.6, 2.7, 1.9 }) do
+				part({ Shape = Enum.PartType.Ball, Size = Vector3.new(r, r, r), CFrame = CFrame.new(O + Vector3.new(x, ({ 1.6, 4.4, 6.6 })[k], z)), Color = Color3.fromRGB(250, 250, 255), Material = Enum.Material.Snow })
+			end
+			part({ Size = Vector3.new(0.3, 0.3, 1.2), CFrame = CFrame.new(O + Vector3.new(x, 6.6, z - 1.2)), Color = Color3.fromRGB(255, 140, 30) })
+		end
+	end
+	for _ = 1, 2 do
+		local x, z = freeSpot(rng, 10, 90)
+		if x then
+			building(O, x, z, 16, 12, 10, Color3.fromRGB(130, 85, 50), Enum.Material.WoodPlanks, nil, Color3.fromRGB(255, 220, 150))
+			part({ Class = "WedgePart", Size = Vector3.new(17, 6, 7), CFrame = CFrame.new(O + Vector3.new(x, 14, z - 3)), Color = Color3.fromRGB(240, 245, 255), Material = Enum.Material.Snow })
+			part({ Class = "WedgePart", Size = Vector3.new(17, 6, 7), CFrame = CFrame.new(O + Vector3.new(x, 14, z + 3)) * CFrame.Angles(0, math.rad(180), 0), Color = Color3.fromRGB(240, 245, 255), Material = Enum.Material.Snow })
+		end
+	end
+end
+
+THEME_DECO.temple = function(O, w, rng)
+	airParticles(O, Color3.fromRGB(255, 180, 210), 0.5, 3, 40)
+	for _ = 1, 18 do
+		local x, z = freeSpot(rng, 2, 50)
+		if x then
+			part({ Size = Vector3.new(0.6, 6, 0.6), CFrame = CFrame.new(O + Vector3.new(x, 3, z)), Color = Color3.fromRGB(60, 40, 30), Material = Enum.Material.Wood })
+			local lan = ellipsoid({ Size = Vector3.new(2, 2.6, 2), CFrame = CFrame.new(O + Vector3.new(x, 6.8, z)), Color = Color3.fromRGB(230, 50, 40), Material = Enum.Material.Neon })
+			local l = Instance.new("PointLight")
+			l.Color = Color3.fromRGB(255, 120, 80)
+			l.Range = 12
+			l.Parent = lan
+		end
+	end
+	for _ = 1, 12 do
+		local x, z = freeSpot(rng, 6, 60)
+		if x then tree(O, x, z, Color3.fromRGB(255, 170, 205), 1.1) end
+	end
+	for _ = 1, 9 do
+		local x, z = freeSpot(rng, 3, 60)
+		if x then
+			for k = 1, 5 do
+				local h = rng:NextNumber(10, 18)
+				part({ Size = Vector3.new(0.8, h, 0.8), CFrame = CFrame.new(O + Vector3.new(x + rng:NextNumber(-1.5, 1.5), h / 2, z + rng:NextNumber(-1.5, 1.5))),
+					Color = Color3.fromRGB(110, 170, 60), Material = Enum.Material.Grass })
+			end
+		end
+	end
+	for _, pos in ipairs({ { 0, -110 }, { -150, 20 } }) do
+		local base = CFrame.new(O + Vector3.new(pos[1], 0, pos[2]))
+		for _, s in ipairs({ -7, 7 }) do part({ Size = Vector3.new(1.6, 16, 1.6), CFrame = base * CFrame.new(s, 8, 0), Color = Color3.fromRGB(210, 40, 30) }) end
+		part({ Size = Vector3.new(20, 1.6, 2.2), CFrame = base * CFrame.new(0, 16.5, 0), Color = Color3.fromRGB(30, 25, 25) })
+		part({ Size = Vector3.new(17, 1.2, 1.6), CFrame = base * CFrame.new(0, 13.5, 0), Color = Color3.fromRGB(210, 40, 30) })
+	end
+	local px, pz = freeSpot(rng, 14, 70)
+	if px then
+		part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.6, 24, 24), CFrame = CFrame.new(O + Vector3.new(px, 0.3, pz)) * CFrame.Angles(0, 0, math.rad(90)),
+			Color = Color3.fromRGB(70, 150, 200), Material = Enum.Material.Glass, Transparency = 0.25, CanCollide = false })
+		for _ = 1, 6 do
+			ellipsoid({ Size = Vector3.new(0.8, 0.6, 1.8), CFrame = CFrame.new(O + Vector3.new(px + rng:NextNumber(-8, 8), 0.5, pz + rng:NextNumber(-8, 8))) * CFrame.Angles(0, rng:NextNumber(0, 6), 0),
+				Color = rng:NextNumber() < 0.5 and Color3.fromRGB(255, 140, 50) or Color3.fromRGB(255, 255, 255), CanCollide = false })
+		end
+	end
+end
+
+THEME_DECO.fashion = function(O, w, rng)
+	airParticles(O, Color3.fromRGB(255, 200, 240), 0.3, 2, 25)
+	for _ = 1, 12 do
+		local x, z = freeSpot(rng, 2, 45)
+		if x then
+			local base = CFrame.new(O + Vector3.new(x, 0, z)) * CFrame.Angles(0, rng:NextNumber(0, 6), 0)
+			part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.3, 2.5, 2.5), CFrame = base * CFrame.new(0, 0.15, 0) * CFrame.Angles(0, 0, math.rad(90)), Color = Color3.fromRGB(30, 30, 30) })
+			part({ Size = Vector3.new(0.3, 3, 0.3), CFrame = base * CFrame.new(0, 1.6, 0), Color = Color3.fromRGB(30, 30, 30) })
+			part({ Size = Vector3.new(2.2, 2.8, 1.1), CFrame = base * CFrame.new(0, 4.4, 0), Color = FLOWER_COLORS[rng:NextInteger(1, #FLOWER_COLORS)] })
+			part({ Shape = Enum.PartType.Ball, Size = Vector3.new(1.2, 1.2, 1.2), CFrame = base * CFrame.new(0, 6.4, 0), Color = Color3.fromRGB(245, 240, 235) })
+		end
+	end
+	for _ = 1, 8 do
+		local x, z = freeSpot(rng, 3, 50)
+		if x then
+			part({ Size = Vector3.new(6, 0.3, 0.3), CFrame = CFrame.new(O + Vector3.new(x, 5, z)), Color = Color3.fromRGB(200, 200, 210), Material = Enum.Material.Metal })
+			for _, s in ipairs({ -2.8, 2.8 }) do part({ Size = Vector3.new(0.3, 5, 0.3), CFrame = CFrame.new(O + Vector3.new(x + s, 2.5, z)), Color = Color3.fromRGB(200, 200, 210), Material = Enum.Material.Metal }) end
+			for k = -2, 2 do
+				part({ Size = Vector3.new(0.4, 2.6, 1.6), CFrame = CFrame.new(O + Vector3.new(x + k * 1.1, 3.5, z)), Color = FLOWER_COLORS[rng:NextInteger(1, #FLOWER_COLORS)], Material = Enum.Material.Fabric })
+			end
+		end
+	end
+	for _ = 1, 2 do
+		local x, z = freeSpot(rng, 10, 80)
+		if x then fountain(O, x, z) end
+	end
+end
+
+THEME_DECO.hollywood = function(O, w, rng)
+	for _ = 1, 8 do
+		local x, z = freeSpot(rng, 3, 50)
+		if x then
+			local base = CFrame.new(O + Vector3.new(x, 0, z)) * CFrame.Angles(0, rng:NextNumber(0, 6), 0)
+			for k = 0, 2 do part({ Size = Vector3.new(0.3, 5, 0.3), CFrame = base * CFrame.Angles(0, math.rad(k * 120), 0) * CFrame.new(0, 2.3, 0.8) * CFrame.Angles(math.rad(15), 0, 0), Color = Color3.fromRGB(40, 40, 40) }) end
+			part({ Size = Vector3.new(2, 1.8, 3), CFrame = base * CFrame.new(0, 5.4, 0), Color = Color3.fromRGB(30, 30, 30) })
+			part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(1.2, 1.2, 1.2), CFrame = base * CFrame.new(0, 5.4, -1.9) * CFrame.Angles(0, math.rad(90), 0), Color = Color3.fromRGB(80, 80, 90) })
+		end
+	end
+	for _ = 1, 6 do
+		local x, z = freeSpot(rng, 2, 45)
+		if x then
+			local base = CFrame.new(O + Vector3.new(x, 0, z)) * CFrame.Angles(0, rng:NextNumber(0, 6), 0)
+			part({ Size = Vector3.new(2.4, 0.3, 2), CFrame = base * CFrame.new(0, 2.2, 0), Color = Color3.fromRGB(30, 30, 30), Material = Enum.Material.Fabric })
+			part({ Size = Vector3.new(2.4, 1.6, 0.2), CFrame = base * CFrame.new(0, 3.4, 0.9), Color = Color3.fromRGB(30, 30, 30), Material = Enum.Material.Fabric })
+			for _, s in ipairs({ -1.1, 1.1 }) do part({ Size = Vector3.new(0.2, 2.2, 2), CFrame = base * CFrame.new(s, 1.1, 0), Color = Color3.fromRGB(150, 100, 60), Material = Enum.Material.Wood }) end
+		end
+	end
+	for _ = 1, 4 do
+		local x, z = freeSpot(rng, 6, 70)
+		if x then statue(O, x, z, Color3.fromRGB(255, 205, 60), math.atan2(x, z)) end
+	end
+	for _ = 1, 3 do
+		local x, z = freeSpot(rng, 10, 90)
+		if x then
+			part({ Size = Vector3.new(10, 7, 22), CFrame = CFrame.new(O + Vector3.new(x, 4.5, z)), Color = Color3.fromRGB(235, 235, 240), Material = Enum.Material.Metal })
+			surfaceSign(part({ Size = Vector3.new(8, 2, 0.3), CFrame = CFrame.new(O + Vector3.new(x, 6, z - 11.2)), Color = Color3.fromRGB(20, 5, 35) }), Enum.NormalId.Front, "⭐ STAR", Color3.fromRGB(20, 5, 35), WHITE)
+		end
+	end
+end
+
+THEME_DECO.dubai = function(O, w, rng)
+	for _ = 1, 9 do
+		local x, z = freeSpot(rng, 6, 50)
+		if x then car(O, x, z, rng:NextNumber(0, 6), rng:NextNumber() < 0.6 and Color3.fromRGB(212, 175, 55) or Color3.fromRGB(250, 250, 250), true) end
+	end
+	for _ = 1, 8 do
+		local a = rng:NextNumber(0, math.pi * 2)
+		local r = rng:NextNumber(180, 230)
+		ellipsoid({ Size = Vector3.new(rng:NextNumber(40, 70), rng:NextNumber(10, 18), rng:NextNumber(30, 50)), CFrame = CFrame.new(O + Vector3.new(math.cos(a) * r, 0, math.sin(a) * r)),
+			Color = Color3.fromRGB(230, 200, 140), Material = Enum.Material.Sand })
+	end
+	for _ = 1, 5 do
+		local x, z = freeSpot(rng, 4, 60)
+		if x then
+			local base = CFrame.new(O + Vector3.new(x, 0, z)) * CFrame.Angles(0, rng:NextNumber(0, 6), 0)
+			local col = Color3.fromRGB(200, 160, 100)
+			ellipsoid({ Size = Vector3.new(2.4, 2.4, 5), CFrame = base * CFrame.new(0, 4.5, 0), Color = col })
+			ellipsoid({ Size = Vector3.new(2, 2, 2.4), CFrame = base * CFrame.new(0, 6, 0.2), Color = col })
+			ellipsoid({ Size = Vector3.new(0.8, 3, 0.8), CFrame = base * CFrame.new(0, 6, -2.6) * CFrame.Angles(math.rad(-20), 0, 0), Color = col })
+			ellipsoid({ Size = Vector3.new(1.2, 1.2, 1.8), CFrame = base * CFrame.new(0, 7.6, -3.2), Color = col })
+			for _, p in ipairs({ { -0.8, -1.8 }, { 0.8, -1.8 }, { -0.8, 1.8 }, { 0.8, 1.8 } }) do
+				part({ Size = Vector3.new(0.5, 3.8, 0.5), CFrame = base * CFrame.new(p[1], 1.9, p[2]), Color = col })
+			end
+		end
+	end
+	for _ = 1, 3 do
+		local x, z = freeSpot(rng, 10, 80)
+		if x then fountain(O, x, z) end
+	end
+	for _ = 1, 2 do
+		local x, z = freeSpot(rng, 6, 80)
+		if x then statue(O, x, z, Color3.fromRGB(212, 175, 55), math.atan2(x, z)) end
+	end
+end
+
+THEME_DECO.galaxy = function(O, w, rng)
+	airParticles(O, Color3.fromRGB(220, 200, 255), 0.4, 1.5, 50)
+	-- Rakete
+	local rx, rz = 150, 120
+	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(40, 10, 10), CFrame = CFrame.new(O + Vector3.new(rx, 22, rz)) * CFrame.Angles(0, 0, math.rad(90)), Color = Color3.fromRGB(240, 240, 245), Material = Enum.Material.Metal })
+	ellipsoid({ Size = Vector3.new(10, 14, 10), CFrame = CFrame.new(O + Vector3.new(rx, 44, rz)), Color = Color3.fromRGB(230, 50, 60) })
+	for k = 0, 3 do
+		part({ Class = "WedgePart", Size = Vector3.new(1, 10, 6), CFrame = CFrame.new(O + Vector3.new(rx, 5, rz)) * CFrame.Angles(0, math.rad(k * 90), 0) * CFrame.new(0, 0, 7), Color = Color3.fromRGB(230, 50, 60) })
+	end
+	part({ Shape = Enum.PartType.Ball, Size = Vector3.new(3.5, 3.5, 3.5), CFrame = CFrame.new(O + Vector3.new(rx, 30, rz - 5)), Color = Color3.fromRGB(120, 200, 255), Material = Enum.Material.Neon })
+	for _ = 1, 4 do
+		local pos = O + Vector3.new(rng:NextNumber(-200, 200), rng:NextNumber(50, 90), rng:NextNumber(-200, 200))
+		part({ Size = Vector3.new(3, 3, 4), CFrame = CFrame.new(pos), Color = Color3.fromRGB(200, 200, 210), Material = Enum.Material.Metal, CanCollide = false })
+		for _, s in ipairs({ -1, 1 }) do
+			part({ Size = Vector3.new(7, 0.2, 3), CFrame = CFrame.new(pos + Vector3.new(s * 5.5, 0, 0)), Color = Color3.fromRGB(40, 70, 160), Material = Enum.Material.Glass, CanCollide = false })
+		end
+	end
+	for _ = 1, 16 do
+		local s = rng:NextNumber(3, 9)
+		part({ Shape = Enum.PartType.Ball, Size = Vector3.new(s, s * 0.8, s), CFrame = CFrame.new(O + Vector3.new(rng:NextNumber(-220, 220), rng:NextNumber(15, 60), rng:NextNumber(-220, 220))),
+			Color = Color3.fromRGB(110, 95, 130), Material = Enum.Material.Slate, CanCollide = false })
+	end
+	for _ = 1, 12 do
+		local x, z = freeSpot(rng, 3, 50)
+		if x then
+			local h = rng:NextNumber(4, 9)
+			part({ Size = Vector3.new(0.5, h, 0.5), CFrame = CFrame.new(O + Vector3.new(x, h / 2, z)), Color = Color3.fromRGB(80, 200, 160) })
+			part({ Shape = Enum.PartType.Ball, Size = Vector3.new(2.2, 2.2, 2.2), CFrame = CFrame.new(O + Vector3.new(x, h + 0.6, z)), Color = Color3.fromRGB(255, 100, 220), Material = Enum.Material.Neon })
+		end
+	end
+end
+
+-- Für ALLE Welten: Wolken, Bänke, Büsche, Blumen, Mülleimer, Werbetafeln
+local function decorate(O, w, rng)
+	if w.theme ~= "galaxy" then
+		for _ = 1, 10 do cloud(O, rng) end
+	end
+	local natural = (w.theme == "mountain" or w.theme == "temple" or w.theme == "beach")
+	for _ = 1, 12 do
+		local x, z = freeSpot(rng, 4, 45)
+		if x then bench(O, x, z, rng:NextNumber(0, 6)) end
+	end
+	if w.theme ~= "galaxy" then
+		for _ = 1, 20 do
+			local x, z = freeSpot(rng, 3, 45)
+			if x then bush(O, x, z, natural and Color3.fromRGB(70, 140, 60) or Color3.fromRGB(60, 160, 80), rng:NextNumber(3, 5)) end
+		end
+		for _ = 1, 10 do
+			local x, z = freeSpot(rng, 4, 45)
+			if x then flowerbed(O, x, z, rng) end
+		end
+	end
+	if not natural then
+		for _ = 1, 8 do
+			local x, z = freeSpot(rng, 2, 40)
+			if x then trashcan(O, x, z) end
+		end
+	end
+	for k = 1, 4 do
+		local x, z = freeSpot(rng, 12, 90)
+		if x then bigSign(O, x, z, SLOGANS[((math.floor(w.mult * 7) + k) % #SLOGANS) + 1], math.atan2(x, z) + math.pi, w.accent) end
+	end
+	local extra = THEME_DECO[w.theme]
+	if extra then extra(O, w, rng) end
+end
+
 local GROUND_MATERIAL = {
 	city = Enum.Material.SmoothPlastic, beach = Enum.Material.Sand, mountain = Enum.Material.Grass, temple = Enum.Material.Grass,
 	fashion = Enum.Material.SmoothPlastic, hollywood = Enum.Material.Sandstone, dubai = Enum.Material.Sand, galaxy = Enum.Material.Slate,
@@ -3302,39 +4623,57 @@ local function buildWorld(index, mapFolder)
 	-- Deko
 	local theme = THEMES[w.theme]
 	if theme then theme(O, w, rng) end
+	decorate(O, w, rng)
 
-	-- Geschenkbox-Stand
-	local egg = Config.Eggs[index]
-	local ep = O + Vector3.new(55, 0, -40)
-	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(2, 14, 14), CFrame = CFrame.new(ep + Vector3.new(0, 1, 0)) * CFrame.Angles(0, 0, math.rad(90)), Color = Color3.fromRGB(40, 20, 60) })
-	local box = part({ Name = "Geschenkbox", Size = Vector3.new(6, 6, 6), CFrame = CFrame.new(ep + Vector3.new(0, 5, 0)) * CFrame.Angles(0, math.rad(20), 0), Color = w.accent })
-	part({ Size = Vector3.new(6.2, 6.2, 1), CFrame = box.CFrame, Color = Color3.fromRGB(255, 209, 102), Material = Enum.Material.Neon })
-	part({ Size = Vector3.new(1, 6.2, 6.2), CFrame = box.CFrame, Color = Color3.fromRGB(255, 209, 102), Material = Enum.Material.Neon })
-	billboard(box, "🎁 " .. egg.name .. "\n<font color='#ffd166'>" .. Util.format(egg.cost) .. " Aura</font>", 12, 4, 6.5, WHITE)
-	table.insert(MapBuilder.eggPrompts, { prompt = prompt(box, "Öffnen", egg.name, 0.25), egg = egg, count = 1 })
-	table.insert(MapBuilder.eggPrompts, { prompt = prompt(box, "3x öffnen", "Rebirth-Shop: 3er-Öffnen", 0.25, Enum.KeyCode.F), egg = egg, count = 3 })
-
-	-- Tafel mit den Chancen der Box
-	local total = 0
-	for _, e in ipairs(egg.pets) do total = total + e.weight end
-	local lines = { "<b>Inhalt der " .. egg.name .. "</b>" }
-	for _, e in ipairs(egg.pets) do
-		local def
-		for _, p in ipairs(Config.Pets) do
-			if p.id == e.id then def = p end
+	-- Pet-Stationen: 5 Geschenkboxen, von günstig bis göttlich
+	for st, station in ipairs(Config.EggStations) do
+		local egg = Config.Eggs[Config.eggIndex(index, st)]
+		local ep = O + Vector3.new(40 + (st - 1) * 26, 0, -45 - math.abs(st - 3) * 6)
+		part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(2, 13, 13), CFrame = CFrame.new(ep + Vector3.new(0, 1, 0)) * CFrame.Angles(0, 0, math.rad(90)),
+			Color = Color3.fromRGB(40, 20, 60), Material = Enum.Material.SmoothPlastic })
+		part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.3, 13.6, 13.6), CFrame = CFrame.new(ep + Vector3.new(0, 2.05, 0)) * CFrame.Angles(0, 0, math.rad(90)),
+			Color = station.color, Material = Enum.Material.Neon, Transparency = 0.3 })
+		local s = 4.5 + st * 0.5
+		local box = part({ Name = "Geschenkbox", Size = Vector3.new(s, s, s), CFrame = CFrame.new(ep + Vector3.new(0, 2 + s / 2 + 0.5, 0)) * CFrame.Angles(0, math.rad(20), 0),
+			Color = station.color, Material = st >= 4 and Enum.Material.Glass or Enum.Material.SmoothPlastic, Reflectance = st >= 3 and 0.2 or 0 })
+		part({ Size = Vector3.new(s + 0.2, s + 0.2, 0.9), CFrame = box.CFrame, Color = Color3.fromRGB(255, 255, 255), Material = Enum.Material.Neon })
+		part({ Size = Vector3.new(0.9, s + 0.2, s + 0.2), CFrame = box.CFrame, Color = Color3.fromRGB(255, 255, 255), Material = Enum.Material.Neon })
+		part({ Shape = Enum.PartType.Ball, Size = Vector3.new(1.6, 1.6, 1.6), CFrame = box.CFrame * CFrame.new(0, s / 2 + 0.5, 0), Color = Color3.fromRGB(255, 255, 255), Material = Enum.Material.Neon })
+		local light = Instance.new("PointLight")
+		light.Color = station.color
+		light.Range = 14
+		light.Parent = box
+		-- beste Chance auf dem Schild
+		local bestName, bestChance, total = nil, 0, 0
+		for _, e in ipairs(egg.pets) do total = total + e.weight end
+		local bestOrder = 0
+		for rarityId, w in pairs(station.weights) do
+			local r = Config.Rarities[rarityId]
+			if r.order > bestOrder then bestOrder, bestName, bestChance = r.order, r.name, w end
 		end
-		local r = Config.Rarities[def.rarity]
-		local hex = string.format("#%02x%02x%02x", math.floor(r.color.R * 255 + 0.5), math.floor(r.color.G * 255 + 0.5), math.floor(r.color.B * 255 + 0.5))
-		table.insert(lines, def.emoji .. " " .. def.name .. "  <font color='" .. hex .. "'>" .. Util.format(e.weight / total * 100) .. " %</font>")
+		billboard(box, station.emoji .. " " .. station.name .. "\n<font color='#ffd166'>" .. Util.format(egg.cost) .. " Aura</font>\n<font size='14'>bis " .. bestName .. ": "
+			.. Util.format(bestChance / total * 100) .. " %</font>", 11, 4.6, s / 2 + 3.5, WHITE)
+		table.insert(MapBuilder.eggPrompts, { prompt = prompt(box, "Öffnen", station.name, 0.25), egg = egg, count = 1 })
+		table.insert(MapBuilder.eggPrompts, { prompt = prompt(box, "3x öffnen", "Rebirth-Shop: 3er-Öffnen", 0.25, Enum.KeyCode.F), egg = egg, count = 3 })
+		table.insert(MapBuilder.eggPrompts, { prompt = prompt(box, "Inhalt ansehen", station.name, 0, Enum.KeyCode.R), egg = egg, info = true })
 	end
-	local chanceBoard = part({ Size = Vector3.new(14, 16, 0.6), CFrame = CFrame.new(O + Vector3.new(95, 9, -40)) * CFrame.Angles(0, math.rad(115), 0), Color = Color3.fromRGB(20, 5, 35) })
-	local _, chanceLabel = surfaceSign(chanceBoard, Enum.NormalId.Front, table.concat(lines, "\n"), Color3.fromRGB(20, 5, 35), WHITE)
-	chanceLabel.Font = Enum.Font.GothamBold
-	part({ Size = Vector3.new(1, 9, 1), CFrame = CFrame.new(O + Vector3.new(95, 0.5, -40)), Color = Color3.fromRGB(60, 60, 70) })
+	local plazaSign = part({ Size = Vector3.new(30, 5, 1), CFrame = CFrame.new(O + Vector3.new(92, 14, -78)), Color = Color3.fromRGB(20, 5, 35) })
+	surfaceSign(plazaSign, Enum.NormalId.Back, "🐾 PET-STATIONEN", Color3.fromRGB(20, 5, 35), WHITE)
+	part({ Size = Vector3.new(1, 13, 1), CFrame = CFrame.new(O + Vector3.new(78, 6.5, -78)), Color = Color3.fromRGB(60, 60, 70) })
+	part({ Size = Vector3.new(1, 13, 1), CFrame = CFrame.new(O + Vector3.new(106, 6.5, -78)), Color = Color3.fromRGB(60, 60, 70) })
 
 	-- Rivale & Boss
 	local rival = Config.Rivals[index]
 	table.insert(MapBuilder.npcs, { prompt = makeNPC(rival, O + Vector3.new(-55, 0, -40), false), def = rival, world = index, isBoss = false })
+	-- schwächere Rivalen zum Üben
+	for k, extra in ipairs(Config.ExtraRivals) do
+		local name = extra.prefix .. " " .. Config.RivalNames[((index * 3 + k) % #Config.RivalNames) + 1]
+		local def = {
+			name = name, level = math.max(1, math.floor(rival.level * extra.strength)), rebirths = math.floor(rival.rebirths * extra.strength),
+			shirt = rival.shirt:Lerp(Color3.fromRGB(80, 80, 90), 0.4), pants = rival.pants, skin = rival.skin,
+		}
+		table.insert(MapBuilder.npcs, { prompt = makeNPC(def, O + Vector3.new(-85 - k * 25, 0, -25 - k * 18), false), def = def, world = index, isBoss = false })
+	end
 	local boss = Config.Bosses[index]
 	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(4, 30, 30), CFrame = CFrame.new(O + Vector3.new(0, 2, -160)) * CFrame.Angles(0, 0, math.rad(90)),
 		Color = boss.final and Color3.fromRGB(212, 175, 55) or Color3.fromRGB(60, 20, 40), Material = boss.final and Enum.Material.Foil or Enum.Material.Slate })
@@ -3427,7 +4766,7 @@ end
 
 return MapBuilder
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000000F"><Properties><string name="Name">PetService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000011"><Properties><string name="Name">PetService</string><ProtectedString name="Source"><![CDATA[--[[
 	PETSERVICE – Geschenkboxen öffnen, Pets ausrüsten, fusionieren, löschen.
 	Die Pet-Figuren in der Welt werden hier erstellt; bewegt werden sie
 	auf jedem Gerät vom Client-Skript "PetFollow".
@@ -3444,6 +4783,7 @@ local Util = require(Shared:WaitForChild("Util"))
 local Remotes = require(script.Parent.Remotes)
 local DataService = require(script.Parent.DataService)
 local GameService = require(script.Parent.GameService)
+local PetModels = require(Shared:WaitForChild("PetModels"))
 
 local PetService = {}
 local rng = Random.new()
@@ -3480,38 +4820,14 @@ function PetService.rebuildModels(player)
 			slot = slot + 1
 			local def = Logic.petById[pet.id]
 			if def then
-				local rarity = Config.Rarities[def.rarity]
-				local tier = Config.PetTiers[pet.tier or 1]
-				local p = Instance.new("Part")
-				p.Name = def.name
-				p.Shape = Enum.PartType.Ball
-				p.Size = Vector3.new(2, 2, 2) * (1 + (pet.tier - 1) * 0.15)
-				p.Color = tier.color or rarity.color
-				p.Material = rarity.order >= 5 and Enum.Material.Neon or Enum.Material.SmoothPlastic
-				p.Transparency = 0.15
-				p.Anchored = true
-				p.CanCollide = false
-				p.CanTouch = false
-				p.CanQuery = false
-				p.CastShadow = false
-				p:SetAttribute("Owner", player.UserId)
-				p:SetAttribute("Slot", slot)
-				p:SetAttribute("Tier", pet.tier or 1)
+				local model = PetModels.build(def, pet.tier or 1, true)
+				model:SetAttribute("Owner", player.UserId)
+				model:SetAttribute("Slot", slot)
+				model:SetAttribute("Tier", pet.tier or 1)
 				if hrp then
-					p.CFrame = hrp.CFrame * CFrame.new(slot * 2, 0, 4)
+					model:PivotTo(hrp.CFrame * CFrame.new(slot * 2, 0, 4))
 				end
-				local bb = Instance.new("BillboardGui")
-				bb.Size = UDim2.new(3.2, 0, 3.2, 0)
-				bb.LightInfluence = 0
-				bb.MaxDistance = 90
-				bb.Parent = p
-				local l = Instance.new("TextLabel")
-				l.Size = UDim2.new(1, 0, 1, 0)
-				l.BackgroundTransparency = 1
-				l.TextScaled = true
-				l.Text = def.emoji
-				l.Parent = bb
-				p.Parent = folder
+				model.Parent = folder
 			end
 		end
 	end
@@ -3658,7 +4974,7 @@ function PetService.hatch(player, eggIndex, count, free)
 		local rarity = Config.Rarities[def.rarity]
 		if rarity.order >= 5 then
 			data.pity = 0
-			PetService.announce(player.DisplayName .. " hat " .. (rarity.order >= 6 and "ein MYTHISCHES" or "ein legendäres") .. " Pet gezogen: " .. def.emoji .. " " .. def.name .. "!")
+			PetService.announce(player.DisplayName .. " hat ein " .. rarity.name .. "es Pet gezogen: " .. def.emoji .. " " .. def.name .. "!")
 		end
 		local pet, isNew = addPet(data, id, 1)
 		table.insert(results, { id = id, uid = pet.uid, new = isNew })
@@ -3776,7 +5092,7 @@ end)
 
 return PetService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000010"><Properties><string name="Name">QuestService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000012"><Properties><string name="Name">QuestService</string><ProtectedString name="Source"><![CDATA[--[[
 	QUESTSERVICE – tägliche Aufträge (3 pro Tag) und Erfolge (je 4 Stufen).
 
 	Aufträge: Beim ersten Login des Tages werden 3 zufällige Aufträge gewählt.
@@ -3892,7 +5208,7 @@ end)
 
 return QuestService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000011"><Properties><string name="Name">Remotes</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000013"><Properties><string name="Name">Remotes</string><ProtectedString name="Source"><![CDATA[--[[
 	REMOTES – die "Leitungen" zwischen Server und Spieler.
 	Der Server erstellt sie beim Start in ReplicatedStorage/Remotes.
 ]]
@@ -3948,7 +5264,7 @@ folder.Parent = ReplicatedStorage
 
 return Remotes
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000012"><Properties><string name="Name">RewardService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000014"><Properties><string name="Name">RewardService</string><ProtectedString name="Source"><![CDATA[--[[
 	REWARDSERVICE – tägliche Belohnungen (7-Tage-Serie), Promo-Codes und Tränke.
 ]]
 
@@ -3999,7 +5315,7 @@ local function give(player, data, reward)
 			if Logic.worldUnlocked(data, i) then best = i end
 		end
 		task.delay(1, function()
-			if player.Parent then PetService.hatch(player, best, 1, true) end
+			if player.Parent then PetService.hatch(player, Config.eggIndex(best, 2), 1, true) end   -- gratis Silber-Box
 		end)
 		table.insert(parts, "🎁 gratis Geschenkbox")
 	end
@@ -4062,7 +5378,7 @@ end)
 
 return RewardService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000013"><Properties><string name="Name">TradeService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000015"><Properties><string name="Name">TradeService</string><ProtectedString name="Source"><![CDATA[--[[
 	TRADESERVICE – Pets & Geld zwischen Spielern tauschen.
 
 	Sicherheit gegen Betrug:
@@ -4303,7 +5619,7 @@ return TradeService
 ]]></ProtectedString></Properties></Item>
 </Item>
 </Item>
-<Item class="StarterPlayer" referent="RBX00000022"><Properties><string name="Name">StarterPlayer</string></Properties><Item class="StarterPlayerScripts" referent="RBX00000021"><Properties><string name="Name">StarterPlayerScripts</string></Properties><Item class="LocalScript" referent="RBX00000020"><Properties><string name="Name">Client</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="StarterPlayer" referent="RBX00000025"><Properties><string name="Name">StarterPlayer</string></Properties><Item class="StarterPlayerScripts" referent="RBX00000024"><Properties><string name="Name">StarterPlayerScripts</string></Properties><Item class="LocalScript" referent="RBX00000023"><Properties><string name="Name">Client</string><ProtectedString name="Source"><![CDATA[--[[
 	CLIENT – startet die Oberfläche auf dem Gerät des Spielers
 	und empfängt alle Nachrichten vom Server.
 ]]
@@ -4386,8 +5702,8 @@ Remotes:WaitForChild("BattleRequest").OnClientEvent:Connect(function(name, userI
 	end)
 end)
 
-Remotes:WaitForChild("OpenMenu").OnClientEvent:Connect(function(name)
-	Menus.open(name)
+Remotes:WaitForChild("OpenMenu").OnClientEvent:Connect(function(name, arg)
+	Menus.open(name, arg)
 end)
 
 -- Fans
@@ -4416,7 +5732,7 @@ task.delay(2, function()
 		Effects.toast("🖱️ Kamera", "Maustaste halten + ziehen = drehen · Mausrad = zoomen · Strg = Maus-Kamera", "")
 	end
 end)
-]]></ProtectedString></Properties><Item class="ModuleScript" referent="RBX00000016"><Properties><string name="Name">CameraController</string><ProtectedString name="Source"><![CDATA[--[[
+]]></ProtectedString></Properties><Item class="ModuleScript" referent="RBX00000018"><Properties><string name="Name">CameraController</string><ProtectedString name="Source"><![CDATA[--[[
 	CAMERACONTROLLER – eigene Kamerasteuerung für alle Geräte
 
 	PC:
@@ -4637,7 +5953,7 @@ end
 
 return CameraController
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000017"><Properties><string name="Name">Effects</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000019"><Properties><string name="Name">Effects</string><ProtectedString name="Source"><![CDATA[--[[
 	EFFECTS – alles, was kurz aufpoppt:
 	Nachrichten (Toasts), große Banner, fliegende Zahlen,
 	Box-Öffnen-Animation, Mog-Battle-Ansicht, Herausforderungen, Bestätigungen.
@@ -4653,6 +5969,7 @@ local Logic = require(Shared:WaitForChild("Logic"))
 local Util = require(Shared:WaitForChild("Util"))
 local UI = require(script.Parent:WaitForChild("UI"))
 local Sounds = require(script.Parent:WaitForChild("Sounds"))
+local PetView = require(script.Parent:WaitForChild("PetView"))
 
 local Effects = {}
 local gui, overlayGui, toastHolder
@@ -4779,7 +6096,7 @@ function Effects.hatch(results)
 		local card = UI.panel(row, { Size = UDim2.new(0, 170, 0, 220), Color = rarity.color:Lerp(Color3.new(0, 0, 0), 0.55) })
 		UI.stroke(card, rarity.color, 4, 0)
 		UI.padding(card, 8)
-		UI.text(card, def.emoji, { Size = UDim2.new(1, 0, 0.5, 0), MaxText = 90 })
+		PetView.make(card, def.id, 1, true, { Size = UDim2.new(1, 0, 0.5, 0) })
 		UI.text(card, def.name, { Size = UDim2.new(1, 0, 0.18, 0), Position = UDim2.new(0, 0, 0.52, 0), MaxText = 20 })
 		UI.text(card, rarity.name, { Size = UDim2.new(1, 0, 0.14, 0), Position = UDim2.new(0, 0, 0.7, 0), Color = rarity.color, MaxText = 18 })
 		UI.text(card, Util.formatPercent(def.boost) .. " Aura", { Size = UDim2.new(1, 0, 0.13, 0), Position = UDim2.new(0, 0, 0.85, 0),
@@ -5068,7 +6385,7 @@ end
 
 return Effects
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000018"><Properties><string name="Name">Hud</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000001A"><Properties><string name="Name">Hud</string><ProtectedString name="Source"><![CDATA[--[[
 	HUD – die ständige Anzeige:
 	oben die Werte, links die Menü-Knöpfe, unten der Daily-Routine-Knopf
 	mit Titel und Fortschritt zum nächsten Titel.
@@ -5167,7 +6484,6 @@ function Hud.init(gui)
 		Remotes.Click:FireServer()
 		s.data.aura = s.data.aura + s.click      -- sofort anzeigen
 		State.bump()
-		Sounds.play("Click")
 		local pos = routineBtn.AbsolutePosition
 		local size = routineBtn.AbsoluteSize
 		Effects.floatText("+" .. Util.format(s.click), UDim2.new(0, pos.X + size.X * (0.3 + math.random() * 0.4), 0, pos.Y), C.gold)
@@ -5262,7 +6578,7 @@ end
 
 return Hud
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000019"><Properties><string name="Name">Menus</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000001B"><Properties><string name="Name">Menus</string><ProtectedString name="Source"><![CDATA[--[[
 	MENUS – alle Menüfenster:
 	💪 Upgrades · 🐾 Pets · 🌍 Welten · ♻️ Rebirth · 🏆 Rangliste · 🎁 Belohnungen · ⚙️ Einstellungen
 ]]
@@ -5280,6 +6596,7 @@ local State = require(script.Parent:WaitForChild("State"))
 local Sounds = require(script.Parent:WaitForChild("Sounds"))
 local Effects = require(script.Parent:WaitForChild("Effects"))
 local CameraController = require(script.Parent:WaitForChild("CameraController"))
+local PetView = require(script.Parent:WaitForChild("PetView"))
 local UserInputService = game:GetService("UserInputService")
 
 local Menus = {}
@@ -5319,17 +6636,17 @@ local BUILDERS = {}
 local TITLES = {
 	upgrades = "💪 Upgrades", pets = "🐾 Pets", worlds = "🌍 Welten", rebirth = "♻️ Rebirth",
 	leaderboard = "🏆 Globale Rangliste", rewards = "🎁 Belohnungen", settings = "⚙️ Einstellungen",
-	quests = "📋 Aufträge & Erfolge", jobs = "💼 Jobs", weapons = "⚔️ Waffen & Bosskampf",
+	quests = "📋 Aufträge & Erfolge", jobs = "💼 Jobs", weapons = "⚔️ Waffen & Bosskampf", egginfo = "🎁 Box-Inhalt",
 }
 
-function Menus.open(name)
+function Menus.open(name, arg)
 	if not BUILDERS[name] or not State.snap then return end
 	UI.clear(content)
 	for _, c in ipairs(content:GetChildren()) do c:Destroy() end
 	current = name
 	titleLabel.Text = TITLES[name]
 	window.Visible = true
-	refreshFn = BUILDERS[name](content)
+	refreshFn = BUILDERS[name](content, arg)
 	if refreshFn then refreshFn("full") end
 end
 
@@ -5470,7 +6787,7 @@ BUILDERS.pets = function(root)
 		local def = Logic.petById[pet.id]
 		local rarity = Config.Rarities[def.rarity]
 		local tier = Config.PetTiers[pet.tier]
-		UI.text(detail, def.emoji, { Size = UDim2.new(1, 0, 0.26, 0), MaxText = 80 })
+		PetView.make(detail, pet.id, pet.tier, true, { Size = UDim2.new(1, 0, 0.26, 0) })
 		UI.text(detail, def.name, { Size = UDim2.new(1, 0, 0.09, 0), Position = UDim2.new(0, 0, 0.27, 0), MaxText = 22 })
 		UI.text(detail, rarity.name .. (pet.tier > 1 and (" · " .. tier.name) or ""), { Size = UDim2.new(1, 0, 0.07, 0), Position = UDim2.new(0, 0, 0.36, 0),
 			Color = tier.color or rarity.color, MaxText = 18 })
@@ -5518,7 +6835,7 @@ BUILDERS.pets = function(root)
 					LayoutOrder = i, Parent = grid })
 				UI.corner(cell, 10)
 				UI.stroke(cell, tier.color or rarity.color, pet.uid == selectedPet and 4 or 2, 0)
-				UI.text(cell, def.emoji, { Size = UDim2.new(1, 0, 0.55, 0), MaxText = 44 })
+				PetView.make(cell, pet.id, pet.tier, false, { Size = UDim2.new(1, 0, 0.56, 0) })
 				UI.text(cell, Util.formatPercent(Logic.petBoost(pet)), { Size = UDim2.new(1, -4, 0.2, 0), Position = UDim2.new(0, 2, 0.56, 0), Color = C.green, MaxText = 13 })
 				UI.text(cell, pet.tier > 1 and tier.name or rarity.name, { Size = UDim2.new(1, -4, 0.18, 0), Position = UDim2.new(0, 2, 0.78, 0),
 					Color = tier.color or rarity.color, Font = Enum.Font.GothamBold, MaxText = 11 })
@@ -6032,11 +7349,50 @@ BUILDERS.weapons = function(root)
 end
 
 
+----------------------------------------------------------------------------
+-- 🎁 BOX-INHALT (an einer Pet-Station mit R geöffnet)
+----------------------------------------------------------------------------
+BUILDERS.egginfo = function(root, eggIndex)
+	local egg = Config.Eggs[eggIndex or 1]
+	if not egg then return nil end
+	local station = Config.EggStations[egg.station]
+	local d = data()
+	local total = 0
+	for _, e in ipairs(egg.pets) do total = total + e.weight end
+	UI.text(root, station.emoji .. " <b>" .. egg.name .. "</b>  ·  <font color='" .. UI.hex(C.gold) .. "'>" .. Util.format(egg.cost) .. " Aura</font>  ·  🍀 Glück "
+		.. Util.formatMult(snap().luck), { Size = UDim2.new(1, -250, 0, 34), XAlign = Enum.TextXAlignment.Left, MaxText = 18 })
+	UI.button(root, "🎁 Öffnen", C.gold, function()
+		Remotes.HatchEgg:FireServer(egg.index, 1)
+		Menus.close()
+	end, { AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -124, 0, 0), Size = UDim2.new(0, 118, 0, 34), TextColor = C.dark, MaxText = 16 })
+	UI.button(root, "🎁 3x", Logic.perkLevel(d, "triple") > 0 and C.gold or C.grey, function()
+		Remotes.HatchEgg:FireServer(egg.index, 3)
+		Menus.close()
+	end, { AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, 0, 0, 0), Size = UDim2.new(0, 118, 0, 34), TextColor = C.dark, MaxText = 16 })
+	local grid = UI.scroll(root, { Size = UDim2.new(1, 0, 1, -42), Position = UDim2.new(0, 0, 0, 42) })
+	UI.new("UIGridLayout", { CellSize = UDim2.new(0, 112, 0, 150), CellPadding = UDim2.new(0, 8, 0, 8), SortOrder = Enum.SortOrder.LayoutOrder, Parent = grid })
+	for i, e in ipairs(egg.pets) do
+		local def = Logic.petById[e.id]
+		local rarity = Config.Rarities[def.rarity]
+		local cell = UI.panel(grid, { Color = rarity.color:Lerp(Color3.new(0, 0, 0), 0.65), LayoutOrder = i, Radius = 10 })
+		UI.stroke(cell, rarity.color, 2, 0)
+		PetView.make(cell, def.id, 1, false, { Size = UDim2.new(1, 0, 0.5, 0) })
+		UI.text(cell, def.name, { Size = UDim2.new(1, -6, 0.15, 0), Position = UDim2.new(0, 3, 0.5, 0), MaxText = 14 })
+		UI.text(cell, rarity.name, { Size = UDim2.new(1, -6, 0.11, 0), Position = UDim2.new(0, 3, 0.65, 0), Color = rarity.color, MaxText = 13 })
+		UI.text(cell, Util.format(e.weight / total * 100) .. " %", { Size = UDim2.new(1, -6, 0.12, 0), Position = UDim2.new(0, 3, 0.76, 0), Color = C.gold, MaxText = 15 })
+		UI.text(cell, Util.formatPercent(def.boost) .. " Aura", { Size = UDim2.new(1, -6, 0.1, 0), Position = UDim2.new(0, 3, 0.88, 0), Color = C.green,
+			Font = Enum.Font.GothamBold, MaxText = 12 })
+	end
+	return nil
+end
+
+
 return Menus
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000001A"><Properties><string name="Name">PetFollow</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000001C"><Properties><string name="Name">PetFollow</string><ProtectedString name="Source"><![CDATA[--[[
 	PETFOLLOW – bewegt alle Pets (von allen Spielern) flüssig hinter ihren Besitzern her.
 	Läuft auf jedem Gerät selbst, damit es ruckelfrei aussieht.
+	Pets laufen leicht hüpfend, schauen in Laufrichtung, Regenbogen-Pets wechseln die Farbe.
 ]]
 
 local Players = game:GetService("Players")
@@ -6044,33 +7400,46 @@ local RunService = game:GetService("RunService")
 
 local PetFollow = {}
 local t = 0
+local FAR = 220   -- weiter entfernte Pets werden nicht bewegt (spart Leistung)
 
 function PetFollow.init()
 	RunService.RenderStepped:Connect(function(dt)
 		t = t + dt
 		local folder = workspace:FindFirstChild("Pets")
-		if not folder then return end
+		local cam = workspace.CurrentCamera
+		if not folder or not cam then return end
+		local camPos = cam.CFrame.Position
 		for _, ownerFolder in ipairs(folder:GetChildren()) do
 			local owner = Players:GetPlayerByUserId(tonumber(ownerFolder.Name) or 0)
 			local char = owner and owner.Character
 			local hrp = char and char:FindFirstChild("HumanoidRootPart")
-			if hrp then
+			if hrp and (hrp.Position - camPos).Magnitude < FAR then
 				local pets = ownerFolder:GetChildren()
 				local n = #pets
-				for _, p in ipairs(pets) do
-					if p:IsA("BasePart") then
-						local slot = p:GetAttribute("Slot") or 1
-						-- Pets im Halbkreis hinter dem Spieler
+				local moving = hrp.AssemblyLinearVelocity.Magnitude > 1
+				for _, model in ipairs(pets) do
+					local root = model:IsA("Model") and model.PrimaryPart
+					if root then
+						local slot = model:GetAttribute("Slot") or 1
+						-- im Halbkreis hinter dem Spieler
 						local angle = 0
 						if n > 1 then
-							angle = math.rad(-70 + (slot - 1) * (140 / (n - 1)))
+							angle = math.rad(-75 + (slot - 1) * (150 / (n - 1)))
 						end
-						local bob = math.sin(t * 3 + slot) * 0.4
-						local target = hrp.CFrame * CFrame.new(math.sin(angle) * 6, -1 + bob, 4 + math.cos(angle) * 2)
-						p.CFrame = p.CFrame:Lerp(target, math.clamp(dt * 7, 0, 1))
+						local hop = moving and math.abs(math.sin(t * 9 + slot)) * 0.8 or math.sin(t * 2 + slot) * 0.25
+						local target = hrp.CFrame * CFrame.new(math.sin(angle) * 6.5, -1.4 + hop, 4.5 + math.cos(angle) * 2)
+						local current = root.CFrame
+						local pos = current.Position:Lerp(target.Position, math.clamp(dt * 7, 0, 1))
+						local look = hrp.CFrame.LookVector
+						root.CFrame = CFrame.lookAt(pos, pos + Vector3.new(look.X, 0, look.Z))
 						-- Regenbogen-Pets wechseln die Farbe
-						if p:GetAttribute("Tier") == 3 then
-							p.Color = Color3.fromHSV((t * 0.25 + slot * 0.1) % 1, 0.65, 1)
+						if model:GetAttribute("Tier") == 3 then
+							local color = Color3.fromHSV((t * 0.25 + slot * 0.1) % 1, 0.65, 1)
+							for _, p in ipairs(model:GetDescendants()) do
+								if p:IsA("BasePart") and p:GetAttribute("Main") then
+									p.Color = color
+								end
+							end
 						end
 					end
 				end
@@ -6081,7 +7450,65 @@ end
 
 return PetFollow
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000001B"><Properties><string name="Name">Sounds</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000001D"><Properties><string name="Name">PetView</string><ProtectedString name="Source"><![CDATA[--[[
+	PETVIEW – zeigt ein Pet als drehbare 3D-Vorschau in Menüs (ViewportFrame).
+]]
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local PetModels = require(Shared:WaitForChild("PetModels"))
+local Logic = require(Shared:WaitForChild("Logic"))
+
+local PetView = {}
+local spinning = {}   -- Modelle, die sich langsam drehen
+
+RunService.RenderStepped:Connect(function(dt)
+	for model, data in pairs(spinning) do
+		if not model.Parent then
+			spinning[model] = nil
+		else
+			data.angle = data.angle + dt * 0.8
+			model:PivotTo(CFrame.Angles(0, data.angle, 0))
+		end
+	end
+end)
+
+-- parent: GUI-Element; petId: z. B. "w1_3"; tier: 1–4; spin: drehen?
+function PetView.make(parent, petId, tier, spin, props)
+	props = props or {}
+	local def = Logic.petById[petId]
+	local vp = Instance.new("ViewportFrame")
+	vp.Name = "PetView"
+	vp.BackgroundTransparency = 1
+	vp.Size = props.Size or UDim2.new(1, 0, 1, 0)
+	vp.Position = props.Position or UDim2.new(0, 0, 0, 0)
+	vp.Ambient = Color3.fromRGB(190, 190, 200)
+	vp.LightColor = Color3.fromRGB(255, 250, 240)
+	vp.LightDirection = Vector3.new(-1, -1.2, -0.6)
+	vp.ZIndex = props.ZIndex or 1
+	vp.Parent = parent
+	if not def then return vp end
+
+	local model = PetModels.build(def, tier or 1, false)
+	model.Parent = vp
+	local cam = Instance.new("Camera")
+	cam.FieldOfView = 40
+	local size = model:GetExtentsSize()
+	local dist = math.max(size.X, size.Y, size.Z) * 1.9 + 1
+	cam.CFrame = CFrame.lookAt(Vector3.new(dist * 0.45, dist * 0.3, -dist), Vector3.new(0, 0, 0))
+	cam.Parent = vp
+	vp.CurrentCamera = cam
+	if spin then
+		spinning[model] = { angle = 0 }
+	end
+	return vp
+end
+
+return PetView
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX0000001E"><Properties><string name="Name">Sounds</string><ProtectedString name="Source"><![CDATA[--[[
 	SOUNDS – spielt Soundeffekte und Hintergrundmusik.
 	Die Sound-IDs stehen in Config.Sounds / Config.Music.
 ]]
@@ -6144,7 +7571,7 @@ end
 
 return Sounds
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000001C"><Properties><string name="Name">State</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000001F"><Properties><string name="Name">State</string><ProtectedString name="Source"><![CDATA[--[[
 	STATE – speichert auf dem Gerät den letzten Spielstand vom Server
 	und informiert alle Menüs, wenn sich etwas ändert.
 ]]
@@ -6192,7 +7619,7 @@ end
 
 return State
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000001D"><Properties><string name="Name">TradeUI</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000020"><Properties><string name="Name">TradeUI</string><ProtectedString name="Source"><![CDATA[--[[
 	TRADEUI – das Handelsfenster.
 	Links: dein Angebot + deine Pets (antippen = hinzufügen/entfernen) + Geld.
 	Rechts: was der andere anbietet.
@@ -6374,7 +7801,7 @@ end
 
 return TradeUI
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000001E"><Properties><string name="Name">UI</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000021"><Properties><string name="Name">UI</string><ProtectedString name="Source"><![CDATA[--[[
 	UI – kleine Helfer, um Oberflächen per Code zu bauen.
 	Farben und Schriften des Spiels sind hier festgelegt.
 ]]
@@ -6557,7 +7984,7 @@ end
 
 return UI
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000001F"><Properties><string name="Name">WorldFx</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000022"><Properties><string name="Name">WorldFx</string><ProtectedString name="Source"><![CDATA[--[[
 	WORLDFX – Licht, Nebel und Musik passend zur Welt,
 	und versteckt den eigenen "Mog Battle"-Knopf am eigenen Körper.
 ]]

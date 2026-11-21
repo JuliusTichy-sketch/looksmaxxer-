@@ -174,15 +174,17 @@ Config.RebirthShop = {
 ----------------------------------------------------------------------------
 -- PETS & GESCHENKBOXEN
 ----------------------------------------------------------------------------
--- Seltenheiten: weight = Chance (relativ), mult = Stärke-Faktor
+-- Seltenheiten: weight = Grundchance, mult = Stärke-Faktor
 Config.Rarities = {
-	common    = { order = 1, name = "Gewöhnlich",   color = Color3.fromRGB(200, 200, 210), weight = 55,  mult = 1 },
-	uncommon  = { order = 2, name = "Ungewöhnlich", color = Color3.fromRGB(78, 240, 120),  weight = 27,  mult = 2 },
-	rare      = { order = 3, name = "Selten",       color = Color3.fromRGB(70, 150, 255),  weight = 12,  mult = 4 },
-	epic      = { order = 4, name = "Episch",       color = Color3.fromRGB(170, 90, 255),  weight = 5,   mult = 9 },
-	legendary = { order = 5, name = "Legendär",     color = Color3.fromRGB(255, 200, 40),  weight = 0.9, mult = 25 },
-	mythic    = { order = 6, name = "Mythisch",     color = Color3.fromRGB(255, 60, 90),   weight = 0.1, mult = 80 },
-	secret    = { order = 7, name = "GEHEIM",       color = Color3.fromRGB(255, 255, 255), weight = 0,   mult = 300 },
+	common    = { order = 1, name = "Gewöhnlich",   color = Color3.fromRGB(200, 200, 210), mult = 1 },
+	uncommon  = { order = 2, name = "Ungewöhnlich", color = Color3.fromRGB(78, 240, 120),  mult = 1.7 },
+	rare      = { order = 3, name = "Selten",       color = Color3.fromRGB(70, 150, 255),  mult = 2.8 },
+	epic      = { order = 4, name = "Episch",       color = Color3.fromRGB(170, 90, 255),  mult = 4.5 },
+	legendary = { order = 5, name = "Legendär",     color = Color3.fromRGB(255, 200, 40),  mult = 8 },
+	mythic    = { order = 6, name = "Mythisch",     color = Color3.fromRGB(255, 60, 90),   mult = 14 },
+	exotic    = { order = 7, name = "Exotisch",     color = Color3.fromRGB(0, 255, 200),   mult = 25 },
+	divine    = { order = 8, name = "Göttlich",     color = Color3.fromRGB(255, 240, 150), mult = 45 },
+	secret    = { order = 9, name = "GEHEIM",       color = Color3.fromRGB(255, 255, 255), mult = 80 },
 }
 
 -- Stufen durch Fusionieren (5 gleiche = 1 bessere)
@@ -194,83 +196,208 @@ Config.PetTiers = {
 }
 Config.FUSE_COUNT = 5
 Config.BASE_PET_SLOTS = 3
-Config.MAX_PET_INVENTORY = 60
-Config.PITY = 150                 -- spätestens nach so vielen Boxen ohne Legendär kommt eins
-Config.PET_BASE_BOOST = 0.05      -- Gewöhnliches Pet in Welt 1 = +5 % Aura
+Config.MAX_PET_INVENTORY = 75
+Config.PITY = 150                 -- spätestens nach so vielen Boxen ohne Legendär (oder besser) kommt eins
+Config.PET_BASE_BOOST = 0.03      -- Gewöhnliches Pet in Welt 1 = +3 % Aura
 Config.PET_WORLD_GROWTH = 1.5     -- jede Welt: Pets 1,5x stärker
 
--- Pets pro Welt: { Name, Emoji, Seltenheit }
+-- 5 Stationen pro Welt: je teurer, desto bessere Chancen
+-- costMult = Preis-Faktor, weights = Chancen pro Seltenheit
+Config.EggStations = {
+	{ name = "Basis-Box",    emoji = "📦", costMult = 1,    color = Color3.fromRGB(205, 127, 50),
+	  weights = { common = 55, uncommon = 27, rare = 12, epic = 5, legendary = 0.9, mythic = 0.1 } },
+	{ name = "Silber-Box",   emoji = "🥈", costMult = 6,    color = Color3.fromRGB(200, 205, 215),
+	  weights = { common = 30, uncommon = 32, rare = 22, epic = 11.5, legendary = 3.5, mythic = 0.9, exotic = 0.1 } },
+	{ name = "Gold-Box",     emoji = "🥇", costMult = 40,   color = Color3.fromRGB(255, 205, 60),
+	  weights = { common = 10, uncommon = 28, rare = 32, epic = 20, legendary = 7.5, mythic = 2, exotic = 0.45, divine = 0.05 } },
+	{ name = "Diamant-Box",  emoji = "💎", costMult = 250,  color = Color3.fromRGB(150, 240, 255),
+	  weights = { uncommon = 18, rare = 36, epic = 30, legendary = 11, mythic = 3.8, exotic = 1, divine = 0.2 } },
+	{ name = "Göttliche Box", emoji = "🌈", costMult = 1500, color = Color3.fromRGB(255, 120, 240),
+	  weights = { rare = 28, epic = 40, legendary = 20, mythic = 8, exotic = 3.2, divine = 0.8 } },
+}
+
+local C = Color3.fromRGB
+--[[ Pets pro Welt: { Name, Emoji, Seltenheit, Aussehen }
+	Aussehen (look): plan = Bauplan der 3D-Figur, c1/c2 = Farben, dazu Extras:
+	  quad    = Vierbeiner (ears = round/pointy/long/floppy/big, tail = short/long/fluffy/curl, mane, horn, horns, hump, trunk, stripes, spots, patches, mask)
+	  bird    = Vogel (style = penguin/owl/eagle/longleg/crest/peacock/swan/phoenix)
+	  sea     = Meerestier (style = fish/dolphin/shark/whale)
+	  crab, scorpion, octopus, turtle, snake, frog, dragon, moai, ghost, alien, star, planet, blob
+	  glass = durchsichtig glänzend, neon = leuchtend, gold = golden, halo = Heiligenschein, shades = Sonnenbrille
+]]
 local PET_DATA = {
 	{ -- 1 Glow City
-		{ "Gym-Hamster", "🐹", "common" }, { "Skincare-Katze", "🐱", "common" }, { "Mewing-Mops", "🐶", "uncommon" },
-		{ "Protein-Pinguin", "🐧", "rare" }, { "Sigma-Wolf", "🐺", "epic" }, { "Golden Retriever Chad", "🐕", "legendary" },
-		{ "Mini-Moai", "🗿", "mythic" },
+		{ "Gym-Hamster", "🐹", "common", { plan = "quad", c1 = C(230, 170, 100), c2 = C(255, 235, 210), ears = "round", tail = "short", size = 0.85 } },
+		{ "Skincare-Katze", "🐱", "common", { plan = "quad", c1 = C(240, 240, 240), c2 = C(255, 190, 200), ears = "pointy", tail = "long", cucumber = true } },
+		{ "Straßen-Taube", "🐦", "common", { plan = "bird", c1 = C(140, 140, 155), c2 = C(90, 95, 110) } },
+		{ "Mewing-Mops", "🐶", "uncommon", { plan = "quad", c1 = C(215, 185, 140), c2 = C(60, 50, 45), ears = "floppy", tail = "curl" } },
+		{ "Selfie-Eichhörnchen", "🐿️", "uncommon", { plan = "quad", c1 = C(190, 110, 60), c2 = C(240, 200, 160), ears = "pointy", tail = "fluffy", size = 0.9 } },
+		{ "Protein-Pinguin", "🐧", "rare", { plan = "bird", style = "penguin", c1 = C(30, 30, 35), c2 = C(250, 250, 250) } },
+		{ "Hipster-Fuchs", "🦊", "rare", { plan = "quad", c1 = C(235, 120, 40), c2 = C(255, 255, 255), ears = "pointy", tail = "fluffy", shades = true } },
+		{ "Sigma-Wolf", "🐺", "epic", { plan = "quad", c1 = C(110, 115, 130), c2 = C(220, 220, 230), ears = "pointy", tail = "long" } },
+		{ "Neon-Katze", "😺", "epic", { plan = "quad", c1 = C(255, 79, 216), c2 = C(62, 242, 255), ears = "pointy", tail = "long", neon = true } },
+		{ "Golden Retriever Chad", "🐕", "legendary", { plan = "quad", c1 = C(230, 180, 80), c2 = C(250, 230, 170), ears = "floppy", tail = "long", shades = true, size = 1.1 } },
+		{ "Mini-Moai", "🗿", "mythic", { plan = "moai", c1 = C(130, 125, 120), c2 = C(100, 95, 90) } },
+		{ "Kristall-Drache", "🐉", "exotic", { plan = "dragon", c1 = C(120, 220, 255), c2 = C(255, 255, 255), glass = true } },
+		{ "Glow-Gott-Löwe", "🦁", "divine", { plan = "quad", c1 = C(255, 215, 90), c2 = C(255, 150, 40), ears = "round", tail = "long", mane = true, neon = true, halo = true, size = 1.15 } },
 	},
 	{ -- 2 Miami Beach
-		{ "Pinch-Krabbe", "🦀", "common" }, { "Strand-Möwe", "🐦", "common" }, { "Flex-Delfin", "🐬", "uncommon" },
-		{ "Glow-Mingo", "🦩", "rare" }, { "Jaw-Hai", "🦈", "epic" }, { "Bronze-Schildkröte", "🐢", "legendary" },
-		{ "Sonnengott-Krake", "🐙", "mythic" },
+		{ "Pinch-Krabbe", "🦀", "common", { plan = "crab", c1 = C(230, 70, 50), c2 = C(255, 200, 180) } },
+		{ "Strand-Möwe", "🐦", "common", { plan = "bird", c1 = C(250, 250, 250), c2 = C(150, 155, 165) } },
+		{ "Sand-Schildkröte", "🐢", "common", { plan = "turtle", c1 = C(120, 170, 90), c2 = C(160, 120, 70) } },
+		{ "Flex-Delfin", "🐬", "uncommon", { plan = "sea", style = "dolphin", c1 = C(120, 170, 220), c2 = C(230, 240, 250) } },
+		{ "Kokos-Affe", "🐒", "uncommon", { plan = "quad", c1 = C(130, 90, 60), c2 = C(230, 190, 150), ears = "round", tail = "long" } },
+		{ "Glow-Mingo", "🦩", "rare", { plan = "bird", style = "longleg", c1 = C(255, 130, 170), c2 = C(255, 200, 220) } },
+		{ "Seestern Sam", "⭐", "rare", { plan = "star", c1 = C(255, 150, 80), c2 = C(255, 220, 150) } },
+		{ "Jaw-Hai", "🦈", "epic", { plan = "sea", style = "shark", c1 = C(120, 130, 150), c2 = C(240, 240, 245) } },
+		{ "Papagei Pablo", "🦜", "epic", { plan = "bird", style = "crest", c1 = C(230, 40, 40), c2 = C(40, 120, 255) } },
+		{ "Bronze-Schildkröte", "🐢", "legendary", { plan = "turtle", c1 = C(205, 127, 50), c2 = C(140, 90, 40), gold = true } },
+		{ "Sonnengott-Krake", "🐙", "mythic", { plan = "octopus", c1 = C(255, 120, 60), c2 = C(255, 200, 120) } },
+		{ "Regenbogen-Wal", "🐋", "exotic", { plan = "sea", style = "whale", c1 = C(90, 140, 255), c2 = C(220, 240, 255), glass = true } },
+		{ "Poseidons Delfin", "🔱", "divine", { plan = "sea", style = "dolphin", c1 = C(255, 220, 100), c2 = C(255, 255, 255), neon = true, halo = true } },
 	},
 	{ -- 3 Iron Mountain
-		{ "Hantel-Hase", "🐰", "common" }, { "Bergziege", "🐐", "common" }, { "Eiweiß-Eule", "🦉", "uncommon" },
-		{ "Eisbär-Bro", "🐻", "rare" }, { "Titan-Gorilla", "🦍", "epic" }, { "Gains-Drache", "🐉", "legendary" },
-		{ "Ur-Mammut", "🐘", "mythic" },
+		{ "Hantel-Hase", "🐰", "common", { plan = "quad", c1 = C(240, 240, 240), c2 = C(255, 190, 200), ears = "long", tail = "short", size = 0.85 } },
+		{ "Bergziege", "🐐", "common", { plan = "quad", c1 = C(220, 210, 190), c2 = C(120, 100, 80), ears = "floppy", tail = "short", horns = true } },
+		{ "Murmeltier", "🦫", "common", { plan = "quad", c1 = C(150, 110, 70), c2 = C(210, 180, 140), ears = "round", tail = "short", size = 0.9 } },
+		{ "Eiweiß-Eule", "🦉", "uncommon", { plan = "bird", style = "owl", c1 = C(140, 100, 70), c2 = C(240, 220, 190) } },
+		{ "Schnee-Fuchs", "🦊", "uncommon", { plan = "quad", c1 = C(245, 245, 255), c2 = C(200, 210, 230), ears = "pointy", tail = "fluffy" } },
+		{ "Eisbär-Bro", "🐻", "rare", { plan = "quad", c1 = C(245, 245, 250), c2 = C(40, 40, 45), ears = "round", tail = "short", size = 1.15 } },
+		{ "Adler Arnold", "🦅", "rare", { plan = "bird", style = "eagle", c1 = C(100, 70, 40), c2 = C(255, 255, 255) } },
+		{ "Titan-Gorilla", "🦍", "epic", { plan = "quad", c1 = C(55, 55, 60), c2 = C(120, 110, 105), ears = "round", tail = "none", size = 1.25 } },
+		{ "Yeti-Baby", "❄️", "epic", { plan = "quad", c1 = C(230, 235, 255), c2 = C(150, 180, 230), ears = "round", tail = "fluffy", mane = true } },
+		{ "Gains-Drache", "🐉", "legendary", { plan = "dragon", c1 = C(60, 160, 80), c2 = C(255, 220, 80) } },
+		{ "Ur-Mammut", "🦣", "mythic", { plan = "quad", c1 = C(130, 90, 60), c2 = C(245, 240, 225), ears = "big", tail = "short", trunk = true, size = 1.3 } },
+		{ "Lawinen-Wolf", "🐺", "exotic", { plan = "quad", c1 = C(200, 230, 255), c2 = C(255, 255, 255), ears = "pointy", tail = "long", glass = true } },
+		{ "Berg-Gott-Adler", "🦅", "divine", { plan = "bird", style = "eagle", c1 = C(255, 210, 80), c2 = C(255, 255, 255), neon = true, halo = true } },
 	},
 	{ -- 4 Mewing-Tempel
-		{ "Meditations-Frosch", "🐸", "common" }, { "Tempel-Affe", "🐒", "common" }, { "Jade-Schlange", "🐍", "uncommon" },
-		{ "Zen-Kranich", "🦢", "rare" }, { "Mönch-Panda", "🐼", "epic" }, { "Kiefer-Tiger", "🐯", "legendary" },
-		{ "Ur-Moai-Geist", "👻", "mythic" },
+		{ "Meditations-Frosch", "🐸", "common", { plan = "frog", c1 = C(100, 200, 80), c2 = C(220, 240, 170) } },
+		{ "Tempel-Affe", "🐒", "common", { plan = "quad", c1 = C(160, 110, 70), c2 = C(240, 200, 170), ears = "round", tail = "long" } },
+		{ "Koi-Fisch", "🐟", "common", { plan = "sea", style = "fish", c1 = C(255, 140, 60), c2 = C(255, 255, 255) } },
+		{ "Jade-Schlange", "🐍", "uncommon", { plan = "snake", c1 = C(60, 180, 120), c2 = C(220, 240, 180) } },
+		{ "Glücks-Katze", "😸", "uncommon", { plan = "quad", c1 = C(255, 250, 240), c2 = C(220, 40, 40), ears = "pointy", tail = "short" } },
+		{ "Zen-Kranich", "🦢", "rare", { plan = "bird", style = "longleg", c1 = C(250, 250, 250), c2 = C(30, 30, 30) } },
+		{ "Tempel-Löwe", "🦁", "rare", { plan = "quad", c1 = C(210, 170, 60), c2 = C(170, 60, 40), ears = "round", tail = "long", mane = true } },
+		{ "Mönch-Panda", "🐼", "epic", { plan = "quad", c1 = C(250, 250, 250), c2 = C(25, 25, 25), ears = "round", tail = "short", patches = true, size = 1.15 } },
+		{ "Kirschblüten-Hirsch", "🦌", "epic", { plan = "quad", c1 = C(170, 110, 70), c2 = C(255, 180, 210), ears = "pointy", tail = "short", horns = true } },
+		{ "Kiefer-Tiger", "🐯", "legendary", { plan = "quad", c1 = C(240, 140, 40), c2 = C(30, 25, 20), ears = "round", tail = "long", stripes = true, size = 1.1 } },
+		{ "Ur-Moai-Geist", "👻", "mythic", { plan = "ghost", c1 = C(200, 230, 255), c2 = C(120, 160, 255) } },
+		{ "Jade-Drache", "🐲", "exotic", { plan = "dragon", c1 = C(60, 200, 140), c2 = C(220, 255, 230), glass = true } },
+		{ "Erleuchteter Moai", "🗿", "divine", { plan = "moai", c1 = C(255, 215, 90), c2 = C(255, 255, 200), neon = true, halo = true } },
 	},
 	{ -- 5 Mailand
-		{ "Laufsteg-Pudel", "🐩", "common" }, { "Designer-Maus", "🐭", "common" }, { "Pfau Paolo", "🦚", "uncommon" },
-		{ "Drip-Zebra", "🦓", "rare" }, { "Fashion-Fuchs", "🦊", "epic" }, { "Couture-Schwan", "🦢", "legendary" },
-		{ "Il-Drippo-Einhorn", "🦄", "mythic" },
+		{ "Laufsteg-Pudel", "🐩", "common", { plan = "quad", c1 = C(250, 250, 250), c2 = C(255, 190, 220), ears = "floppy", tail = "fluffy", mane = true } },
+		{ "Designer-Maus", "🐭", "common", { plan = "quad", c1 = C(180, 180, 190), c2 = C(255, 190, 200), ears = "big", tail = "long", size = 0.8 } },
+		{ "Tauben-Model", "🐦", "common", { plan = "bird", c1 = C(170, 170, 190), c2 = C(120, 200, 180) } },
+		{ "Pfau Paolo", "🦚", "uncommon", { plan = "bird", style = "peacock", c1 = C(40, 120, 200), c2 = C(40, 200, 120) } },
+		{ "Seiden-Raupe", "🐛", "uncommon", { plan = "snake", c1 = C(250, 230, 240), c2 = C(255, 150, 200) } },
+		{ "Drip-Zebra", "🦓", "rare", { plan = "quad", c1 = C(250, 250, 250), c2 = C(20, 20, 20), ears = "pointy", tail = "long", stripes = true, mane = true } },
+		{ "Flamingo Fiorella", "🦩", "rare", { plan = "bird", style = "longleg", c1 = C(255, 140, 190), c2 = C(255, 220, 235), shades = true } },
+		{ "Fashion-Fuchs", "🦊", "epic", { plan = "quad", c1 = C(220, 80, 140), c2 = C(255, 255, 255), ears = "pointy", tail = "fluffy", shades = true } },
+		{ "Couture-Chamäleon", "🦎", "epic", { plan = "frog", c1 = C(120, 220, 180), c2 = C(255, 120, 200) } },
+		{ "Couture-Schwan", "🦢", "legendary", { plan = "bird", style = "swan", c1 = C(250, 250, 250), c2 = C(255, 180, 0) } },
+		{ "Il-Drippo-Einhorn", "🦄", "mythic", { plan = "quad", c1 = C(255, 230, 250), c2 = C(200, 120, 255), ears = "pointy", tail = "long", mane = true, horn = true } },
+		{ "Diamant-Pfau", "💎", "exotic", { plan = "bird", style = "peacock", c1 = C(180, 240, 255), c2 = C(255, 255, 255), glass = true } },
+		{ "Vogue-Phönix", "🔥", "divine", { plan = "bird", style = "phoenix", c1 = C(255, 120, 200), c2 = C(255, 220, 120), neon = true, halo = true } },
 	},
 	{ -- 6 Hollywood
-		{ "Paparazzi-Papagei", "🦜", "common" }, { "Popcorn-Waschbär", "🦝", "common" }, { "Oscar-Otter", "🦦", "uncommon" },
-		{ "Stunt-Känguru", "🦘", "rare" }, { "Red-Carpet-Löwe", "🦁", "epic" }, { "Blockbuster-Bär", "🐻", "legendary" },
-		{ "Walk-of-Fame-Phönix", "🔥", "mythic" },
+		{ "Paparazzi-Papagei", "🦜", "common", { plan = "bird", style = "crest", c1 = C(60, 200, 90), c2 = C(255, 220, 60) } },
+		{ "Popcorn-Waschbär", "🦝", "common", { plan = "quad", c1 = C(130, 130, 140), c2 = C(40, 40, 45), ears = "round", tail = "fluffy", mask = true } },
+		{ "Stunt-Frosch", "🐸", "common", { plan = "frog", c1 = C(60, 140, 60), c2 = C(255, 200, 60) } },
+		{ "Oscar-Otter", "🦦", "uncommon", { plan = "quad", c1 = C(120, 85, 60), c2 = C(220, 190, 160), ears = "round", tail = "long" } },
+		{ "Kamera-Krabbe", "📷", "uncommon", { plan = "crab", c1 = C(40, 40, 45), c2 = C(200, 200, 210) } },
+		{ "Stunt-Känguru", "🦘", "rare", { plan = "quad", c1 = C(200, 140, 90), c2 = C(240, 210, 180), ears = "long", tail = "long" } },
+		{ "Starlet-Katze", "🐈", "rare", { plan = "quad", c1 = C(255, 220, 240), c2 = C(255, 120, 180), ears = "pointy", tail = "long", shades = true } },
+		{ "Red-Carpet-Löwe", "🦁", "epic", { plan = "quad", c1 = C(220, 170, 80), c2 = C(150, 70, 40), ears = "round", tail = "long", mane = true, size = 1.15 } },
+		{ "Spotlight-Eule", "🦉", "epic", { plan = "bird", style = "owl", c1 = C(255, 240, 150), c2 = C(255, 255, 230), neon = true } },
+		{ "Blockbuster-Bär", "🐻", "legendary", { plan = "quad", c1 = C(120, 80, 50), c2 = C(200, 160, 120), ears = "round", tail = "short", shades = true, size = 1.25 } },
+		{ "Walk-of-Fame-Phönix", "🔥", "mythic", { plan = "bird", style = "phoenix", c1 = C(255, 120, 40), c2 = C(255, 220, 80) } },
+		{ "Oscar-Statuen-Hund", "🏆", "exotic", { plan = "quad", c1 = C(255, 205, 60), c2 = C(255, 240, 180), ears = "floppy", tail = "long", gold = true } },
+		{ "Hollywood-Drache", "🐉", "divine", { plan = "dragon", c1 = C(255, 60, 60), c2 = C(255, 220, 120), neon = true, halo = true } },
 	},
 	{ -- 7 Dubai
-		{ "Gold-Kamel", "🐫", "common" }, { "Wüsten-Skorpion", "🦂", "common" }, { "Falke Faisal", "🦅", "uncommon" },
-		{ "Luxus-Leopard", "🐆", "rare" }, { "Yacht-Wal", "🐋", "epic" }, { "Diamant-Drache", "🐲", "legendary" },
-		{ "Scheich-Phönix", "✨", "mythic" },
+		{ "Gold-Kamel", "🐫", "common", { plan = "quad", c1 = C(210, 170, 110), c2 = C(240, 210, 160), ears = "round", tail = "short", hump = true } },
+		{ "Wüsten-Skorpion", "🦂", "common", { plan = "scorpion", c1 = C(200, 160, 90), c2 = C(120, 90, 50) } },
+		{ "Fennek", "🦊", "common", { plan = "quad", c1 = C(240, 200, 150), c2 = C(255, 240, 220), ears = "big", tail = "fluffy", size = 0.85 } },
+		{ "Falke Faisal", "🦅", "uncommon", { plan = "bird", style = "eagle", c1 = C(150, 110, 70), c2 = C(240, 230, 210) } },
+		{ "Oryx", "🦌", "uncommon", { plan = "quad", c1 = C(240, 235, 225), c2 = C(40, 35, 30), ears = "pointy", tail = "short", horns = true } },
+		{ "Luxus-Leopard", "🐆", "rare", { plan = "quad", c1 = C(230, 190, 110), c2 = C(50, 35, 20), ears = "round", tail = "long", spots = true } },
+		{ "Perlen-Blob", "🦪", "rare", { plan = "blob", c1 = C(240, 240, 255), c2 = C(255, 220, 240) } },
+		{ "Yacht-Wal", "🐋", "epic", { plan = "sea", style = "whale", c1 = C(60, 90, 160), c2 = C(220, 230, 245) } },
+		{ "Gold-Gepard", "🐆", "epic", { plan = "quad", c1 = C(255, 210, 80), c2 = C(80, 50, 20), ears = "round", tail = "long", spots = true, gold = true } },
+		{ "Diamant-Drache", "🐲", "legendary", { plan = "dragon", c1 = C(180, 230, 255), c2 = C(255, 255, 255), glass = true } },
+		{ "Scheich-Phönix", "✨", "mythic", { plan = "bird", style = "phoenix", c1 = C(255, 205, 60), c2 = C(255, 255, 255), gold = true } },
+		{ "Platin-Kamel", "🐪", "exotic", { plan = "quad", c1 = C(230, 230, 240), c2 = C(255, 255, 255), ears = "round", tail = "short", hump = true, gold = true } },
+		{ "Sultan-Löwe", "👑", "divine", { plan = "quad", c1 = C(255, 215, 90), c2 = C(255, 255, 255), ears = "round", tail = "long", mane = true, neon = true, halo = true, size = 1.2 } },
 	},
 	{ -- 8 Aura-Galaxie
-		{ "Mond-Hamster", "🌙", "common" }, { "Sternen-Katze", "⭐", "common" }, { "Komet-Hund", "💫", "uncommon" },
-		{ "Alien-Bro", "👽", "rare" }, { "Nebula-Wal", "🌌", "epic" }, { "Schwarzes-Loch-Mops", "⚫", "legendary" },
-		{ "Aura-Gott", "🌈", "mythic" },
+		{ "Mond-Hamster", "🌙", "common", { plan = "quad", c1 = C(220, 220, 240), c2 = C(180, 180, 210), ears = "round", tail = "short", size = 0.85 } },
+		{ "Sternen-Katze", "⭐", "common", { plan = "quad", c1 = C(60, 60, 120), c2 = C(255, 240, 150), ears = "pointy", tail = "long", spots = true } },
+		{ "Asteroiden-Blob", "☄️", "common", { plan = "blob", c1 = C(120, 110, 100), c2 = C(255, 150, 80) } },
+		{ "Komet-Hund", "💫", "uncommon", { plan = "quad", c1 = C(120, 200, 255), c2 = C(255, 255, 255), ears = "floppy", tail = "long", neon = true } },
+		{ "Saturn-Schildkröte", "🪐", "uncommon", { plan = "turtle", c1 = C(220, 190, 120), c2 = C(160, 120, 255) } },
+		{ "Alien-Bro", "👽", "rare", { plan = "alien", c1 = C(120, 255, 120), c2 = C(20, 20, 20) } },
+		{ "UFO-Katze", "🛸", "rare", { plan = "quad", c1 = C(150, 150, 170), c2 = C(120, 255, 200), ears = "pointy", tail = "long", halo = true } },
+		{ "Nebula-Wal", "🌌", "epic", { plan = "sea", style = "whale", c1 = C(160, 90, 255), c2 = C(255, 150, 230), neon = true } },
+		{ "Planet-Blob", "🌍", "epic", { plan = "planet", c1 = C(90, 200, 255), c2 = C(120, 230, 120) } },
+		{ "Schwarzes-Loch-Mops", "⚫", "legendary", { plan = "quad", c1 = C(25, 20, 35), c2 = C(160, 90, 255), ears = "floppy", tail = "curl", halo = true } },
+		{ "Aura-Gott", "🌈", "mythic", { plan = "star", c1 = C(255, 120, 240), c2 = C(120, 240, 255), neon = true } },
+		{ "Galaxie-Drache", "🐉", "exotic", { plan = "dragon", c1 = C(120, 60, 255), c2 = C(255, 150, 255), neon = true } },
+		{ "Kosmischer Löwe", "🦁", "divine", { plan = "quad", c1 = C(255, 255, 255), c2 = C(200, 160, 255), ears = "round", tail = "long", mane = true, neon = true, halo = true, size = 1.25 } },
 	},
 }
 
-local EGG_NAMES = { "Glow-City-Box", "Strand-Box", "Gym-Box", "Tempel-Box", "Couture-Box", "Blockbuster-Box", "Gold-Box", "Galaxie-Box" }
-local EGG_COSTS = { 150, 2500, 1.5e6, 1.5e8, 1e10, 3e11, 1e13, 1.5e14 }
+local WORLD_BOX_NAMES = { "Glow City", "Strand", "Gym", "Tempel", "Couture", "Blockbuster", "Gold", "Galaxie" }
+local EGG_COSTS = { 150, 2500, 1.5e6, 1.5e8, 1e10, 3e11, 1e13, 1.5e14 }   -- Preis der Basis-Box je Welt
 
 -- Pets und Boxen werden hier automatisch aus den Listen oben erzeugt
 Config.Pets = {}
 Config.Eggs = {}
+local petsOfWorld = {}
 for w, list in ipairs(PET_DATA) do
-	local egg = { index = w, world = w, name = EGG_NAMES[w], cost = EGG_COSTS[w], pets = {} }
-	local counts = {}
-	for _, p in ipairs(list) do
-		counts[p[3]] = (counts[p[3]] or 0) + 1
-	end
+	petsOfWorld[w] = {}
 	local base = Config.PET_BASE_BOOST * Config.PET_WORLD_GROWTH ^ (w - 1)
 	for i, p in ipairs(list) do
 		local rarity = Config.Rarities[p[3]]
-		local pet = {
-			id = "w" .. w .. "_" .. i, name = p[1], emoji = p[2], rarity = p[3], world = w,
-			boost = base * rarity.mult,
-		}
+		local pet = { id = "w" .. w .. "_" .. i, name = p[1], emoji = p[2], rarity = p[3], world = w, look = p[4], boost = base * rarity.mult }
 		table.insert(Config.Pets, pet)
-		table.insert(egg.pets, { id = pet.id, weight = rarity.weight / counts[p[3]] })
+		table.insert(petsOfWorld[w], pet)
 	end
-	table.insert(Config.Eggs, egg)
 end
+for w = 1, #PET_DATA do
+	for s, station in ipairs(Config.EggStations) do
+		local counts = {}
+		for _, pet in ipairs(petsOfWorld[w]) do
+			if station.weights[pet.rarity] then
+				counts[pet.rarity] = (counts[pet.rarity] or 0) + 1
+			end
+		end
+		local egg = {
+			index = (w - 1) * #Config.EggStations + s, world = w, station = s,
+			name = WORLD_BOX_NAMES[w] .. " · " .. station.name, emoji = station.emoji,
+			cost = EGG_COSTS[w] * station.costMult, pets = {},
+		}
+		for _, pet in ipairs(petsOfWorld[w]) do
+			local wgt = station.weights[pet.rarity]
+			if wgt then
+				table.insert(egg.pets, { id = pet.id, weight = wgt / counts[pet.rarity] })
+			end
+		end
+		table.insert(Config.Eggs, egg)
+	end
+end
+
+-- Box-Nummer aus Welt & Station
+function Config.eggIndex(world, station)
+	return (world - 1) * #Config.EggStations + (station or 1)
+end
+
 -- Das geheime Pet gibt es nur, wenn man Endboss Leon besiegt
 Config.SECRET_PET = "secret_goldfisch"
 table.insert(Config.Pets, {
 	id = Config.SECRET_PET, name = "Leons Goldfisch", emoji = "🐠", rarity = "secret", world = 8,
+	look = { plan = "sea", style = "fish", c1 = C(255, 200, 40), c2 = C(255, 255, 255), gold = true, halo = true },
 	boost = Config.PET_BASE_BOOST * Config.PET_WORLD_GROWTH ^ 7 * Config.Rarities.secret.mult,
 })
 Config.SECRET_CHANCE = 0.05   -- 5 % Chance bei einem Sieg gegen Leon
@@ -299,6 +426,13 @@ Config.Bosses = {
 	{ name = "Scheich Glowmed",      level = 50, rebirths = 16, shirt = Color3.fromRGB(255, 255, 255), pants = Color3.fromRGB(255, 255, 255), skin = Color3.fromRGB(198, 134, 66), scale = 1.35 },
 	{ name = "LEON",                 level = 50, rebirths = 20, shirt = Color3.fromRGB(201, 162, 39), pants = Color3.fromRGB(201, 162, 39), skin = Color3.fromRGB(241, 194, 125), scale = 1.6, final = true },
 }
+-- Zusätzliche (schwächere) Rivalen pro Welt: Stärke = Anteil vom Haupt-Rivalen
+Config.ExtraRivals = {
+	{ prefix = "Azubi", strength = 0.55 },
+	{ prefix = "Möchtegern", strength = 0.75 },
+}
+Config.RivalNames = { "Kevin", "Justin", "Marco", "Tobi", "Can", "Malte", "Ole", "Nico", "Dario", "Yannis", "Jannik", "Luis",
+	"Elias", "Mehmet", "Finn", "Leandro" }
 Config.RIVAL_COOLDOWN = 30   -- Sekunden
 Config.BOSS_COOLDOWN = 120
 Config.PVP_COOLDOWN = 20
@@ -361,7 +495,7 @@ Config.Codes = {
 -- z. B. "rbxassetid://123456789". Leer = kein Sound.
 ----------------------------------------------------------------------------
 Config.Sounds = {
-	Click       = "rbxasset://sounds/electronicpingshort.wav",
+	Click       = "",   -- (absichtlich leer: kein Sound bei der Daily Routine)
 	Buy         = "",   -- Suchbegriff: "cash register" / "ka-ching"
 	TitleUp     = "",   -- "phonk cowbell" / "level up"
 	BattleStart = "",   -- "vine boom" / "bass boom"
@@ -415,7 +549,7 @@ Config.Achievements = {
 	{ id = "jobs",     stat = "jobs",      emoji = "💼", name = "Arbeitstier",     text = "erledigte Jobs",        tiers = { 5, 50, 250, 1000 } },
 	{ id = "trades",   stat = "trades",    emoji = "🤝", name = "Händler",         text = "abgeschlossene Handel", tiers = { 1, 10, 50, 200 } },
 	{ id = "worlds",   stat = "worlds",    emoji = "🌍", name = "Weltenbummler",   text = "freigeschaltete Welten", tiers = { 2, 4, 6, 8 } },
-	{ id = "index",    stat = "index",     emoji = "📖", name = "Sammler",         text = "Pets im Sammelbuch",    tiers = { 10, 25, 40, 57 } },
+	{ id = "index",    stat = "index",     emoji = "📖", name = "Sammler",         text = "Pets im Sammelbuch",    tiers = { 10, 30, 60, 105 } },
 }
 
 ----------------------------------------------------------------------------
@@ -435,7 +569,7 @@ Config.Jobs = {
 ----------------------------------------------------------------------------
 -- ⭐ FANS IN DEN WELTEN
 ----------------------------------------------------------------------------
-Config.FANS_PER_WORLD = 6
+Config.FANS_PER_WORLD = 18
 Config.FAN_FAIL_COOLDOWN = 45      -- nach einem Fehlversuch (Sekunden)
 Config.FAN_REPEAT = 300            -- derselbe Fan erst nach 5 Minuten wieder
 -- Grund-Charisma, das Fans in Welt 1–8 erwarten (Promi 5 ≈ x1,2 · Promi 10 = x2)

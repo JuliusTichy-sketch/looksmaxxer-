@@ -16,6 +16,7 @@ local State = require(script.Parent:WaitForChild("State"))
 local Sounds = require(script.Parent:WaitForChild("Sounds"))
 local Effects = require(script.Parent:WaitForChild("Effects"))
 local CameraController = require(script.Parent:WaitForChild("CameraController"))
+local PetView = require(script.Parent:WaitForChild("PetView"))
 local UserInputService = game:GetService("UserInputService")
 
 local Menus = {}
@@ -55,17 +56,17 @@ local BUILDERS = {}
 local TITLES = {
 	upgrades = "💪 Upgrades", pets = "🐾 Pets", worlds = "🌍 Welten", rebirth = "♻️ Rebirth",
 	leaderboard = "🏆 Globale Rangliste", rewards = "🎁 Belohnungen", settings = "⚙️ Einstellungen",
-	quests = "📋 Aufträge & Erfolge", jobs = "💼 Jobs", weapons = "⚔️ Waffen & Bosskampf",
+	quests = "📋 Aufträge & Erfolge", jobs = "💼 Jobs", weapons = "⚔️ Waffen & Bosskampf", egginfo = "🎁 Box-Inhalt",
 }
 
-function Menus.open(name)
+function Menus.open(name, arg)
 	if not BUILDERS[name] or not State.snap then return end
 	UI.clear(content)
 	for _, c in ipairs(content:GetChildren()) do c:Destroy() end
 	current = name
 	titleLabel.Text = TITLES[name]
 	window.Visible = true
-	refreshFn = BUILDERS[name](content)
+	refreshFn = BUILDERS[name](content, arg)
 	if refreshFn then refreshFn("full") end
 end
 
@@ -206,7 +207,7 @@ BUILDERS.pets = function(root)
 		local def = Logic.petById[pet.id]
 		local rarity = Config.Rarities[def.rarity]
 		local tier = Config.PetTiers[pet.tier]
-		UI.text(detail, def.emoji, { Size = UDim2.new(1, 0, 0.26, 0), MaxText = 80 })
+		PetView.make(detail, pet.id, pet.tier, true, { Size = UDim2.new(1, 0, 0.26, 0) })
 		UI.text(detail, def.name, { Size = UDim2.new(1, 0, 0.09, 0), Position = UDim2.new(0, 0, 0.27, 0), MaxText = 22 })
 		UI.text(detail, rarity.name .. (pet.tier > 1 and (" · " .. tier.name) or ""), { Size = UDim2.new(1, 0, 0.07, 0), Position = UDim2.new(0, 0, 0.36, 0),
 			Color = tier.color or rarity.color, MaxText = 18 })
@@ -254,7 +255,7 @@ BUILDERS.pets = function(root)
 					LayoutOrder = i, Parent = grid })
 				UI.corner(cell, 10)
 				UI.stroke(cell, tier.color or rarity.color, pet.uid == selectedPet and 4 or 2, 0)
-				UI.text(cell, def.emoji, { Size = UDim2.new(1, 0, 0.55, 0), MaxText = 44 })
+				PetView.make(cell, pet.id, pet.tier, false, { Size = UDim2.new(1, 0, 0.56, 0) })
 				UI.text(cell, Util.formatPercent(Logic.petBoost(pet)), { Size = UDim2.new(1, -4, 0.2, 0), Position = UDim2.new(0, 2, 0.56, 0), Color = C.green, MaxText = 13 })
 				UI.text(cell, pet.tier > 1 and tier.name or rarity.name, { Size = UDim2.new(1, -4, 0.18, 0), Position = UDim2.new(0, 2, 0.78, 0),
 					Color = tier.color or rarity.color, Font = Enum.Font.GothamBold, MaxText = 11 })
@@ -765,6 +766,44 @@ BUILDERS.weapons = function(root)
 	return function(kind)
 		if kind == "full" then build() end
 	end
+end
+
+
+----------------------------------------------------------------------------
+-- 🎁 BOX-INHALT (an einer Pet-Station mit R geöffnet)
+----------------------------------------------------------------------------
+BUILDERS.egginfo = function(root, eggIndex)
+	local egg = Config.Eggs[eggIndex or 1]
+	if not egg then return nil end
+	local station = Config.EggStations[egg.station]
+	local d = data()
+	local total = 0
+	for _, e in ipairs(egg.pets) do total = total + e.weight end
+	UI.text(root, station.emoji .. " <b>" .. egg.name .. "</b>  ·  <font color='" .. UI.hex(C.gold) .. "'>" .. Util.format(egg.cost) .. " Aura</font>  ·  🍀 Glück "
+		.. Util.formatMult(snap().luck), { Size = UDim2.new(1, -250, 0, 34), XAlign = Enum.TextXAlignment.Left, MaxText = 18 })
+	UI.button(root, "🎁 Öffnen", C.gold, function()
+		Remotes.HatchEgg:FireServer(egg.index, 1)
+		Menus.close()
+	end, { AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -124, 0, 0), Size = UDim2.new(0, 118, 0, 34), TextColor = C.dark, MaxText = 16 })
+	UI.button(root, "🎁 3x", Logic.perkLevel(d, "triple") > 0 and C.gold or C.grey, function()
+		Remotes.HatchEgg:FireServer(egg.index, 3)
+		Menus.close()
+	end, { AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, 0, 0, 0), Size = UDim2.new(0, 118, 0, 34), TextColor = C.dark, MaxText = 16 })
+	local grid = UI.scroll(root, { Size = UDim2.new(1, 0, 1, -42), Position = UDim2.new(0, 0, 0, 42) })
+	UI.new("UIGridLayout", { CellSize = UDim2.new(0, 112, 0, 150), CellPadding = UDim2.new(0, 8, 0, 8), SortOrder = Enum.SortOrder.LayoutOrder, Parent = grid })
+	for i, e in ipairs(egg.pets) do
+		local def = Logic.petById[e.id]
+		local rarity = Config.Rarities[def.rarity]
+		local cell = UI.panel(grid, { Color = rarity.color:Lerp(Color3.new(0, 0, 0), 0.65), LayoutOrder = i, Radius = 10 })
+		UI.stroke(cell, rarity.color, 2, 0)
+		PetView.make(cell, def.id, 1, false, { Size = UDim2.new(1, 0, 0.5, 0) })
+		UI.text(cell, def.name, { Size = UDim2.new(1, -6, 0.15, 0), Position = UDim2.new(0, 3, 0.5, 0), MaxText = 14 })
+		UI.text(cell, rarity.name, { Size = UDim2.new(1, -6, 0.11, 0), Position = UDim2.new(0, 3, 0.65, 0), Color = rarity.color, MaxText = 13 })
+		UI.text(cell, Util.format(e.weight / total * 100) .. " %", { Size = UDim2.new(1, -6, 0.12, 0), Position = UDim2.new(0, 3, 0.76, 0), Color = C.gold, MaxText = 15 })
+		UI.text(cell, Util.formatPercent(def.boost) .. " Aura", { Size = UDim2.new(1, -6, 0.1, 0), Position = UDim2.new(0, 3, 0.88, 0), Color = C.green,
+			Font = Enum.Font.GothamBold, MaxText = 12 })
+	end
+	return nil
 end
 
 

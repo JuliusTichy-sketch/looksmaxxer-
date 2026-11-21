@@ -85,7 +85,7 @@ function BattleService.fightNPC(player, entry)
 	if not data then return end
 	local def, world, isBoss = entry.def, entry.world, entry.isBoss
 	if not Logic.worldUnlocked(data, world) then return end
-	local key = (isBoss and "boss" or "rival") .. world
+	local key = (isBoss and "boss" or "rival") .. world .. def.name
 	local wait = onCooldown(player, key, isBoss and Config.BOSS_COOLDOWN or Config.RIVAL_COOLDOWN)
 	if wait then
 		GameService.notify(player, "⏳ Verschnaufpause", def.name .. " erholt sich noch " .. wait .. " s.", "")
@@ -136,7 +136,7 @@ function BattleService.fightNPC(player, entry)
 				PetService.givePet(player, Config.SECRET_PET)
 				PetService.announce(player.DisplayName .. " hat LEON besiegt und das GEHEIME Pet 🐠 Leons Goldfisch erbeutet!")
 			else
-				PetService.hatch(player, world, 1, true)
+				PetService.hatch(player, Config.eggIndex(world, 2), 1, true)   -- gratis Silber-Box
 			end
 		end)
 	end

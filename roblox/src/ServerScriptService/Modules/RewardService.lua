@@ -49,7 +49,7 @@ local function give(player, data, reward)
 			if Logic.worldUnlocked(data, i) then best = i end
 		end
 		task.delay(1, function()
-			if player.Parent then PetService.hatch(player, best, 1, true) end
+			if player.Parent then PetService.hatch(player, Config.eggIndex(best, 2), 1, true) end   -- gratis Silber-Box
 		end)
 		table.insert(parts, "🎁 gratis Geschenkbox")
 	end

@@ -100,8 +100,8 @@ end
 
 -- Plätze, an denen keine Deko stehen soll (relativ zur Weltmitte)
 local RESERVED = {
-	{ 0, 0, 55 }, { 55, -40, 22 }, { -55, -40, 22 }, { 0, -160, 40 },
-	{ 200, 0, 30 }, { -200, 0, 30 }, { 0, 100, 30 }, { -45, 60, 18 }, { 95, -40, 16 },
+	{ 0, 0, 55 }, { 95, -55, 70 }, { -85, -40, 50 }, { 0, -160, 40 },
+	{ 200, 0, 30 }, { -200, 0, 30 }, { 0, 100, 30 }, { -45, 60, 18 },
 }
 local function isFree(x, z, radius)
 	for _, r in ipairs(RESERVED) do
@@ -432,6 +432,432 @@ THEMES.galaxy = function(O, w, rng)
 	end
 end
 
+----------------------------------------------------------------------------
+-- ZUSÄTZLICHE DEKORATION (damit die Welten voller und lebendiger wirken)
+----------------------------------------------------------------------------
+local function ellipsoid(props)
+	local p = part(props)
+	local m = Instance.new("SpecialMesh")
+	m.MeshType = Enum.MeshType.Sphere
+	m.Parent = p
+	return p
+end
+
+local SLOGANS = { "DRINK WATER 💧", "MEWING IS LIFE 🗿", "SKINCARE > ALLES 🧴", "8 STUNDEN SCHLAF 😴", "SMILE MORE 😁",
+	"GLOW UP SEASON ✨", "LEON IST ÜBERALL 👑", "PROTEIN 💪", "SONNENCREME! ☀️", "ZAHNSEIDE RETTET LEBEN 🧵" }
+local FLOWER_COLORS = { Color3.fromRGB(255, 90, 120), Color3.fromRGB(255, 220, 80), Color3.fromRGB(170, 110, 255), Color3.fromRGB(255, 255, 255), Color3.fromRGB(255, 150, 60) }
+local CAR_COLORS = { Color3.fromRGB(230, 57, 70), Color3.fromRGB(58, 134, 255), Color3.fromRGB(255, 200, 40), Color3.fromRGB(40, 40, 45), Color3.fromRGB(240, 240, 240), Color3.fromRGB(42, 157, 143) }
+
+local function cloud(O, rng)
+	local c = O + Vector3.new(rng:NextNumber(-HALF, HALF), rng:NextNumber(95, 150), rng:NextNumber(-HALF, HALF))
+	for k = 1, 5 do
+		local r = rng:NextNumber(12, 22)
+		part({ Shape = Enum.PartType.Ball, Size = Vector3.new(r, r, r), CFrame = CFrame.new(c + Vector3.new((k - 3) * 9, rng:NextNumber(-3, 3), rng:NextNumber(-5, 5))),
+			Color = Color3.fromRGB(255, 255, 255), Material = Enum.Material.SmoothPlastic, Transparency = 0.15, CanCollide = false, CastShadow = false })
+	end
+end
+
+local function bench(O, x, z, rot)
+	local base = CFrame.new(O + Vector3.new(x, 0, z)) * CFrame.Angles(0, rot, 0)
+	part({ Size = Vector3.new(7, 0.5, 2), CFrame = base * CFrame.new(0, 1.6, 0), Color = Color3.fromRGB(150, 95, 55), Material = Enum.Material.WoodPlanks })
+	part({ Size = Vector3.new(7, 1.6, 0.4), CFrame = base * CFrame.new(0, 2.6, 0.8), Color = Color3.fromRGB(150, 95, 55), Material = Enum.Material.WoodPlanks })
+	for _, s in ipairs({ -3, 3 }) do part({ Size = Vector3.new(0.4, 1.6, 1.8), CFrame = base * CFrame.new(s, 0.8, 0), Color = Color3.fromRGB(50, 50, 55), Material = Enum.Material.Metal }) end
+end
+
+local function bush(O, x, z, color, size)
+	size = size or 4
+	ellipsoid({ Size = Vector3.new(size * 1.3, size, size * 1.2), CFrame = CFrame.new(O + Vector3.new(x, size * 0.35, z)), Color = color or Color3.fromRGB(60, 150, 70), Material = Enum.Material.Grass })
+end
+
+local function flowerbed(O, x, z, rng)
+	part({ Size = Vector3.new(7, 0.8, 4), CFrame = CFrame.new(O + Vector3.new(x, 0.4, z)), Color = Color3.fromRGB(110, 75, 45), Material = Enum.Material.Ground })
+	for k = 1, 8 do
+		local col = FLOWER_COLORS[rng:NextInteger(1, #FLOWER_COLORS)]
+		part({ Shape = Enum.PartType.Ball, Size = Vector3.new(0.9, 0.9, 0.9), CFrame = CFrame.new(O + Vector3.new(x + rng:NextNumber(-3, 3), 1.2, z + rng:NextNumber(-1.6, 1.6))), Color = col })
+	end
+end
+
+local function trashcan(O, x, z)
+	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(3, 2.2, 2.2), CFrame = CFrame.new(O + Vector3.new(x, 1.5, z)) * CFrame.Angles(0, 0, math.rad(90)), Color = Color3.fromRGB(60, 120, 80), Material = Enum.Material.Metal })
+	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.3, 2.4, 2.4), CFrame = CFrame.new(O + Vector3.new(x, 3.1, z)) * CFrame.Angles(0, 0, math.rad(90)), Color = Color3.fromRGB(40, 90, 60), Material = Enum.Material.Metal })
+end
+
+local function bigSign(O, x, z, text, rot, color)
+	local base = CFrame.new(O + Vector3.new(x, 0, z)) * CFrame.Angles(0, rot, 0)
+	for _, s in ipairs({ -8, 8 }) do part({ Size = Vector3.new(1, 14, 1), CFrame = base * CFrame.new(s, 7, 0), Color = Color3.fromRGB(60, 60, 70), Material = Enum.Material.Metal }) end
+	local panel = part({ Size = Vector3.new(22, 8, 0.8), CFrame = base * CFrame.new(0, 15, 0), Color = color or Color3.fromRGB(255, 79, 216) })
+	surfaceSign(panel, Enum.NormalId.Front, text, color or Color3.fromRGB(255, 79, 216), WHITE)
+	surfaceSign(panel, Enum.NormalId.Back, text, color or Color3.fromRGB(255, 79, 216), WHITE)
+end
+
+local function car(O, x, z, rot, color, luxury)
+	local base = CFrame.new(O + Vector3.new(x, 0, z)) * CFrame.Angles(0, rot, 0)
+	local mat = luxury and Enum.Material.Foil or Enum.Material.SmoothPlastic
+	part({ Size = Vector3.new(5, 1.8, 10), CFrame = base * CFrame.new(0, 1.7, 0), Color = color, Material = mat, Reflectance = luxury and 0.3 or 0.1 })
+	part({ Size = Vector3.new(4.4, 1.6, 5), CFrame = base * CFrame.new(0, 3.3, 0.6), Color = Color3.fromRGB(150, 200, 230), Material = Enum.Material.Glass, Transparency = 0.3 })
+	for _, p in ipairs({ { -2.4, -3.2 }, { 2.4, -3.2 }, { -2.4, 3.2 }, { 2.4, 3.2 } }) do
+		part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.8, 2, 2), CFrame = base * CFrame.new(p[1], 1, p[2]), Color = Color3.fromRGB(25, 25, 25) })
+	end
+	for _, s in ipairs({ -1.6, 1.6 }) do part({ Size = Vector3.new(0.9, 0.5, 0.2), CFrame = base * CFrame.new(s, 1.9, -5.05), Color = Color3.fromRGB(255, 250, 200), Material = Enum.Material.Neon }) end
+end
+
+local function statue(O, x, z, color, rot)
+	local base = CFrame.new(O + Vector3.new(x, 0, z)) * CFrame.Angles(0, rot or 0, 0)
+	part({ Size = Vector3.new(6, 3, 6), CFrame = base * CFrame.new(0, 1.5, 0), Color = Color3.fromRGB(230, 225, 215), Material = Enum.Material.Marble })
+	local mat = Enum.Material.Foil
+	part({ Size = Vector3.new(4.5, 4, 2), CFrame = base * CFrame.new(0, 8.5, 0), Color = color, Material = mat, Reflectance = 0.3 })   -- Brust (breit!)
+	part({ Size = Vector3.new(2.2, 3.5, 1.6), CFrame = base * CFrame.new(-1, 4.8, 0), Color = color, Material = mat, Reflectance = 0.3 })
+	part({ Size = Vector3.new(2.2, 3.5, 1.6), CFrame = base * CFrame.new(1, 4.8, 0), Color = color, Material = mat, Reflectance = 0.3 })
+	part({ Size = Vector3.new(1.4, 4, 1.4), CFrame = base * CFrame.new(-3.1, 9.5, 0) * CFrame.Angles(0, 0, math.rad(-150)), Color = color, Material = mat, Reflectance = 0.3 })   -- Bizeps-Pose
+	part({ Size = Vector3.new(1.4, 4, 1.4), CFrame = base * CFrame.new(3.1, 9.5, 0) * CFrame.Angles(0, 0, math.rad(150)), Color = color, Material = mat, Reflectance = 0.3 })
+	part({ Size = Vector3.new(2.2, 2.6, 2.4), CFrame = base * CFrame.new(0, 11.8, 0), Color = color, Material = mat, Reflectance = 0.3 })   -- kantiger Kopf
+	part({ Size = Vector3.new(2.4, 0.8, 2.6), CFrame = base * CFrame.new(0, 10.8, -0.1), Color = color, Material = mat, Reflectance = 0.3 })  -- Kiefer
+end
+
+local function fountain(O, x, z)
+	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(2, 18, 18), CFrame = CFrame.new(O + Vector3.new(x, 1, z)) * CFrame.Angles(0, 0, math.rad(90)), Color = Color3.fromRGB(220, 220, 225), Material = Enum.Material.Marble })
+	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.4, 15.5, 15.5), CFrame = CFrame.new(O + Vector3.new(x, 2.05, z)) * CFrame.Angles(0, 0, math.rad(90)), Color = Color3.fromRGB(90, 190, 240), Material = Enum.Material.Glass, Transparency = 0.3 })
+	part({ Size = Vector3.new(1.5, 6, 1.5), CFrame = CFrame.new(O + Vector3.new(x, 4, z)), Color = Color3.fromRGB(220, 220, 225), Material = Enum.Material.Marble })
+	local top = part({ Shape = Enum.PartType.Ball, Size = Vector3.new(2, 2, 2), CFrame = CFrame.new(O + Vector3.new(x, 7.5, z)), Color = Color3.fromRGB(150, 220, 255), Material = Enum.Material.Glass, Transparency = 0.3 })
+	local water = Instance.new("ParticleEmitter")
+	water.Color = ColorSequence.new(Color3.fromRGB(180, 230, 255))
+	water.Rate = 25
+	water.Speed = NumberRange.new(6, 9)
+	water.Lifetime = NumberRange.new(0.8, 1.1)
+	water.SpreadAngle = Vector2.new(25, 25)
+	water.Acceleration = Vector3.new(0, -20, 0)
+	water.Size = NumberSequence.new(0.4)
+	water.EmissionDirection = Enum.NormalId.Top
+	water.Parent = top
+end
+
+-- Wetter / Teilchen in der Luft (Schnee, Blüten, Sterne …)
+local function airParticles(O, color, size, speed, rate)
+	local p = part({ Size = Vector3.new(S, 1, S), CFrame = CFrame.new(O + Vector3.new(0, 70, 0)), Transparency = 1, CanCollide = false, CanQuery = false })
+	local e = Instance.new("ParticleEmitter")
+	e.Color = ColorSequence.new(color)
+	e.Size = NumberSequence.new(size)
+	e.Rate = rate or 40
+	e.Speed = NumberRange.new(speed, speed * 1.5)
+	e.Lifetime = NumberRange.new(10, 14)
+	e.EmissionDirection = Enum.NormalId.Bottom
+	e.SpreadAngle = Vector2.new(15, 15)
+	e.LightEmission = 0.4
+	e.Parent = p
+end
+
+local THEME_DECO = {}
+
+THEME_DECO.city = function(O, w, rng)
+	for k = 1, 12 do
+		local alongX = k % 2 == 0
+		local pos = rng:NextNumber(70, 165) * (rng:NextNumber() < 0.5 and -1 or 1)
+		local lane = (rng:NextNumber() < 0.5 and -6 or 6)
+		if alongX then car(O, pos, lane, math.rad(90), CAR_COLORS[rng:NextInteger(1, #CAR_COLORS)])
+		else car(O, lane, pos, 0, CAR_COLORS[rng:NextInteger(1, #CAR_COLORS)]) end
+	end
+	for _ = 1, 10 do
+		local x, z = freeSpot(rng, 2, 50)
+		if x then
+			part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(2.6, 1.3, 1.3), CFrame = CFrame.new(O + Vector3.new(x, 1.3, z)) * CFrame.Angles(0, 0, math.rad(90)), Color = Color3.fromRGB(220, 40, 40) })
+			part({ Shape = Enum.PartType.Ball, Size = Vector3.new(1.4, 1.4, 1.4), CFrame = CFrame.new(O + Vector3.new(x, 2.7, z)), Color = Color3.fromRGB(220, 40, 40) })
+		end
+	end
+	local x, z = freeSpot(rng, 6, 80)
+	if x then statue(O, x, z, Color3.fromRGB(255, 205, 60), math.atan2(x, z)) end
+	local fx, fz = freeSpot(rng, 10, 80)
+	if fx then fountain(O, fx, fz) end
+end
+
+THEME_DECO.beach = function(O, w, rng)
+	local boardColors = { Color3.fromRGB(255, 90, 120), Color3.fromRGB(0, 200, 220), Color3.fromRGB(255, 220, 60), Color3.fromRGB(120, 220, 90) }
+	for _ = 1, 12 do
+		local x, z = freeSpot(rng, 2, 50)
+		if x and z < 115 then
+			ellipsoid({ Size = Vector3.new(2, 8, 0.4), CFrame = CFrame.new(O + Vector3.new(x, 3.5, z)) * CFrame.Angles(math.rad(-10), rng:NextNumber(0, 6), 0),
+				Color = boardColors[rng:NextInteger(1, #boardColors)] })
+		end
+	end
+	for _ = 1, 7 do
+		local x, z = freeSpot(rng, 5, 50)
+		if x and z < 115 then
+			part({ Size = Vector3.new(6, 2, 6), CFrame = CFrame.new(O + Vector3.new(x, 1, z)), Color = Color3.fromRGB(225, 200, 140), Material = Enum.Material.Sand })
+			for _, p in ipairs({ { -2.5, -2.5 }, { 2.5, -2.5 }, { -2.5, 2.5 }, { 2.5, 2.5 } }) do
+				part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(3.5, 1.6, 1.6), CFrame = CFrame.new(O + Vector3.new(x + p[1], 2.5, z + p[2])) * CFrame.Angles(0, 0, math.rad(90)),
+					Color = Color3.fromRGB(225, 200, 140), Material = Enum.Material.Sand })
+			end
+		end
+	end
+	for k = 1, 5 do
+		local x = rng:NextNumber(-200, 200)
+		local z = rng:NextNumber(150, 225)
+		local base = CFrame.new(O + Vector3.new(x, 0.8, z)) * CFrame.Angles(0, rng:NextNumber(0, 6), 0)
+		part({ Size = Vector3.new(5, 2, 12), CFrame = base, Color = Color3.fromRGB(250, 250, 250) })
+		part({ Size = Vector3.new(0.5, 10, 0.5), CFrame = base * CFrame.new(0, 6, 0), Color = Color3.fromRGB(120, 80, 50), Material = Enum.Material.Wood })
+		part({ Class = "WedgePart", Size = Vector3.new(0.2, 8, 5), CFrame = base * CFrame.new(0, 6, 2.6), Color = k % 2 == 0 and Color3.fromRGB(255, 90, 120) or Color3.fromRGB(255, 255, 255) })
+	end
+	-- Rettungsturm
+	local tx, tz = 60, 100
+	for _, p in ipairs({ { -3, -3 }, { 3, -3 }, { -3, 3 }, { 3, 3 } }) do
+		part({ Size = Vector3.new(0.8, 10, 0.8), CFrame = CFrame.new(O + Vector3.new(tx + p[1], 5, tz + p[2])), Color = Color3.fromRGB(250, 250, 250) })
+	end
+	part({ Size = Vector3.new(8, 5, 8), CFrame = CFrame.new(O + Vector3.new(tx, 12.5, tz)), Color = Color3.fromRGB(230, 50, 50) })
+	part({ Size = Vector3.new(9, 0.8, 9), CFrame = CFrame.new(O + Vector3.new(tx, 15.4, tz)), Color = Color3.fromRGB(250, 250, 250) })
+	for _ = 1, 10 do
+		local x, z = freeSpot(rng, 2, 45)
+		if x and z < 115 then
+			part({ Shape = Enum.PartType.Ball, Size = Vector3.new(2, 2, 2), CFrame = CFrame.new(O + Vector3.new(x, 1, z)), Color = boardColors[rng:NextInteger(1, #boardColors)] })
+		end
+	end
+end
+
+THEME_DECO.mountain = function(O, w, rng)
+	airParticles(O, Color3.fromRGB(255, 255, 255), 0.5, 4, 60)
+	for _ = 1, 7 do
+		local x, z = freeSpot(rng, 5, 60, HALF - 60)
+		if x then
+			local base = CFrame.new(O + Vector3.new(x, 0, z)) * CFrame.Angles(0, rng:NextNumber(0, 6), 0)
+			local col = ({ Color3.fromRGB(230, 90, 60), Color3.fromRGB(60, 130, 220), Color3.fromRGB(240, 200, 60) })[rng:NextInteger(1, 3)]
+			part({ Class = "WedgePart", Size = Vector3.new(6, 4, 3), CFrame = base * CFrame.new(0, 2, -1.5), Color = col })
+			part({ Class = "WedgePart", Size = Vector3.new(6, 4, 3), CFrame = base * CFrame.new(0, 2, 1.5) * CFrame.Angles(0, math.rad(180), 0), Color = col })
+		end
+	end
+	for _ = 1, 5 do
+		local x, z = freeSpot(rng, 3, 60)
+		if x then
+			for k = 0, 2 do
+				part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(3, 0.6, 0.6), CFrame = CFrame.new(O + Vector3.new(x, 0.3, z)) * CFrame.Angles(0, math.rad(k * 60), 0), Color = Color3.fromRGB(110, 70, 40), Material = Enum.Material.Wood })
+			end
+			local fireBase = part({ Size = Vector3.new(1, 1, 1), CFrame = CFrame.new(O + Vector3.new(x, 0.8, z)), Transparency = 1, CanCollide = false })
+			local f = Instance.new("Fire")
+			f.Size = 4
+			f.Parent = fireBase
+		end
+	end
+	for _ = 1, 7 do
+		local x, z = freeSpot(rng, 3, 50)
+		if x then
+			for k, r in ipairs({ 3.6, 2.7, 1.9 }) do
+				part({ Shape = Enum.PartType.Ball, Size = Vector3.new(r, r, r), CFrame = CFrame.new(O + Vector3.new(x, ({ 1.6, 4.4, 6.6 })[k], z)), Color = Color3.fromRGB(250, 250, 255), Material = Enum.Material.Snow })
+			end
+			part({ Size = Vector3.new(0.3, 0.3, 1.2), CFrame = CFrame.new(O + Vector3.new(x, 6.6, z - 1.2)), Color = Color3.fromRGB(255, 140, 30) })
+		end
+	end
+	for _ = 1, 2 do
+		local x, z = freeSpot(rng, 10, 90)
+		if x then
+			building(O, x, z, 16, 12, 10, Color3.fromRGB(130, 85, 50), Enum.Material.WoodPlanks, nil, Color3.fromRGB(255, 220, 150))
+			part({ Class = "WedgePart", Size = Vector3.new(17, 6, 7), CFrame = CFrame.new(O + Vector3.new(x, 14, z - 3)), Color = Color3.fromRGB(240, 245, 255), Material = Enum.Material.Snow })
+			part({ Class = "WedgePart", Size = Vector3.new(17, 6, 7), CFrame = CFrame.new(O + Vector3.new(x, 14, z + 3)) * CFrame.Angles(0, math.rad(180), 0), Color = Color3.fromRGB(240, 245, 255), Material = Enum.Material.Snow })
+		end
+	end
+end
+
+THEME_DECO.temple = function(O, w, rng)
+	airParticles(O, Color3.fromRGB(255, 180, 210), 0.5, 3, 40)
+	for _ = 1, 18 do
+		local x, z = freeSpot(rng, 2, 50)
+		if x then
+			part({ Size = Vector3.new(0.6, 6, 0.6), CFrame = CFrame.new(O + Vector3.new(x, 3, z)), Color = Color3.fromRGB(60, 40, 30), Material = Enum.Material.Wood })
+			local lan = ellipsoid({ Size = Vector3.new(2, 2.6, 2), CFrame = CFrame.new(O + Vector3.new(x, 6.8, z)), Color = Color3.fromRGB(230, 50, 40), Material = Enum.Material.Neon })
+			local l = Instance.new("PointLight")
+			l.Color = Color3.fromRGB(255, 120, 80)
+			l.Range = 12
+			l.Parent = lan
+		end
+	end
+	for _ = 1, 12 do
+		local x, z = freeSpot(rng, 6, 60)
+		if x then tree(O, x, z, Color3.fromRGB(255, 170, 205), 1.1) end
+	end
+	for _ = 1, 9 do
+		local x, z = freeSpot(rng, 3, 60)
+		if x then
+			for k = 1, 5 do
+				local h = rng:NextNumber(10, 18)
+				part({ Size = Vector3.new(0.8, h, 0.8), CFrame = CFrame.new(O + Vector3.new(x + rng:NextNumber(-1.5, 1.5), h / 2, z + rng:NextNumber(-1.5, 1.5))),
+					Color = Color3.fromRGB(110, 170, 60), Material = Enum.Material.Grass })
+			end
+		end
+	end
+	for _, pos in ipairs({ { 0, -110 }, { -150, 20 } }) do
+		local base = CFrame.new(O + Vector3.new(pos[1], 0, pos[2]))
+		for _, s in ipairs({ -7, 7 }) do part({ Size = Vector3.new(1.6, 16, 1.6), CFrame = base * CFrame.new(s, 8, 0), Color = Color3.fromRGB(210, 40, 30) }) end
+		part({ Size = Vector3.new(20, 1.6, 2.2), CFrame = base * CFrame.new(0, 16.5, 0), Color = Color3.fromRGB(30, 25, 25) })
+		part({ Size = Vector3.new(17, 1.2, 1.6), CFrame = base * CFrame.new(0, 13.5, 0), Color = Color3.fromRGB(210, 40, 30) })
+	end
+	local px, pz = freeSpot(rng, 14, 70)
+	if px then
+		part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.6, 24, 24), CFrame = CFrame.new(O + Vector3.new(px, 0.3, pz)) * CFrame.Angles(0, 0, math.rad(90)),
+			Color = Color3.fromRGB(70, 150, 200), Material = Enum.Material.Glass, Transparency = 0.25, CanCollide = false })
+		for _ = 1, 6 do
+			ellipsoid({ Size = Vector3.new(0.8, 0.6, 1.8), CFrame = CFrame.new(O + Vector3.new(px + rng:NextNumber(-8, 8), 0.5, pz + rng:NextNumber(-8, 8))) * CFrame.Angles(0, rng:NextNumber(0, 6), 0),
+				Color = rng:NextNumber() < 0.5 and Color3.fromRGB(255, 140, 50) or Color3.fromRGB(255, 255, 255), CanCollide = false })
+		end
+	end
+end
+
+THEME_DECO.fashion = function(O, w, rng)
+	airParticles(O, Color3.fromRGB(255, 200, 240), 0.3, 2, 25)
+	for _ = 1, 12 do
+		local x, z = freeSpot(rng, 2, 45)
+		if x then
+			local base = CFrame.new(O + Vector3.new(x, 0, z)) * CFrame.Angles(0, rng:NextNumber(0, 6), 0)
+			part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.3, 2.5, 2.5), CFrame = base * CFrame.new(0, 0.15, 0) * CFrame.Angles(0, 0, math.rad(90)), Color = Color3.fromRGB(30, 30, 30) })
+			part({ Size = Vector3.new(0.3, 3, 0.3), CFrame = base * CFrame.new(0, 1.6, 0), Color = Color3.fromRGB(30, 30, 30) })
+			part({ Size = Vector3.new(2.2, 2.8, 1.1), CFrame = base * CFrame.new(0, 4.4, 0), Color = FLOWER_COLORS[rng:NextInteger(1, #FLOWER_COLORS)] })
+			part({ Shape = Enum.PartType.Ball, Size = Vector3.new(1.2, 1.2, 1.2), CFrame = base * CFrame.new(0, 6.4, 0), Color = Color3.fromRGB(245, 240, 235) })
+		end
+	end
+	for _ = 1, 8 do
+		local x, z = freeSpot(rng, 3, 50)
+		if x then
+			part({ Size = Vector3.new(6, 0.3, 0.3), CFrame = CFrame.new(O + Vector3.new(x, 5, z)), Color = Color3.fromRGB(200, 200, 210), Material = Enum.Material.Metal })
+			for _, s in ipairs({ -2.8, 2.8 }) do part({ Size = Vector3.new(0.3, 5, 0.3), CFrame = CFrame.new(O + Vector3.new(x + s, 2.5, z)), Color = Color3.fromRGB(200, 200, 210), Material = Enum.Material.Metal }) end
+			for k = -2, 2 do
+				part({ Size = Vector3.new(0.4, 2.6, 1.6), CFrame = CFrame.new(O + Vector3.new(x + k * 1.1, 3.5, z)), Color = FLOWER_COLORS[rng:NextInteger(1, #FLOWER_COLORS)], Material = Enum.Material.Fabric })
+			end
+		end
+	end
+	for _ = 1, 2 do
+		local x, z = freeSpot(rng, 10, 80)
+		if x then fountain(O, x, z) end
+	end
+end
+
+THEME_DECO.hollywood = function(O, w, rng)
+	for _ = 1, 8 do
+		local x, z = freeSpot(rng, 3, 50)
+		if x then
+			local base = CFrame.new(O + Vector3.new(x, 0, z)) * CFrame.Angles(0, rng:NextNumber(0, 6), 0)
+			for k = 0, 2 do part({ Size = Vector3.new(0.3, 5, 0.3), CFrame = base * CFrame.Angles(0, math.rad(k * 120), 0) * CFrame.new(0, 2.3, 0.8) * CFrame.Angles(math.rad(15), 0, 0), Color = Color3.fromRGB(40, 40, 40) }) end
+			part({ Size = Vector3.new(2, 1.8, 3), CFrame = base * CFrame.new(0, 5.4, 0), Color = Color3.fromRGB(30, 30, 30) })
+			part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(1.2, 1.2, 1.2), CFrame = base * CFrame.new(0, 5.4, -1.9) * CFrame.Angles(0, math.rad(90), 0), Color = Color3.fromRGB(80, 80, 90) })
+		end
+	end
+	for _ = 1, 6 do
+		local x, z = freeSpot(rng, 2, 45)
+		if x then
+			local base = CFrame.new(O + Vector3.new(x, 0, z)) * CFrame.Angles(0, rng:NextNumber(0, 6), 0)
+			part({ Size = Vector3.new(2.4, 0.3, 2), CFrame = base * CFrame.new(0, 2.2, 0), Color = Color3.fromRGB(30, 30, 30), Material = Enum.Material.Fabric })
+			part({ Size = Vector3.new(2.4, 1.6, 0.2), CFrame = base * CFrame.new(0, 3.4, 0.9), Color = Color3.fromRGB(30, 30, 30), Material = Enum.Material.Fabric })
+			for _, s in ipairs({ -1.1, 1.1 }) do part({ Size = Vector3.new(0.2, 2.2, 2), CFrame = base * CFrame.new(s, 1.1, 0), Color = Color3.fromRGB(150, 100, 60), Material = Enum.Material.Wood }) end
+		end
+	end
+	for _ = 1, 4 do
+		local x, z = freeSpot(rng, 6, 70)
+		if x then statue(O, x, z, Color3.fromRGB(255, 205, 60), math.atan2(x, z)) end
+	end
+	for _ = 1, 3 do
+		local x, z = freeSpot(rng, 10, 90)
+		if x then
+			part({ Size = Vector3.new(10, 7, 22), CFrame = CFrame.new(O + Vector3.new(x, 4.5, z)), Color = Color3.fromRGB(235, 235, 240), Material = Enum.Material.Metal })
+			surfaceSign(part({ Size = Vector3.new(8, 2, 0.3), CFrame = CFrame.new(O + Vector3.new(x, 6, z - 11.2)), Color = Color3.fromRGB(20, 5, 35) }), Enum.NormalId.Front, "⭐ STAR", Color3.fromRGB(20, 5, 35), WHITE)
+		end
+	end
+end
+
+THEME_DECO.dubai = function(O, w, rng)
+	for _ = 1, 9 do
+		local x, z = freeSpot(rng, 6, 50)
+		if x then car(O, x, z, rng:NextNumber(0, 6), rng:NextNumber() < 0.6 and Color3.fromRGB(212, 175, 55) or Color3.fromRGB(250, 250, 250), true) end
+	end
+	for _ = 1, 8 do
+		local a = rng:NextNumber(0, math.pi * 2)
+		local r = rng:NextNumber(180, 230)
+		ellipsoid({ Size = Vector3.new(rng:NextNumber(40, 70), rng:NextNumber(10, 18), rng:NextNumber(30, 50)), CFrame = CFrame.new(O + Vector3.new(math.cos(a) * r, 0, math.sin(a) * r)),
+			Color = Color3.fromRGB(230, 200, 140), Material = Enum.Material.Sand })
+	end
+	for _ = 1, 5 do
+		local x, z = freeSpot(rng, 4, 60)
+		if x then
+			local base = CFrame.new(O + Vector3.new(x, 0, z)) * CFrame.Angles(0, rng:NextNumber(0, 6), 0)
+			local col = Color3.fromRGB(200, 160, 100)
+			ellipsoid({ Size = Vector3.new(2.4, 2.4, 5), CFrame = base * CFrame.new(0, 4.5, 0), Color = col })
+			ellipsoid({ Size = Vector3.new(2, 2, 2.4), CFrame = base * CFrame.new(0, 6, 0.2), Color = col })
+			ellipsoid({ Size = Vector3.new(0.8, 3, 0.8), CFrame = base * CFrame.new(0, 6, -2.6) * CFrame.Angles(math.rad(-20), 0, 0), Color = col })
+			ellipsoid({ Size = Vector3.new(1.2, 1.2, 1.8), CFrame = base * CFrame.new(0, 7.6, -3.2), Color = col })
+			for _, p in ipairs({ { -0.8, -1.8 }, { 0.8, -1.8 }, { -0.8, 1.8 }, { 0.8, 1.8 } }) do
+				part({ Size = Vector3.new(0.5, 3.8, 0.5), CFrame = base * CFrame.new(p[1], 1.9, p[2]), Color = col })
+			end
+		end
+	end
+	for _ = 1, 3 do
+		local x, z = freeSpot(rng, 10, 80)
+		if x then fountain(O, x, z) end
+	end
+	for _ = 1, 2 do
+		local x, z = freeSpot(rng, 6, 80)
+		if x then statue(O, x, z, Color3.fromRGB(212, 175, 55), math.atan2(x, z)) end
+	end
+end
+
+THEME_DECO.galaxy = function(O, w, rng)
+	airParticles(O, Color3.fromRGB(220, 200, 255), 0.4, 1.5, 50)
+	-- Rakete
+	local rx, rz = 150, 120
+	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(40, 10, 10), CFrame = CFrame.new(O + Vector3.new(rx, 22, rz)) * CFrame.Angles(0, 0, math.rad(90)), Color = Color3.fromRGB(240, 240, 245), Material = Enum.Material.Metal })
+	ellipsoid({ Size = Vector3.new(10, 14, 10), CFrame = CFrame.new(O + Vector3.new(rx, 44, rz)), Color = Color3.fromRGB(230, 50, 60) })
+	for k = 0, 3 do
+		part({ Class = "WedgePart", Size = Vector3.new(1, 10, 6), CFrame = CFrame.new(O + Vector3.new(rx, 5, rz)) * CFrame.Angles(0, math.rad(k * 90), 0) * CFrame.new(0, 0, 7), Color = Color3.fromRGB(230, 50, 60) })
+	end
+	part({ Shape = Enum.PartType.Ball, Size = Vector3.new(3.5, 3.5, 3.5), CFrame = CFrame.new(O + Vector3.new(rx, 30, rz - 5)), Color = Color3.fromRGB(120, 200, 255), Material = Enum.Material.Neon })
+	for _ = 1, 4 do
+		local pos = O + Vector3.new(rng:NextNumber(-200, 200), rng:NextNumber(50, 90), rng:NextNumber(-200, 200))
+		part({ Size = Vector3.new(3, 3, 4), CFrame = CFrame.new(pos), Color = Color3.fromRGB(200, 200, 210), Material = Enum.Material.Metal, CanCollide = false })
+		for _, s in ipairs({ -1, 1 }) do
+			part({ Size = Vector3.new(7, 0.2, 3), CFrame = CFrame.new(pos + Vector3.new(s * 5.5, 0, 0)), Color = Color3.fromRGB(40, 70, 160), Material = Enum.Material.Glass, CanCollide = false })
+		end
+	end
+	for _ = 1, 16 do
+		local s = rng:NextNumber(3, 9)
+		part({ Shape = Enum.PartType.Ball, Size = Vector3.new(s, s * 0.8, s), CFrame = CFrame.new(O + Vector3.new(rng:NextNumber(-220, 220), rng:NextNumber(15, 60), rng:NextNumber(-220, 220))),
+			Color = Color3.fromRGB(110, 95, 130), Material = Enum.Material.Slate, CanCollide = false })
+	end
+	for _ = 1, 12 do
+		local x, z = freeSpot(rng, 3, 50)
+		if x then
+			local h = rng:NextNumber(4, 9)
+			part({ Size = Vector3.new(0.5, h, 0.5), CFrame = CFrame.new(O + Vector3.new(x, h / 2, z)), Color = Color3.fromRGB(80, 200, 160) })
+			part({ Shape = Enum.PartType.Ball, Size = Vector3.new(2.2, 2.2, 2.2), CFrame = CFrame.new(O + Vector3.new(x, h + 0.6, z)), Color = Color3.fromRGB(255, 100, 220), Material = Enum.Material.Neon })
+		end
+	end
+end
+
+-- Für ALLE Welten: Wolken, Bänke, Büsche, Blumen, Mülleimer, Werbetafeln
+local function decorate(O, w, rng)
+	if w.theme ~= "galaxy" then
+		for _ = 1, 10 do cloud(O, rng) end
+	end
+	local natural = (w.theme == "mountain" or w.theme == "temple" or w.theme == "beach")
+	for _ = 1, 12 do
+		local x, z = freeSpot(rng, 4, 45)
+		if x then bench(O, x, z, rng:NextNumber(0, 6)) end
+	end
+	if w.theme ~= "galaxy" then
+		for _ = 1, 20 do
+			local x, z = freeSpot(rng, 3, 45)
+			if x then bush(O, x, z, natural and Color3.fromRGB(70, 140, 60) or Color3.fromRGB(60, 160, 80), rng:NextNumber(3, 5)) end
+		end
+		for _ = 1, 10 do
+			local x, z = freeSpot(rng, 4, 45)
+			if x then flowerbed(O, x, z, rng) end
+		end
+	end
+	if not natural then
+		for _ = 1, 8 do
+			local x, z = freeSpot(rng, 2, 40)
+			if x then trashcan(O, x, z) end
+		end
+	end
+	for k = 1, 4 do
+		local x, z = freeSpot(rng, 12, 90)
+		if x then bigSign(O, x, z, SLOGANS[((math.floor(w.mult * 7) + k) % #SLOGANS) + 1], math.atan2(x, z) + math.pi, w.accent) end
+	end
+	local extra = THEME_DECO[w.theme]
+	if extra then extra(O, w, rng) end
+end
+
 local GROUND_MATERIAL = {
 	city = Enum.Material.SmoothPlastic, beach = Enum.Material.Sand, mountain = Enum.Material.Grass, temple = Enum.Material.Grass,
 	fashion = Enum.Material.SmoothPlastic, hollywood = Enum.Material.Sandstone, dubai = Enum.Material.Sand, galaxy = Enum.Material.Slate,
@@ -552,39 +978,57 @@ local function buildWorld(index, mapFolder)
 	-- Deko
 	local theme = THEMES[w.theme]
 	if theme then theme(O, w, rng) end
+	decorate(O, w, rng)
 
-	-- Geschenkbox-Stand
-	local egg = Config.Eggs[index]
-	local ep = O + Vector3.new(55, 0, -40)
-	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(2, 14, 14), CFrame = CFrame.new(ep + Vector3.new(0, 1, 0)) * CFrame.Angles(0, 0, math.rad(90)), Color = Color3.fromRGB(40, 20, 60) })
-	local box = part({ Name = "Geschenkbox", Size = Vector3.new(6, 6, 6), CFrame = CFrame.new(ep + Vector3.new(0, 5, 0)) * CFrame.Angles(0, math.rad(20), 0), Color = w.accent })
-	part({ Size = Vector3.new(6.2, 6.2, 1), CFrame = box.CFrame, Color = Color3.fromRGB(255, 209, 102), Material = Enum.Material.Neon })
-	part({ Size = Vector3.new(1, 6.2, 6.2), CFrame = box.CFrame, Color = Color3.fromRGB(255, 209, 102), Material = Enum.Material.Neon })
-	billboard(box, "🎁 " .. egg.name .. "\n<font color='#ffd166'>" .. Util.format(egg.cost) .. " Aura</font>", 12, 4, 6.5, WHITE)
-	table.insert(MapBuilder.eggPrompts, { prompt = prompt(box, "Öffnen", egg.name, 0.25), egg = egg, count = 1 })
-	table.insert(MapBuilder.eggPrompts, { prompt = prompt(box, "3x öffnen", "Rebirth-Shop: 3er-Öffnen", 0.25, Enum.KeyCode.F), egg = egg, count = 3 })
-
-	-- Tafel mit den Chancen der Box
-	local total = 0
-	for _, e in ipairs(egg.pets) do total = total + e.weight end
-	local lines = { "<b>Inhalt der " .. egg.name .. "</b>" }
-	for _, e in ipairs(egg.pets) do
-		local def
-		for _, p in ipairs(Config.Pets) do
-			if p.id == e.id then def = p end
+	-- Pet-Stationen: 5 Geschenkboxen, von günstig bis göttlich
+	for st, station in ipairs(Config.EggStations) do
+		local egg = Config.Eggs[Config.eggIndex(index, st)]
+		local ep = O + Vector3.new(40 + (st - 1) * 26, 0, -45 - math.abs(st - 3) * 6)
+		part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(2, 13, 13), CFrame = CFrame.new(ep + Vector3.new(0, 1, 0)) * CFrame.Angles(0, 0, math.rad(90)),
+			Color = Color3.fromRGB(40, 20, 60), Material = Enum.Material.SmoothPlastic })
+		part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.3, 13.6, 13.6), CFrame = CFrame.new(ep + Vector3.new(0, 2.05, 0)) * CFrame.Angles(0, 0, math.rad(90)),
+			Color = station.color, Material = Enum.Material.Neon, Transparency = 0.3 })
+		local s = 4.5 + st * 0.5
+		local box = part({ Name = "Geschenkbox", Size = Vector3.new(s, s, s), CFrame = CFrame.new(ep + Vector3.new(0, 2 + s / 2 + 0.5, 0)) * CFrame.Angles(0, math.rad(20), 0),
+			Color = station.color, Material = st >= 4 and Enum.Material.Glass or Enum.Material.SmoothPlastic, Reflectance = st >= 3 and 0.2 or 0 })
+		part({ Size = Vector3.new(s + 0.2, s + 0.2, 0.9), CFrame = box.CFrame, Color = Color3.fromRGB(255, 255, 255), Material = Enum.Material.Neon })
+		part({ Size = Vector3.new(0.9, s + 0.2, s + 0.2), CFrame = box.CFrame, Color = Color3.fromRGB(255, 255, 255), Material = Enum.Material.Neon })
+		part({ Shape = Enum.PartType.Ball, Size = Vector3.new(1.6, 1.6, 1.6), CFrame = box.CFrame * CFrame.new(0, s / 2 + 0.5, 0), Color = Color3.fromRGB(255, 255, 255), Material = Enum.Material.Neon })
+		local light = Instance.new("PointLight")
+		light.Color = station.color
+		light.Range = 14
+		light.Parent = box
+		-- beste Chance auf dem Schild
+		local bestName, bestChance, total = nil, 0, 0
+		for _, e in ipairs(egg.pets) do total = total + e.weight end
+		local bestOrder = 0
+		for rarityId, w in pairs(station.weights) do
+			local r = Config.Rarities[rarityId]
+			if r.order > bestOrder then bestOrder, bestName, bestChance = r.order, r.name, w end
 		end
-		local r = Config.Rarities[def.rarity]
-		local hex = string.format("#%02x%02x%02x", math.floor(r.color.R * 255 + 0.5), math.floor(r.color.G * 255 + 0.5), math.floor(r.color.B * 255 + 0.5))
-		table.insert(lines, def.emoji .. " " .. def.name .. "  <font color='" .. hex .. "'>" .. Util.format(e.weight / total * 100) .. " %</font>")
+		billboard(box, station.emoji .. " " .. station.name .. "\n<font color='#ffd166'>" .. Util.format(egg.cost) .. " Aura</font>\n<font size='14'>bis " .. bestName .. ": "
+			.. Util.format(bestChance / total * 100) .. " %</font>", 11, 4.6, s / 2 + 3.5, WHITE)
+		table.insert(MapBuilder.eggPrompts, { prompt = prompt(box, "Öffnen", station.name, 0.25), egg = egg, count = 1 })
+		table.insert(MapBuilder.eggPrompts, { prompt = prompt(box, "3x öffnen", "Rebirth-Shop: 3er-Öffnen", 0.25, Enum.KeyCode.F), egg = egg, count = 3 })
+		table.insert(MapBuilder.eggPrompts, { prompt = prompt(box, "Inhalt ansehen", station.name, 0, Enum.KeyCode.R), egg = egg, info = true })
 	end
-	local chanceBoard = part({ Size = Vector3.new(14, 16, 0.6), CFrame = CFrame.new(O + Vector3.new(95, 9, -40)) * CFrame.Angles(0, math.rad(115), 0), Color = Color3.fromRGB(20, 5, 35) })
-	local _, chanceLabel = surfaceSign(chanceBoard, Enum.NormalId.Front, table.concat(lines, "\n"), Color3.fromRGB(20, 5, 35), WHITE)
-	chanceLabel.Font = Enum.Font.GothamBold
-	part({ Size = Vector3.new(1, 9, 1), CFrame = CFrame.new(O + Vector3.new(95, 0.5, -40)), Color = Color3.fromRGB(60, 60, 70) })
+	local plazaSign = part({ Size = Vector3.new(30, 5, 1), CFrame = CFrame.new(O + Vector3.new(92, 14, -78)), Color = Color3.fromRGB(20, 5, 35) })
+	surfaceSign(plazaSign, Enum.NormalId.Back, "🐾 PET-STATIONEN", Color3.fromRGB(20, 5, 35), WHITE)
+	part({ Size = Vector3.new(1, 13, 1), CFrame = CFrame.new(O + Vector3.new(78, 6.5, -78)), Color = Color3.fromRGB(60, 60, 70) })
+	part({ Size = Vector3.new(1, 13, 1), CFrame = CFrame.new(O + Vector3.new(106, 6.5, -78)), Color = Color3.fromRGB(60, 60, 70) })
 
 	-- Rivale & Boss
 	local rival = Config.Rivals[index]
 	table.insert(MapBuilder.npcs, { prompt = makeNPC(rival, O + Vector3.new(-55, 0, -40), false), def = rival, world = index, isBoss = false })
+	-- schwächere Rivalen zum Üben
+	for k, extra in ipairs(Config.ExtraRivals) do
+		local name = extra.prefix .. " " .. Config.RivalNames[((index * 3 + k) % #Config.RivalNames) + 1]
+		local def = {
+			name = name, level = math.max(1, math.floor(rival.level * extra.strength)), rebirths = math.floor(rival.rebirths * extra.strength),
+			shirt = rival.shirt:Lerp(Color3.fromRGB(80, 80, 90), 0.4), pants = rival.pants, skin = rival.skin,
+		}
+		table.insert(MapBuilder.npcs, { prompt = makeNPC(def, O + Vector3.new(-85 - k * 25, 0, -25 - k * 18), false), def = def, world = index, isBoss = false })
+	end
 	local boss = Config.Bosses[index]
 	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(4, 30, 30), CFrame = CFrame.new(O + Vector3.new(0, 2, -160)) * CFrame.Angles(0, 0, math.rad(90)),
 		Color = boss.final and Color3.fromRGB(212, 175, 55) or Color3.fromRGB(60, 20, 40), Material = boss.final and Enum.Material.Foil or Enum.Material.Slate })

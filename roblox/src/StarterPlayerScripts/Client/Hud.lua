@@ -97,7 +97,6 @@ function Hud.init(gui)
 		Remotes.Click:FireServer()
 		s.data.aura = s.data.aura + s.click      -- sofort anzeigen
 		State.bump()
-		Sounds.play("Click")
 		local pos = routineBtn.AbsolutePosition
 		local size = routineBtn.AbsoluteSize
 		Effects.floatText("+" .. Util.format(s.click), UDim2.new(0, pos.X + size.X * (0.3 + math.random() * 0.4), 0, pos.Y), C.gold)
