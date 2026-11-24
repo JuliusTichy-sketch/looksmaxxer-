@@ -7968,6 +7968,22 @@ function Hud.init(gui)
 		Size = UDim2.new(0.07, 0, 0.84, 0), Parent = gui })
 	UI.new("UISizeConstraint", { MinSize = Vector2.new(44, 300), MaxSize = Vector2.new(74, 780), Parent = side })
 	UI.list(side, false, 6, Enum.HorizontalAlignment.Center, Enum.VerticalAlignment.Center)
+	-- Handy/Tablet: Knöpfe kompakt oben anordnen, damit der Lauf-Joystick unten links frei bleibt
+	local UIS = game:GetService("UserInputService")
+	local touch = UIS.TouchEnabled and not UIS.KeyboardEnabled
+	local function compact(frame, anchorRight)
+		local layout = frame:FindFirstChildOfClass("UIListLayout")
+		if layout then layout:Destroy() end
+		local constraint = frame:FindFirstChildOfClass("UISizeConstraint")
+		if constraint then constraint:Destroy() end
+		frame.AnchorPoint = Vector2.new(anchorRight and 1 or 0, 0)
+		frame.Position = anchorRight and UDim2.new(1, -6, 0, 58) or UDim2.new(0, 6, 0, 58)
+		frame.Size = UDim2.new(0, 100, 0.62, 0)
+		UI.new("UIGridLayout", { CellSize = UDim2.new(0, 47, 0, 47), CellPadding = UDim2.new(0, 4, 0, 4),
+			HorizontalAlignment = anchorRight and Enum.HorizontalAlignment.Right or Enum.HorizontalAlignment.Left,
+			SortOrder = Enum.SortOrder.LayoutOrder, Parent = frame })
+	end
+	if touch then compact(side, false) end
 	local buttons = {
 		{ "upgrades", "💪", "Upgrades", C.pink }, { "pets", "🐾", "Pets", C.purple }, { "weapons", "⚔️", "Waffen", C.red },
 		{ "worlds", "🌍", "Welten", C.cyan }, { "quests", "📋", "Aufträge", C.orange }, { "jobs", "💼", "Jobs", C.money },
@@ -7996,6 +8012,7 @@ function Hud.init(gui)
 		Size = UDim2.new(0.07, 0, 0.56, 0), Parent = gui })
 	UI.new("UISizeConstraint", { MinSize = Vector2.new(44, 220), MaxSize = Vector2.new(74, 520), Parent = right })
 	UI.list(right, false, 6, Enum.HorizontalAlignment.Center, Enum.VerticalAlignment.Center)
+	if touch then compact(right, true) end
 	local rightButtons = {
 		{ "shop", "💎", "Shop", C.cyan }, { "wheel", "🎡", "Glücksrad", C.gold }, { "event", "🎉", "Events", C.orange },
 		{ "style", "✨", "Style", C.purple }, { "emote", "🕺", "Emotes", C.pink }, { "ride", "🛹", "Fahren (V)", C.green },
