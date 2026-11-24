@@ -101,8 +101,36 @@ local function hideOwnPrompt(char)
 	end
 end
 
+-- Sprungfelder & Trampoline (Parkour): schleudern den eigenen Avatar nach oben
+local CollectionService = game:GetService("CollectionService")
+local lastPad = 0
+local function hookPad(pad)
+	if not pad:IsA("BasePart") then return end
+	pad.Touched:Connect(function(hit)
+		local char = player.Character
+		if not char or not hit:IsDescendantOf(char) then return end
+		if os.clock() - lastPad < 0.5 then return end
+		local hrp = char:FindFirstChild("HumanoidRootPart")
+		local hum = char:FindFirstChildOfClass("Humanoid")
+		if not hrp or not hum or hum.Health <= 0 then return end
+		lastPad = os.clock()
+		local power = pad:GetAttribute("Power") or 90
+		local dir = pad:GetAttribute("Dir")
+		local v = hrp.AssemblyLinearVelocity
+		if typeof(dir) == "Vector3" then
+			hrp.AssemblyLinearVelocity = Vector3.new(dir.X, power, dir.Z)
+		else
+			hrp.AssemblyLinearVelocity = Vector3.new(v.X, power, v.Z)
+		end
+		hum:ChangeState(Enum.HumanoidStateType.Freefall)
+		Sounds.play("Click")
+	end)
+end
+
 function WorldFx.init()
 	setupPost()
+	for _, pad in ipairs(CollectionService:GetTagged("JumpPad")) do hookPad(pad) end
+	CollectionService:GetInstanceAddedSignal("JumpPad"):Connect(hookPad)
 	apply(player:GetAttribute("World") or 1)
 	player:GetAttributeChangedSignal("World"):Connect(function()
 		apply(player:GetAttribute("World") or 1)

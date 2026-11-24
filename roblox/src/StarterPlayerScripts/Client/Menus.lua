@@ -36,6 +36,11 @@ function Menus.init(gui)
 	window = UI.panel(gui, { Name = "Window", AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.52, 0),
 		Size = UDim2.new(0.62, 0, 0.74, 0), Color = C.bg, Transparency = 0.03 })
 	window.Visible = false
+	if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled then
+		-- Handy: Fenster nutzt die frei werdende Höhe (Daily Routine verschwindet bei offenem Menü)
+		window.Position = UDim2.new(0.5, 0, 0.5, 0)
+		window.Size = UDim2.new(0.7, 0, 0.94, 0)
+	end
 	window.Active = true   -- Ziehen über dem Menü dreht nicht die Kamera
 	UI.new("UISizeConstraint", { MinSize = Vector2.new(330, 300), MaxSize = Vector2.new(880, 620), Parent = window })
 	UI.stroke(window, C.pink, 2, 0.2)
@@ -61,8 +66,17 @@ local TITLES = {
 	shop = "💎 Shop", style = "✨ Ausrüstung", wheel = "🎡 Glücksrad & Geschenke", event = "🎉 Events",
 }
 
+local visibilityListeners = {}
+function Menus.onVisibility(fn)
+	table.insert(visibilityListeners, fn)
+end
+local function fireVisibility(open)
+	for _, fn in ipairs(visibilityListeners) do pcall(fn, open) end
+end
+
 function Menus.open(name, arg)
 	if not BUILDERS[name] or not State.snap then return end
+	fireVisibility(true)
 	UI.clear(content)
 	for _, c in ipairs(content:GetChildren()) do c:Destroy() end
 	current = name
@@ -74,6 +88,7 @@ end
 
 function Menus.close()
 	window.Visible = false
+	fireVisibility(false)
 	current = nil
 	refreshFn = nil
 end

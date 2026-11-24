@@ -42,7 +42,7 @@ local function groundSpot(origin)
 		if math.sqrt(x * x + z * z) > 35 then
 			local from = origin + Vector3.new(x, 300, z)
 			local hit = workspace:Raycast(from, Vector3.new(0, -400, 0), params)
-			if hit and (hit.Instance.Name == "Ground" or hit.Instance:IsA("Terrain")) and hit.Position.Y < 4 then
+			if hit and (hit.Instance.Name == "Ground" or hit.Instance:IsA("Terrain")) and hit.Material ~= Enum.Material.Water and hit.Position.Y < 4 then
 				return hit.Position
 			end
 		end

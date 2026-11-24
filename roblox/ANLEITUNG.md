@@ -61,6 +61,7 @@ Die Kamera geht nicht durch Wände. Einstellungen dazu (Empfindlichkeit, Zoom-Gr
 - **Events (🎉 rechts):** Vom 20.11. bis 6.1. läuft automatisch das **Winter-Event**: Schneeflocken in allen Welten einsammeln, am Event-Platz in Glow City die Winter-Box öffnen und den Event-Boss besiegen. Außerdem Halloween (10.10.–7.11.) und Sommer (1.7.–20.8.). Jedes **Wochenende** gibt's automatisch x2 Aura & x2 Glück.
   Zum Testen eines anderen Events: in `Shared › Config` bei `Config.EVENT_OVERRIDE = ""` z. B. `"halloween"` eintragen (danach wieder leeren!).
 - **Minispiele:** 🏃 Dach-Parkour (Turm in Glow City, Checkpoints, Belohnung alle 10 Min.), 🏁 Laufrennen in Welt 5 mit Stoppuhr, 🏋️ Gym in Welt 1 und 3 (8 Wiederholungen im Takt → Gym-Pump +50 % Aura).
+- **Parkours in jeder Welt (ab Welt 2):** 🌊 Bojen-Parkour (Miami), 🧗 Gipfel-Kletterei (Iron Mountain), 🔥 Lava-Tempel (Mewing-Tempel), 🛍️ Shopping-Parkour (Mailand), 🎬 Stunt-Parkour (Hollywood), 🏙️ Wolkenkratzer-Lauf (Dubai), 🪐 Planeten-Hüpfen (Galaxie). Orangene Startplatte → **E** drücken. Grüne Felder = Checkpoints, pinke Felder = Sprungfelder, Lava/Wasser schickt dich zum Checkpoint zurück. Belohnung am Pokal alle 10 Minuten. Dazu Trampoline, Eisbahn (rutschig!) und neue Wahrzeichen in jeder Welt.
 - **Ausrüstung (✨ rechts):** Auren, Spuren, Hüte (mit Boosts!), Emotes und Fahrzeuge kaufen & anziehen.
 - **Handel:** mit **2 Spielern** testen (Test → Clients and Servers → 2 Players), beim anderen Spieler **F** halten.
 

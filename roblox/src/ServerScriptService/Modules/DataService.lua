@@ -59,7 +59,7 @@ local function defaultData()
 		vehicles = {},               -- [fahrzeugId] = true
 		vehicle = "",                -- ausgewähltes Fahrzeug
 		cosmetics = { owned = {}, aura = "", trail = "", hat = "" },
-		records = { obbyLast = 0, raceBest = 0, gymLast = 0 },
+		records = { obbyLast = 0, raceBest = 0, gymLast = 0, courses = {} },
 	}
 end
 DataService.defaultData = defaultData

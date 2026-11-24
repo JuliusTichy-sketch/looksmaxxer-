@@ -87,6 +87,61 @@ local function initObby(obby)
 end
 
 ----------------------------------------------------------------------------
+-- 🧗 Parkour-Strecken in den Welten 2–8 (Bojen, Gipfel, Lava-Tempel, Shopping, Stunt, Wolkenkratzer, Planeten)
+----------------------------------------------------------------------------
+local function initCourse(c)
+	local attr = "CP_" .. c.id
+	local function backToCheckpoint(player)
+		local cp = player:GetAttribute(attr) or 0
+		local target = (cp > 0 and c.checkpoints[cp]) or c.first
+		if target then teleportTo(player, target.CFrame * CFrame.new(0, 4, 0)) end
+	end
+	c.start.Triggered:Connect(function(player)
+		local cp = player:GetAttribute(attr) or 0
+		backToCheckpoint(player)
+		GameService.notify(player, "🧗 " .. c.title, cp > 0 and ("Weiter ab Checkpoint " .. cp .. "!") or "Los geht's – ab zum goldenen Pokal!", "")
+	end)
+	for i, cpPart in ipairs(c.checkpoints) do
+		cpPart.Touched:Connect(function(hit)
+			local player = playerFromHit(hit)
+			if player and (player:GetAttribute(attr) or 0) < i then
+				player:SetAttribute(attr, i)
+				GameService.notify(player, "🚩 Checkpoint " .. i, "Wenn du fällst, geht's hier weiter.", "")
+			end
+		end)
+	end
+	-- Lava / Wasser: zurück zum letzten Checkpoint
+	for _, kill in ipairs(c.kills) do
+		kill.Touched:Connect(function(hit)
+			local player = playerFromHit(hit)
+			if player and debounce(player, "kill" .. c.id, 1.2) then
+				backToCheckpoint(player)
+			end
+		end)
+	end
+	c.finish.Touched:Connect(function(hit)
+		local player = playerFromHit(hit)
+		local data = player and DataService.get(player)
+		if not data or not debounce(player, "finish" .. c.id, 5) then return end
+		player:SetAttribute(attr, 0)
+		local now = os.time()
+		local last = data.records.courses[c.id] or 0
+		if now - last < Config.OBBY_COOLDOWN then
+			GameService.notify(player, "🏆 Geschafft!", "Nächste Belohnung hier in " .. Util.formatTime(Config.OBBY_COOLDOWN - (now - last)) .. ".", "good")
+		else
+			data.records.courses[c.id] = now
+			GameService.track(player, "obby", 1)
+			local text = RewardService.give(player, data, c.reward)
+			GameService.notify(player, "🏆 " .. c.title .. " geschafft!", text, "title")
+			GameService.sendFull(player)
+		end
+		task.delay(2.5, function()
+			if player.Parent then teleportTo(player, c.startCf * CFrame.new(0, 4, -6)) end
+		end)
+	end)
+end
+
+----------------------------------------------------------------------------
 -- 🏁 Laufsteg-Rennen
 ----------------------------------------------------------------------------
 local function initRace(race)
@@ -160,6 +215,7 @@ function MinigameService.init(info)
 	if info.obby then initObby(info.obby) end
 	if info.race then initRace(info.race) end
 	for _, prompt in ipairs(info.gyms or {}) do initGym(prompt) end
+	for _, c in ipairs(info.courses or {}) do initCourse(c) end
 end
 
 Players.PlayerRemoving:Connect(function(player)

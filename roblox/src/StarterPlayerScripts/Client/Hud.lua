@@ -24,19 +24,30 @@ local chips = {}
 local titleLabel, nextLabel, progressBar, routineSub, routineBtn, rewardsDot
 local wheelDot, eventBtn, rideBtn, raceLabel
 
+local UIS = game:GetService("UserInputService")
+-- Handy/Tablet ohne Tastatur: kompaktere Oberfläche, damit man mehr vom Spiel sieht
+local touch = UIS.TouchEnabled and not UIS.KeyboardEnabled
+
 local function chip(parent, key, caption, color, order)
-	local f = UI.panel(parent, { Size = UDim2.new(0.155, 0, 1, 0), Color = C.dark, Transparency = 0.15, LayoutOrder = order })
-	UI.stroke(f, color, 2, 0.3)
-	UI.text(f, caption, { Size = UDim2.new(1, 0, 0.34, 0), Position = UDim2.new(0, 0, 0.04, 0), Color = C.muted, Font = Enum.Font.GothamBold, MaxText = 12 })
-	chips[key] = UI.text(f, "0", { Size = UDim2.new(1, -8, 0.58, 0), Position = UDim2.new(0, 4, 0.38, 0), Color = color, MaxText = 24 })
+	local f = UI.panel(parent, { Size = UDim2.new(0.155, 0, 1, 0), Color = C.dark, Transparency = touch and 0.3 or 0.15, LayoutOrder = order, Radius = touch and 10 or 14 })
+	UI.stroke(f, color, touch and 1.5 or 2, 0.3)
+	UI.text(f, caption, { Size = UDim2.new(1, 0, 0.34, 0), Position = UDim2.new(0, 0, 0.04, 0), Color = C.muted, Font = Enum.Font.GothamBold, MaxText = touch and 9 or 12 })
+	chips[key] = UI.text(f, "0", { Size = UDim2.new(1, -8, 0.58, 0), Position = UDim2.new(0, 4, 0.38, 0), Color = color, MaxText = touch and 17 or 24 })
 end
 
 function Hud.init(gui)
 	-- Werte oben
 	local top = UI.new("Frame", { Name = "TopBar", BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, 6),
 		Size = UDim2.new(0.66, 0, 0.08, 0), Parent = gui })
-	UI.new("UISizeConstraint", { MinSize = Vector2.new(320, 44), MaxSize = Vector2.new(900, 62), Parent = top })
-	UI.list(top, true, 6, Enum.HorizontalAlignment.Center)
+	if touch then
+		-- ganz nach oben in die Roblox-Leiste, rechts neben die Roblox-Knöpfe
+		top.Position = UDim2.new(0.63, 0, 0, -50)
+		top.Size = UDim2.new(0.56, 0, 0, 38)
+		UI.new("UISizeConstraint", { MinSize = Vector2.new(280, 32), MaxSize = Vector2.new(560, 40), Parent = top })
+	else
+		UI.new("UISizeConstraint", { MinSize = Vector2.new(320, 44), MaxSize = Vector2.new(900, 62), Parent = top })
+	end
+	UI.list(top, true, touch and 4 or 6, Enum.HorizontalAlignment.Center)
 	chip(top, "aura", "✨ AURA", C.gold, 1)
 	chip(top, "aps", "⚡ PRO SEK.", C.green, 2)
 	chip(top, "cash", "💵 GELD", C.money, 3)
@@ -50,17 +61,15 @@ function Hud.init(gui)
 	UI.new("UISizeConstraint", { MinSize = Vector2.new(44, 300), MaxSize = Vector2.new(74, 780), Parent = side })
 	UI.list(side, false, 6, Enum.HorizontalAlignment.Center, Enum.VerticalAlignment.Center)
 	-- Handy/Tablet: Knöpfe kompakt oben anordnen, damit der Lauf-Joystick unten links frei bleibt
-	local UIS = game:GetService("UserInputService")
-	local touch = UIS.TouchEnabled and not UIS.KeyboardEnabled
 	local function compact(frame, anchorRight)
 		local layout = frame:FindFirstChildOfClass("UIListLayout")
 		if layout then layout:Destroy() end
 		local constraint = frame:FindFirstChildOfClass("UISizeConstraint")
 		if constraint then constraint:Destroy() end
 		frame.AnchorPoint = Vector2.new(anchorRight and 1 or 0, 0)
-		frame.Position = anchorRight and UDim2.new(1, -6, 0, 58) or UDim2.new(0, 6, 0, 58)
-		frame.Size = UDim2.new(0, 100, 0.62, 0)
-		UI.new("UIGridLayout", { CellSize = UDim2.new(0, 47, 0, 47), CellPadding = UDim2.new(0, 4, 0, 4),
+		frame.Position = anchorRight and UDim2.new(1, -4, 0, 4) or UDim2.new(0, 4, 0, 4)
+		frame.Size = UDim2.new(0, 80, 0.75, 0)
+		UI.new("UIGridLayout", { CellSize = UDim2.new(0, 37, 0, 37), CellPadding = UDim2.new(0, 3, 0, 3),
 			HorizontalAlignment = anchorRight and Enum.HorizontalAlignment.Right or Enum.HorizontalAlignment.Left,
 			SortOrder = Enum.SortOrder.LayoutOrder, Parent = frame })
 	end
@@ -77,8 +86,8 @@ function Hud.init(gui)
 		UI.new("UIAspectRatioConstraint", { AspectRatio = 1, Parent = btn })
 		UI.corner(btn, 14)
 		UI.stroke(btn, Color3.new(1, 1, 1), 2, 0.6)
-		UI.text(btn, b[2], { Size = UDim2.new(1, 0, 0.62, 0), MaxText = 34 })
-		UI.text(btn, b[3], { Size = UDim2.new(1, -4, 0.3, 0), Position = UDim2.new(0, 2, 0.66, 0), MaxText = 12 })
+		UI.text(btn, b[2], { Size = UDim2.new(1, 0, 0.62, 0), MaxText = touch and 20 or 34 })
+		UI.text(btn, b[3], { Size = UDim2.new(1, -4, 0.3, 0), Position = UDim2.new(0, 2, 0.66, 0), MaxText = touch and 8 or 12 })
 		btn.Activated:Connect(function()
 			Menus.toggle(b[1])
 		end)
@@ -104,8 +113,8 @@ function Hud.init(gui)
 		UI.new("UIAspectRatioConstraint", { AspectRatio = 1, Parent = btn })
 		UI.corner(btn, 14)
 		UI.stroke(btn, Color3.new(1, 1, 1), 2, 0.6)
-		UI.text(btn, b[2], { Size = UDim2.new(1, 0, 0.62, 0), MaxText = 34 })
-		UI.text(btn, b[3], { Size = UDim2.new(1, -4, 0.3, 0), Position = UDim2.new(0, 2, 0.66, 0), MaxText = 12 })
+		UI.text(btn, b[2], { Size = UDim2.new(1, 0, 0.62, 0), MaxText = touch and 20 or 34 })
+		UI.text(btn, b[3], { Size = UDim2.new(1, -4, 0.3, 0), Position = UDim2.new(0, 2, 0.66, 0), MaxText = touch and 8 or 12 })
 		btn.Activated:Connect(function()
 			if b[1] == "emote" then
 				Menus.open("style", "emote")
@@ -148,7 +157,33 @@ function Hud.init(gui)
 	-- Unten: Titel, Fortschritt, Daily Routine
 	local bottom = UI.new("Frame", { Name = "Bottom", BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 1, -10),
 		Size = UDim2.new(0.3, 0, 0.22, 0), Parent = gui })
-	UI.new("UISizeConstraint", { MinSize = Vector2.new(240, 130), MaxSize = Vector2.new(420, 190), Parent = bottom })
+	if touch then
+		bottom.Size = UDim2.new(0.26, 0, 0.24, 0)
+		bottom.Position = UDim2.new(0.5, 0, 1, -6)
+		UI.new("UISizeConstraint", { MinSize = Vector2.new(190, 92), MaxSize = Vector2.new(300, 124), Parent = bottom })
+	else
+		UI.new("UISizeConstraint", { MinSize = Vector2.new(240, 130), MaxSize = Vector2.new(420, 190), Parent = bottom })
+	end
+	-- Solange ein Menü (z. B. Upgrades) offen ist, verschwindet die Daily Routine, damit man mehr sieht
+	Menus.onVisibility(function(open)
+		bottom.Visible = not open
+	end)
+	if touch then
+		-- liegt eine Waffe im Rucksack, zeigt Roblox unten die Werkzeugleiste → Knopf etwas höher
+		local plr = game:GetService("Players").LocalPlayer
+		local function fitAboveHotbar()
+			local bp = plr:FindFirstChildOfClass("Backpack")
+			local char = plr.Character
+			local hasTool = (bp and #bp:GetChildren() > 0) or (char and char:FindFirstChildOfClass("Tool") ~= nil)
+			bottom.Position = UDim2.new(0.5, 0, 1, hasTool and -62 or -6)
+		end
+		task.spawn(function()
+			while true do
+				fitAboveHotbar()
+				task.wait(1)
+			end
+		end)
+	end
 	titleLabel = UI.text(bottom, "NPC", { Size = UDim2.new(1, 0, 0.18, 0), Color = C.pink, MaxText = 24 })
 	titleLabel.TextStrokeTransparency = 0.4
 	local barBg = UI.panel(bottom, { Size = UDim2.new(1, 0, 0.07, 0), Position = UDim2.new(0, 0, 0.2, 0), Color = C.dark, Radius = 6 })
@@ -180,7 +215,7 @@ function Hud.init(gui)
 	end)
 
 	-- Lebensbalken: Selbstbewusstsein & Boss
-	local bars = UI.new("Frame", { Name = "Bars", BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0.11, 6),
+	local bars = UI.new("Frame", { Name = "Bars", BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 0), Position = touch and UDim2.new(0.5, 0, 0, 4) or UDim2.new(0.5, 0, 0.11, 6),
 		Size = UDim2.new(0.42, 0, 0.09, 0), Parent = gui })
 	UI.new("UISizeConstraint", { MinSize = Vector2.new(260, 56), MaxSize = Vector2.new(560, 80), Parent = bars })
 	local bossBg = UI.panel(bars, { Size = UDim2.new(1, 0, 0.5, -2), Color = C.dark, Radius = 8 })
