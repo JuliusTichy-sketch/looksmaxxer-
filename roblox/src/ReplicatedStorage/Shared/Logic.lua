@@ -151,7 +151,7 @@ function Logic.petMult(data)
 end
 
 function Logic.petSlots(data)
-	return Config.BASE_PET_SLOTS + Logic.perkLevel(data, "petslot")
+	return Config.BASE_PET_SLOTS + Logic.perkLevel(data, "petslot") + (Logic.hasPass(data, "petslots") and 3 or 0)
 end
 
 function Logic.equippedCount(data)
@@ -181,7 +181,8 @@ function Logic.potionFactor(data, field, now)
 end
 
 function Logic.luck(data, now)
-	return (1 + Logic.perkLevel(data, "luck") * 0.1) * Logic.potionFactor(data, "luck", now)
+	return (1 + Logic.perkLevel(data, "luck") * 0.1 + Logic.hatBoost(data, "luck")) * Logic.potionFactor(data, "luck", now)
+		* (Logic.hasPass(data, "lucky") and 2 or 1) * (Logic.isWeekend(now) and Config.WEEKEND_BOOST.luck or 1)
 end
 
 ----------------------------------------------------------------------------
@@ -196,6 +197,8 @@ end
 function Logic.multiplier(data, worldIndex, now)
 	return Logic.worldMult(worldIndex) * Logic.rebirthMult(data.rebirths or 0) * Logic.petMult(data)
 		* Logic.potionFactor(data, "aura", now)
+		* (Logic.hasPass(data, "vip") and 1.25 or 1) * (Logic.hasPass(data, "x2aura") and 2 or 1)
+		* (1 + Logic.hatBoost(data, "aura")) * (Logic.isWeekend(now) and Config.WEEKEND_BOOST.aura or 1)
 end
 
 function Logic.aps(data, worldIndex, now)
@@ -306,6 +309,95 @@ end
 -- Selbstbewusstsein = Lebensbalken im Bosskampf
 function Logic.maxConfidence(data)
 	return math.floor(100 + Logic.baseGlow(data.levels) / 50)
+end
+
+
+----------------------------------------------------------------------------
+-- Gamepasses, Hüte, Wochenende, Events, Laufen
+----------------------------------------------------------------------------
+function Logic.hasPass(data, key)
+	return data.passes ~= nil and data.passes[key] == true
+end
+
+Logic.hatById, Logic.auraById, Logic.trailById, Logic.emoteById, Logic.vehicleById = {}, {}, {}, {}, {}
+for _, h in ipairs(Config.Hats) do Logic.hatById[h.id] = h end
+for _, a in ipairs(Config.Auras) do Logic.auraById[a.id] = a end
+for _, t in ipairs(Config.Trails) do Logic.trailById[t.id] = t end
+for _, e in ipairs(Config.Emotes) do Logic.emoteById[e.id] = e end
+for _, v in ipairs(Config.Vehicles) do Logic.vehicleById[v.id] = v end
+
+-- Bonus des aufgesetzten Hutes (field = "aura", "cash", "luck" oder "speed")
+function Logic.hatBoost(data, field)
+	local hatId = data.cosmetics and data.cosmetics.hat
+	local hat = hatId and Logic.hatById[hatId]
+	return (hat and hat.boost[field]) or 0
+end
+
+-- Geld-Multiplikator (VIP & Hut)
+function Logic.cashMult(data)
+	return (Logic.hasPass(data, "vip") and 1.25 or 1) * (1 + Logic.hatBoost(data, "cash"))
+end
+
+-- Samstag oder Sonntag (UTC)?
+function Logic.isWeekend(now)
+	if not now or now <= 0 then return false end
+	local t = os.date("!*t", now)
+	return t.wday == 1 or t.wday == 7
+end
+
+-- Welches Event läuft gerade? (nil = keins)
+function Logic.activeEvent(now)
+	if Config.EVENT_OVERRIDE and Config.EVENT_OVERRIDE ~= "" then
+		for _, ev in ipairs(Config.Events) do
+			if ev.id == Config.EVENT_OVERRIDE then return ev end
+		end
+	end
+	if not now or now <= 0 then return nil end
+	local t = os.date("!*t", now)
+	local today = t.month * 100 + t.day
+	for _, ev in ipairs(Config.Events) do
+		local from = ev.from[1] * 100 + ev.from[2]
+		local to = ev.to[1] * 100 + ev.to[2]
+		if from <= to then
+			if today >= from and today <= to then return ev end
+		elseif today >= from or today <= to then   -- über den Jahreswechsel
+			return ev
+		end
+	end
+	return nil
+end
+
+function Logic.eventTokens(data, eventId)
+	return (data.eventTokens and data.eventTokens[eventId]) or 0
+end
+
+-- Laufgeschwindigkeit (Perk, Gamepass, Hut, Fahrzeug)
+function Logic.walkSpeed(data, riding)
+	local speed = 16 + 2 * Logic.perkLevel(data, "speed") + (Logic.hasPass(data, "speed") and 8 or 0) + Logic.hatBoost(data, "speed")
+	if riding then
+		local v = Logic.vehicleById[data.vehicle or ""]
+		if v then speed = speed + v.speed end
+	end
+	return speed
+end
+
+-- Besitzt der Spieler einen Gegenstand? (kind: "aura", "trail", "hat", "emote", "vehicle")
+function Logic.ownsItem(data, kind, id)
+	if kind == "vehicle" then return data.vehicles ~= nil and data.vehicles[id] == true end
+	if kind == "emote" then
+		local e = Logic.emoteById[id]
+		if e and e.price == 0 then return true end
+	end
+	return data.cosmetics ~= nil and data.cosmetics.owned ~= nil and data.cosmetics.owned[id] == true
+end
+
+function Logic.itemDef(kind, id)
+	if kind == "aura" then return Logic.auraById[id] end
+	if kind == "trail" then return Logic.trailById[id] end
+	if kind == "hat" then return Logic.hatById[id] end
+	if kind == "emote" then return Logic.emoteById[id] end
+	if kind == "vehicle" then return Logic.vehicleById[id] end
+	return nil
 end
 
 

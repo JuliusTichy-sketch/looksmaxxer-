@@ -42,7 +42,7 @@ local function groundSpot(origin)
 		if math.sqrt(x * x + z * z) > 35 then
 			local from = origin + Vector3.new(x, 300, z)
 			local hit = workspace:Raycast(from, Vector3.new(0, -400, 0), params)
-			if hit and hit.Instance.Name == "Ground" then
+			if hit and (hit.Instance.Name == "Ground" or hit.Instance:IsA("Terrain")) and hit.Position.Y < 4 then
 				return hit.Position
 			end
 		end
@@ -194,7 +194,7 @@ Remotes.FanChoice.OnServerEvent:Connect(function(player, index)
 	if rng:NextNumber() < chance then
 		local aps = math.max(Logic.aps(data, GameService.currentWorld(player), os.time()), 5)
 		local aura = aps * 10 * fan.fame
-		local cash = math.floor(5 * fan.fame * fan.world * fan.world)
+		local cash = math.floor(5 * fan.fame * fan.world * fan.world * Logic.cashMult(data))
 		GameService.addAura(data, aura)
 		data.cash = data.cash + cash
 		GameService.track(player, "fans", 1)

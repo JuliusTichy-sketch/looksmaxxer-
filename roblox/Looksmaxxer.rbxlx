@@ -461,9 +461,10 @@ Config.MogLose = {
 -- TRÄNKE (kosten Geld)
 ----------------------------------------------------------------------------
 Config.Potions = {
-	{ id = "aura2",  emoji = "🧪", name = "Aura-Trank",  desc = "Doppelte Aura für 10 Minuten.",                 price = 300, duration = 600, aura = 2 },
-	{ id = "luck2",  emoji = "🍀", name = "Glücks-Trank", desc = "Doppeltes Glück beim Öffnen für 10 Minuten.",  price = 500, duration = 600, luck = 2 },
+	{ id = "aura2",  emoji = "🧪", name = "Aura-Trank",  desc = "Doppelte Aura für 10 Minuten.",                 gems = 20, price = 300, duration = 600, aura = 2 },
+	{ id = "luck2",  emoji = "🍀", name = "Glücks-Trank", desc = "Doppeltes Glück beim Öffnen für 10 Minuten.",  gems = 30, price = 500, duration = 600, luck = 2 },
 	{ id = "click3", emoji = "🥤", name = "Klick-Shake", desc = "Dreifacher Klick-Wert für 5 Minuten.",          price = 150, duration = 300, click = 3 },
+	{ id = "pump",   emoji = "💪", name = "Gym-Pump",    desc = "+50 % Aura für 3 Minuten (aus dem Gym-Training).", price = 0, duration = 180, aura = 1.5, hidden = true },
 }
 
 ----------------------------------------------------------------------------
@@ -638,6 +639,171 @@ Config.BOSS_HIT_PERCENT = 0.35        -- ein Treffer kostet 35 % deines Selbstbe
 Config.TRADE_MAX_PETS = 8
 Config.TRADE_COOLDOWN = 15
 
+----------------------------------------------------------------------------
+-- 🎉 EVENTS (laufen automatisch nach Kalender, Zeitzone UTC)
+-- from/to = { Monat, Tag }. Zum Testen: Config.EVENT_OVERRIDE = "halloween" usw.
+----------------------------------------------------------------------------
+Config.EVENT_OVERRIDE = ""
+Config.EVENT_EGG_COST = 25          -- Event-Box kostet 25 Event-Münzen
+Config.EVENT_ITEMS_PER_WORLD = 6    -- so viele Sammelobjekte liegen gleichzeitig in jeder Welt
+Config.WEEKEND_BOOST = { aura = 2, luck = 2 }   -- Samstag & Sonntag automatisch
+
+local EC = Color3.fromRGB
+Config.Events = {
+	{ id = "winter", name = "Winter-Glow", emoji = "❄️", from = { 11, 20 }, to = { 1, 6 }, color = EC(140, 220, 255),
+	  token = "Schneeflocken", tokenEmoji = "❄️",
+	  boss = { name = "Frost-Chad", level = 30, rebirths = 6, hp = 2e6, shirt = EC(200, 230, 255), pants = EC(80, 120, 200), skin = EC(220, 235, 255), scale = 1.5 },
+	  pets = {
+		{ "Schneemann-Mops", "⛄", "rare", { plan = "quad", c1 = EC(250, 250, 255), c2 = EC(255, 140, 40), ears = "floppy", tail = "curl" } },
+		{ "Rentier-Chad", "🦌", "epic", { plan = "quad", c1 = EC(150, 100, 60), c2 = EC(230, 40, 40), ears = "pointy", tail = "short", horns = true, shades = true } },
+		{ "Pinguin-Elf", "🐧", "legendary", { plan = "bird", style = "penguin", c1 = EC(40, 150, 60), c2 = EC(230, 40, 40) } },
+		{ "Eis-Yeti", "🧊", "mythic", { plan = "quad", c1 = EC(190, 235, 255), c2 = EC(255, 255, 255), ears = "round", tail = "fluffy", mane = true, glass = true } },
+		{ "Weihnachts-Drache", "🎄", "divine", { plan = "dragon", c1 = EC(220, 30, 40), c2 = EC(255, 215, 90), neon = true, halo = true } },
+	  } },
+	{ id = "halloween", name = "Halloween-Glow", emoji = "🎃", from = { 10, 10 }, to = { 11, 7 }, color = EC(255, 140, 30),
+	  token = "Kürbisse", tokenEmoji = "🎃",
+	  boss = { name = "Kürbis-König", level = 30, rebirths = 6, hp = 2e6, shirt = EC(255, 130, 20), pants = EC(30, 20, 30), skin = EC(120, 200, 80), scale = 1.5 },
+	  pets = {
+		{ "Kürbis-Katze", "🎃", "rare", { plan = "quad", c1 = EC(255, 140, 30), c2 = EC(30, 25, 30), ears = "pointy", tail = "long" } },
+		{ "Fledermaus-Bro", "🦇", "epic", { plan = "bird", style = "eagle", c1 = EC(40, 30, 50), c2 = EC(150, 60, 200) } },
+		{ "Geister-Moai", "👻", "legendary", { plan = "ghost", c1 = EC(230, 240, 255), c2 = EC(120, 255, 150) } },
+		{ "Vampir-Wolf", "🧛", "mythic", { plan = "quad", c1 = EC(60, 20, 30), c2 = EC(200, 20, 40), ears = "pointy", tail = "long" } },
+		{ "Skelett-Drache", "💀", "divine", { plan = "dragon", c1 = EC(245, 245, 235), c2 = EC(120, 255, 120), glass = true, halo = true } },
+	  } },
+	{ id = "summer", name = "Sommer-Glow", emoji = "☀️", from = { 7, 1 }, to = { 8, 20 }, color = EC(255, 210, 60),
+	  token = "Kokosnüsse", tokenEmoji = "🥥",
+	  boss = { name = "Sonnenbrand-Brad", level = 30, rebirths = 6, hp = 2e6, shirt = EC(255, 90, 60), pants = EC(60, 160, 220), skin = EC(255, 150, 120), scale = 1.5 },
+	  pets = {
+		{ "Kokos-Krabbe", "🦀", "rare", { plan = "crab", c1 = EC(150, 100, 60), c2 = EC(255, 240, 220) } },
+		{ "Surf-Delfin", "🏄", "epic", { plan = "sea", style = "dolphin", c1 = EC(60, 200, 230), c2 = EC(255, 255, 255), shades = true } },
+		{ "Sonnen-Flamingo", "🦩", "legendary", { plan = "bird", style = "longleg", c1 = EC(255, 200, 60), c2 = EC(255, 120, 160), gold = true } },
+		{ "Strand-Gott-Hai", "🦈", "mythic", { plan = "sea", style = "shark", c1 = EC(255, 180, 80), c2 = EC(255, 255, 255) } },
+		{ "Sonnen-Phönix", "🌞", "divine", { plan = "bird", style = "phoenix", c1 = EC(255, 200, 40), c2 = EC(255, 90, 40), neon = true, halo = true } },
+	  } },
+}
+-- Event-Pets & Event-Boxen erzeugen (Stärke wie Pets aus Welt 4)
+Config.EVENT_WEIGHTS = { rare = 60, epic = 28, legendary = 9, mythic = 2.6, divine = 0.4 }
+for _, ev in ipairs(Config.Events) do
+	local egg = { index = #Config.Eggs + 1, world = 1, station = 0, event = ev.id, name = ev.name .. "-Box", emoji = ev.emoji,
+		cost = Config.EVENT_EGG_COST, pets = {} }
+	local counts = {}
+	for _, p in ipairs(ev.pets) do counts[p[3]] = (counts[p[3]] or 0) + 1 end
+	for i, p in ipairs(ev.pets) do
+		local pet = { id = "ev_" .. ev.id .. "_" .. i, name = p[1], emoji = p[2], rarity = p[3], world = 4, event = ev.id, look = p[4],
+			boost = Config.PET_BASE_BOOST * Config.PET_WORLD_GROWTH ^ 3 * Config.Rarities[p[3]].mult }
+		table.insert(Config.Pets, pet)
+		table.insert(egg.pets, { id = pet.id, weight = Config.EVENT_WEIGHTS[p[3]] / counts[p[3]] })
+	end
+	ev.eggIndex = egg.index
+	table.insert(Config.Eggs, egg)
+end
+
+----------------------------------------------------------------------------
+-- 🎡 GLÜCKSRAD & SPIELZEIT-GESCHENKE
+-- Glücksrad: 1x pro Tag gratis (+ Drehungen aus Spielzeit-Geschenken). Kein Robux-Kauf (Roblox-Regeln für Zufall).
+----------------------------------------------------------------------------
+Config.WHEEL_COOLDOWN = 20 * 3600
+Config.Wheel = {
+	{ label = "💵 Geld",          weight = 25, color = EC(124, 252, 154), reward = { cash = 500, scale = true } },
+	{ label = "💵 Viel Geld",     weight = 12, color = EC(80, 200, 120),  reward = { cash = 2500, scale = true } },
+	{ label = "💎 10 Gems",       weight = 15, color = EC(120, 200, 255), reward = { gems = 10 } },
+	{ label = "💎 50 Gems",       weight = 4,  color = EC(60, 140, 255),  reward = { gems = 50 } },
+	{ label = "🧪 Aura-Trank",    weight = 14, color = EC(255, 120, 220), reward = { potion = "aura2" } },
+	{ label = "🍀 Glücks-Trank",  weight = 12, color = EC(120, 230, 120), reward = { potion = "luck2" } },
+	{ label = "🥈 Silber-Box",    weight = 12, color = EC(200, 205, 215), reward = { freeEgg = 2 } },
+	{ label = "🌈 Göttliche Box", weight = 1,  color = EC(255, 120, 240), reward = { freeEgg = 5 } },
+	{ label = "✨ 10 Min. Aura",  weight = 5,  color = EC(255, 209, 102), reward = { auraSeconds = 600 } },
+}
+Config.PlaytimeGifts = {
+	{ minutes = 5,  label = "💵 Geld",           reward = { cash = 300, scale = true } },
+	{ minutes = 10, label = "🎡 Glücksrad-Dreh", reward = { spins = 1 } },
+	{ minutes = 20, label = "🧪 Aura-Trank",     reward = { potion = "aura2" } },
+	{ minutes = 30, label = "💎 15 Gems",        reward = { gems = 15 } },
+	{ minutes = 45, label = "🥈 Silber-Box",     reward = { freeEgg = 2 } },
+	{ minutes = 60, label = "🎡 2 Drehungen",    reward = { spins = 2 } },
+}
+
+----------------------------------------------------------------------------
+-- 💎 ROBUX-SHOP
+-- Die IDs musst du im Creator Hub anlegen und hier eintragen (siehe ANLEITUNG.md).
+-- id = 0 → im Spiel steht "Bald verfügbar".
+----------------------------------------------------------------------------
+Config.GamePasses = {
+	{ key = "vip",      id = 0, emoji = "👑", name = "VIP",               robux = 299, desc = "+25 % Aura & Geld, goldenes VIP-Namensschild." },
+	{ key = "x2aura",   id = 0, emoji = "✨", name = "Doppelte Aura",     robux = 399, desc = "Für immer x2 Aura." },
+	{ key = "lucky",    id = 0, emoji = "🍀", name = "Glückspilz",        robux = 249, desc = "Für immer x2 Glück beim Box-Öffnen." },
+	{ key = "petslots", id = 0, emoji = "🐾", name = "+3 Pet-Plätze",     robux = 299, desc = "3 Pets mehr gleichzeitig ausrüsten." },
+	{ key = "triple",   id = 0, emoji = "🎁", name = "3er-Öffnen",        robux = 199, desc = "Öffne 3 Boxen auf einmal – sofort, ohne Rebirth-Shop." },
+	{ key = "speed",    id = 0, emoji = "⚡", name = "Turbo-Laufen",      robux = 99,  desc = "+8 Laufgeschwindigkeit für immer." },
+}
+Config.DevProducts = {
+	{ key = "gems100",  id = 0, emoji = "💎", name = "100 Gems",          robux = 49,  reward = { gems = 100 } },
+	{ key = "gems550",  id = 0, emoji = "💎", name = "550 Gems",          robux = 199, reward = { gems = 550 } },
+	{ key = "gems1200", id = 0, emoji = "💎", name = "1.200 Gems",        robux = 399, reward = { gems = 1200 } },
+	{ key = "gems3000", id = 0, emoji = "💎", name = "3.000 Gems",        robux = 899, reward = { gems = 3000 } },
+	{ key = "starter",  id = 0, emoji = "🎁", name = "Starter-Paket",     robux = 99,  once = true,
+	  reward = { gems = 150, cash = 2000, scale = true, potion = "aura2" }, desc = "Nur einmal kaufbar!" },
+	{ key = "aurapack", id = 0, emoji = "✨", name = "Aura-Paket",        robux = 79,  reward = { auraSeconds = 900 }, desc = "Sofort 15 Minuten deiner Aura/s." },
+}
+
+----------------------------------------------------------------------------
+-- 🛹 FAHRZEUGE (Taste V = aufsteigen/absteigen)
+-- currency = "cash" (Geld) oder "gems"
+----------------------------------------------------------------------------
+Config.Vehicles = {
+	{ id = "skateboard", emoji = "🛹", name = "Skateboard",        speed = 8,  jump = 0,  price = 2000,  currency = "cash", plan = "board" },
+	{ id = "scooter",    emoji = "🛴", name = "E-Scooter",         speed = 14, jump = 0,  price = 50000, currency = "cash", plan = "scooter" },
+	{ id = "sportwagen", emoji = "🏎️", name = "Sportwagen",        speed = 24, jump = 0,  price = 5e6,   currency = "cash", plan = "car" },
+	{ id = "hoverboard", emoji = "🛸", name = "Hoverboard",        speed = 30, jump = 20, price = 400,   currency = "gems", plan = "hover" },
+	{ id = "goldcar",    emoji = "🚗", name = "Gold-Sportwagen",   speed = 36, jump = 0,  price = 1500,  currency = "gems", plan = "car", gold = true },
+}
+
+----------------------------------------------------------------------------
+-- ✨ AUSRÜSTUNG: Auren, Spuren, Hüte (mit Boosts), Emotes
+----------------------------------------------------------------------------
+Config.Auras = {
+	{ id = "aura_pink",    emoji = "💖", name = "Pinke Glitzer-Aura", price = 1000,  currency = "cash", style = "sparkle", color = EC(255, 120, 220) },
+	{ id = "aura_fire",    emoji = "🔥", name = "Feuer-Aura",         price = 25000, currency = "cash", style = "fire",    color = EC(255, 120, 30) },
+	{ id = "aura_ice",     emoji = "❄️", name = "Eis-Aura",           price = 250000, currency = "cash", style = "sparkle", color = EC(140, 220, 255) },
+	{ id = "aura_gold",    emoji = "🌟", name = "Gold-Aura",          price = 2.5e6, currency = "cash", style = "sparkle", color = EC(255, 205, 60), strong = true },
+	{ id = "aura_dark",    emoji = "🌑", name = "Dunkle Aura",        price = 2.5e7, currency = "cash", style = "smoke",   color = EC(70, 20, 110) },
+	{ id = "aura_rainbow", emoji = "🌈", name = "Regenbogen-Aura",    price = 500,   currency = "gems", style = "rainbow", color = EC(255, 255, 255), strong = true },
+}
+Config.Trails = {
+	{ id = "trail_pink",    emoji = "💗", name = "Pinke Spur",       price = 5000,  currency = "cash", c1 = EC(255, 120, 220), c2 = EC(255, 255, 255) },
+	{ id = "trail_fire",    emoji = "🔥", name = "Feuer-Spur",       price = 100000, currency = "cash", c1 = EC(255, 220, 60), c2 = EC(255, 60, 20) },
+	{ id = "trail_neon",    emoji = "💠", name = "Neon-Spur",        price = 2e6,   currency = "cash", c1 = EC(62, 242, 255), c2 = EC(155, 92, 255) },
+	{ id = "trail_rainbow", emoji = "🌈", name = "Regenbogen-Spur",  price = 300,   currency = "gems", rainbow = true },
+	{ id = "trail_galaxy",  emoji = "🌌", name = "Galaxie-Spur",     price = 800,   currency = "gems", c1 = EC(120, 60, 255), c2 = EC(20, 10, 40) },
+}
+-- Hüte geben Boosts: aura/cash/luck = Prozent (0.1 = +10 %), speed = Laufgeschwindigkeit
+Config.Hats = {
+	{ id = "cap",        emoji = "🧢", name = "Gym-Cap",            price = 3000,   currency = "cash", boost = { aura = 0.05 } },
+	{ id = "headphones", emoji = "🎧", name = "Phonk-Kopfhörer",    price = 60000,  currency = "cash", boost = { cash = 0.05, speed = 3 } },
+	{ id = "cowboy",     emoji = "🤠", name = "Sheriff-Hut",        price = 800000, currency = "cash", boost = { cash = 0.1 } },
+	{ id = "halo",       emoji = "😇", name = "Heiligenschein",     price = 1e7,    currency = "cash", boost = { aura = 0.15 } },
+	{ id = "crown",      emoji = "👑", name = "Gigachad-Krone",     price = 2e8,    currency = "cash", boost = { aura = 0.25 } },
+	{ id = "viking",     emoji = "🪖", name = "Wikinger-Helm",      price = 600,    currency = "gems", boost = { luck = 0.15 } },
+	{ id = "diamond",    emoji = "💎", name = "Diamant-Krone",      price = 1500,   currency = "gems", boost = { aura = 0.3, luck = 0.1 } },
+}
+-- Emotes (Standard-Roblox-Animationen für R15)
+Config.Emotes = {
+	{ id = "wave",   emoji = "👋", name = "Winken",       price = 0,     currency = "cash", anim = "rbxassetid://507770239" },
+	{ id = "cheer",  emoji = "🙌", name = "Jubeln",       price = 1000,  currency = "cash", anim = "rbxassetid://507770677" },
+	{ id = "laugh",  emoji = "😂", name = "Lachen",       price = 5000,  currency = "cash", anim = "rbxassetid://507770818" },
+	{ id = "dance",  emoji = "🕺", name = "Tanzen",       price = 25000, currency = "cash", anim = "rbxassetid://507771019" },
+	{ id = "mewing", emoji = "🗿", name = "Mewing-Pose",  price = 100,   currency = "gems", anim = "rbxassetid://507770453", bubble = "*mewt intensiv* 🗿" },
+}
+
+----------------------------------------------------------------------------
+-- 🏃 MINISPIELE
+----------------------------------------------------------------------------
+Config.OBBY_COOLDOWN = 600            -- Belohnung für den Dach-Parkour höchstens alle 10 Minuten
+Config.ObbyReward = { cash = 400, scale = true, gems = 5 }
+Config.RACE_TARGET = 14               -- Sekunden für volle Belohnung im Laufsteg-Rennen
+Config.RaceReward = { cash = 250 }    -- wird mit Lohn-Bonus und Tempo verrechnet
+Config.GYM_COOLDOWN = 45
+
 return Config
 ]]></ProtectedString></Properties></Item>
 <Item class="ModuleScript" referent="RBX00000002"><Properties><string name="Name">Logic</string><ProtectedString name="Source"><![CDATA[--[[
@@ -793,7 +959,7 @@ function Logic.petMult(data)
 end
 
 function Logic.petSlots(data)
-	return Config.BASE_PET_SLOTS + Logic.perkLevel(data, "petslot")
+	return Config.BASE_PET_SLOTS + Logic.perkLevel(data, "petslot") + (Logic.hasPass(data, "petslots") and 3 or 0)
 end
 
 function Logic.equippedCount(data)
@@ -823,7 +989,8 @@ function Logic.potionFactor(data, field, now)
 end
 
 function Logic.luck(data, now)
-	return (1 + Logic.perkLevel(data, "luck") * 0.1) * Logic.potionFactor(data, "luck", now)
+	return (1 + Logic.perkLevel(data, "luck") * 0.1 + Logic.hatBoost(data, "luck")) * Logic.potionFactor(data, "luck", now)
+		* (Logic.hasPass(data, "lucky") and 2 or 1) * (Logic.isWeekend(now) and Config.WEEKEND_BOOST.luck or 1)
 end
 
 ----------------------------------------------------------------------------
@@ -838,6 +1005,8 @@ end
 function Logic.multiplier(data, worldIndex, now)
 	return Logic.worldMult(worldIndex) * Logic.rebirthMult(data.rebirths or 0) * Logic.petMult(data)
 		* Logic.potionFactor(data, "aura", now)
+		* (Logic.hasPass(data, "vip") and 1.25 or 1) * (Logic.hasPass(data, "x2aura") and 2 or 1)
+		* (1 + Logic.hatBoost(data, "aura")) * (Logic.isWeekend(now) and Config.WEEKEND_BOOST.aura or 1)
 end
 
 function Logic.aps(data, worldIndex, now)
@@ -948,6 +1117,95 @@ end
 -- Selbstbewusstsein = Lebensbalken im Bosskampf
 function Logic.maxConfidence(data)
 	return math.floor(100 + Logic.baseGlow(data.levels) / 50)
+end
+
+
+----------------------------------------------------------------------------
+-- Gamepasses, Hüte, Wochenende, Events, Laufen
+----------------------------------------------------------------------------
+function Logic.hasPass(data, key)
+	return data.passes ~= nil and data.passes[key] == true
+end
+
+Logic.hatById, Logic.auraById, Logic.trailById, Logic.emoteById, Logic.vehicleById = {}, {}, {}, {}, {}
+for _, h in ipairs(Config.Hats) do Logic.hatById[h.id] = h end
+for _, a in ipairs(Config.Auras) do Logic.auraById[a.id] = a end
+for _, t in ipairs(Config.Trails) do Logic.trailById[t.id] = t end
+for _, e in ipairs(Config.Emotes) do Logic.emoteById[e.id] = e end
+for _, v in ipairs(Config.Vehicles) do Logic.vehicleById[v.id] = v end
+
+-- Bonus des aufgesetzten Hutes (field = "aura", "cash", "luck" oder "speed")
+function Logic.hatBoost(data, field)
+	local hatId = data.cosmetics and data.cosmetics.hat
+	local hat = hatId and Logic.hatById[hatId]
+	return (hat and hat.boost[field]) or 0
+end
+
+-- Geld-Multiplikator (VIP & Hut)
+function Logic.cashMult(data)
+	return (Logic.hasPass(data, "vip") and 1.25 or 1) * (1 + Logic.hatBoost(data, "cash"))
+end
+
+-- Samstag oder Sonntag (UTC)?
+function Logic.isWeekend(now)
+	if not now or now <= 0 then return false end
+	local t = os.date("!*t", now)
+	return t.wday == 1 or t.wday == 7
+end
+
+-- Welches Event läuft gerade? (nil = keins)
+function Logic.activeEvent(now)
+	if Config.EVENT_OVERRIDE and Config.EVENT_OVERRIDE ~= "" then
+		for _, ev in ipairs(Config.Events) do
+			if ev.id == Config.EVENT_OVERRIDE then return ev end
+		end
+	end
+	if not now or now <= 0 then return nil end
+	local t = os.date("!*t", now)
+	local today = t.month * 100 + t.day
+	for _, ev in ipairs(Config.Events) do
+		local from = ev.from[1] * 100 + ev.from[2]
+		local to = ev.to[1] * 100 + ev.to[2]
+		if from <= to then
+			if today >= from and today <= to then return ev end
+		elseif today >= from or today <= to then   -- über den Jahreswechsel
+			return ev
+		end
+	end
+	return nil
+end
+
+function Logic.eventTokens(data, eventId)
+	return (data.eventTokens and data.eventTokens[eventId]) or 0
+end
+
+-- Laufgeschwindigkeit (Perk, Gamepass, Hut, Fahrzeug)
+function Logic.walkSpeed(data, riding)
+	local speed = 16 + 2 * Logic.perkLevel(data, "speed") + (Logic.hasPass(data, "speed") and 8 or 0) + Logic.hatBoost(data, "speed")
+	if riding then
+		local v = Logic.vehicleById[data.vehicle or ""]
+		if v then speed = speed + v.speed end
+	end
+	return speed
+end
+
+-- Besitzt der Spieler einen Gegenstand? (kind: "aura", "trail", "hat", "emote", "vehicle")
+function Logic.ownsItem(data, kind, id)
+	if kind == "vehicle" then return data.vehicles ~= nil and data.vehicles[id] == true end
+	if kind == "emote" then
+		local e = Logic.emoteById[id]
+		if e and e.price == 0 then return true end
+	end
+	return data.cosmetics ~= nil and data.cosmetics.owned ~= nil and data.cosmetics.owned[id] == true
+end
+
+function Logic.itemDef(kind, id)
+	if kind == "aura" then return Logic.auraById[id] end
+	if kind == "trail" then return Logic.trailById[id] end
+	if kind == "hat" then return Logic.hatById[id] end
+	if kind == "emote" then return Logic.emoteById[id] end
+	if kind == "vehicle" then return Logic.vehicleById[id] end
+	return nil
 end
 
 
@@ -1572,7 +1830,7 @@ return Util
 ]]></ProtectedString></Properties></Item>
 </Item>
 </Item>
-<Item class="ServerScriptService" referent="RBX00000017"><Properties><string name="Name">ServerScriptService</string></Properties><Item class="Script" referent="RBX00000007"><Properties><string name="Name">Main</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ServerScriptService" referent="RBX0000001C"><Properties><string name="Name">ServerScriptService</string></Properties><Item class="Script" referent="RBX00000007"><Properties><string name="Name">Main</string><ProtectedString name="Source"><![CDATA[--[[
 	MAIN – startet das Spiel auf dem Server.
 	Reihenfolge: Remotes → Karte bauen → Systeme starten → Spieler laden.
 ]]
@@ -1592,6 +1850,10 @@ require(Modules.QuestService)
 require(Modules.JobService)
 require(Modules.TradeService)
 local FanService = require(Modules.FanService)
+local EventService = require(Modules.EventService)
+local MinigameService = require(Modules.MinigameService)
+require(Modules.ShopService)
+require(Modules.MonetizationService)
 local CombatService = require(Modules.CombatService)
 
 -- 1) Karte mit allen 8 Welten bauen
@@ -1627,6 +1889,8 @@ BattleService.init(MapBuilder.npcs)
 CombatService.init(MapBuilder.npcs)
 task.spawn(FanService.init)   -- im Hintergrund (das Erstellen der Figuren dauert kurz)
 LeaderboardService.init(MapBuilder.boardRows)
+MinigameService.init(MapBuilder.minigames)
+EventService.init()
 
 -- 5) Spieler
 Players.PlayerAdded:Connect(GameService.playerAdded)
@@ -1642,7 +1906,7 @@ GameService.start()
 
 print("[Looksmaxxer 3000] Server gestartet – viel Spaß beim Glow-Up! ✨")
 ]]></ProtectedString></Properties></Item>
-<Item class="Folder" referent="RBX00000016"><Properties><string name="Name">Modules</string></Properties><Item class="ModuleScript" referent="RBX00000008"><Properties><string name="Name">BattleService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="Folder" referent="RBX0000001B"><Properties><string name="Name">Modules</string></Properties><Item class="ModuleScript" referent="RBX00000008"><Properties><string name="Name">BattleService</string><ProtectedString name="Source"><![CDATA[--[[
 	BATTLESERVICE – Mog Battles
 	• gegen andere Spieler (Anfrage → Annehmen/Ablehnen)
 	• gegen den Rivalen und den Boss jeder Welt
@@ -1758,6 +2022,7 @@ function BattleService.fightNPC(player, entry)
 			reward.cash = 25 * world * world
 			text = string.format(Config.MogWin[rng:NextInteger(1, #Config.MogWin)], def.name)
 		end
+		reward.cash = math.floor(reward.cash * Logic.cashMult(data))
 		GameService.addAura(data, reward.aura)
 		data.cash = data.cash + reward.cash
 	else
@@ -2078,12 +2343,18 @@ local function defeat(boss)
 		local data = DataService.get(player)
 		if data then
 			local aps = math.max(Logic.aps(data, GameService.currentWorld(player), os.time()), 5)
-			local cash = math.floor(150 * boss.world ^ 2.5 * (0.5 + math.min(p.share, 1)))
+			local cash = math.floor(150 * boss.world ^ 2.5 * (0.5 + math.min(p.share, 1)) * Logic.cashMult(data))
 			local aura = aps * 120
 			data.cash = data.cash + cash
 			GameService.addAura(data, aura)
 			GameService.track(player, "bossKills", 1)
 			local text = "+" .. Util.format(cash) .. " Geld · +" .. Util.format(aura) .. " Aura · Dein Anteil: " .. math.floor(p.share * 100) .. " %"
+			-- Event-Boss: Event-Münzen
+			if boss.def.event then
+				local tokens = math.floor(10 + 20 * math.min(p.share, 1))
+				data.eventTokens[boss.def.event] = Logic.eventTokens(data, boss.def.event) + tokens
+				text = text .. " · +" .. tokens .. " Event-Münzen"
+			end
 			-- seltene Boss-Waffen
 			local drop = nil
 			if boss.def.final and rng:NextNumber() < Logic.weaponById.laser.drop and Logic.weaponLevel(data, "laser") == 0 then
@@ -2269,7 +2540,7 @@ function CombatService.init(npcEntries)
 				local boss = {
 					def = entry.def, world = entry.world, model = model, hrp = hrp, head = model:FindFirstChild("Head") or hrp,
 					parent = model.Parent, scale = entry.def.scale or 1, radius = 3 * (entry.def.scale or 1),
-					maxHp = Config.BossHP[entry.world] or 1000, damage = {}, lastHit = 0, dead = false, nextAttack = 0,
+					maxHp = entry.def.hp or Config.BossHP[entry.world] or 1000, damage = {}, lastHit = 0, dead = false, nextAttack = 0,
 				}
 				boss.hp = boss.maxHp
 				makeHpBar(boss)
@@ -2398,6 +2669,16 @@ local function defaultData()
 		jobCd = {},                  -- [jobId] = Ende der Pause (os.time)
 		weapons = { zahnbuerste = 1 }, -- [waffeId] = Stufe
 		weapon = "zahnbuerste",      -- ausgerüstete Waffe
+		gems = 0,                    -- Premium-Währung (Robux-Shop, Glücksrad, Events)
+		passes = {},                 -- gekaufte Gamepasses
+		purchases = {},              -- verarbeitete Robux-Käufe (gegen doppeltes Gutschreiben)
+		starterPack = false,
+		eventTokens = {},            -- [eventId] = Anzahl Event-Münzen
+		wheel = { last = 0, spins = 0 },
+		vehicles = {},               -- [fahrzeugId] = true
+		vehicle = "",                -- ausgewähltes Fahrzeug
+		cosmetics = { owned = {}, aura = "", trail = "", hat = "" },
+		records = { obbyLast = 0, raceBest = 0, gymLast = 0 },
 	}
 end
 DataService.defaultData = defaultData
@@ -2505,7 +2786,118 @@ end)
 
 return DataService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000000B"><Properties><string name="Name">FanService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000000B"><Properties><string name="Name">EventService</string><ProtectedString name="Source"><![CDATA[--[[
+	EVENTSERVICE – saisonale Events (Winter, Halloween, Sommer) laufen automatisch nach Kalender.
+	Während eines Events liegen in allen Welten Sammelobjekte (z. B. ❄️ Schneeflocken).
+	Mit den Event-Münzen öffnet man die Event-Box in Glow City (exklusive Pets!).
+	Außerdem: Samstag & Sonntag automatisch doppelte Aura & doppeltes Glück (siehe Logic).
+]]
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local Config = require(Shared:WaitForChild("Config"))
+local Logic = require(Shared:WaitForChild("Logic"))
+local DataService = require(script.Parent.DataService)
+local GameService = require(script.Parent.GameService)
+
+local EventService = {}
+local rng = Random.new()
+local items = {}        -- [world] = Liste der Sammelobjekte
+local folder = nil
+
+local function groundSpot(origin)
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.FilterDescendantsInstances = { folder }
+	for _ = 1, 30 do
+		local x, z = rng:NextNumber(-200, 200), rng:NextNumber(-200, 200)
+		local hit = workspace:Raycast(origin + Vector3.new(x, 300, z), Vector3.new(0, -400, 0), params)
+		if hit and (hit.Instance.Name == "Ground" or hit.Instance:IsA("Terrain")) and hit.Position.Y < 4 then
+			return hit.Position
+		end
+	end
+	return nil
+end
+
+local function spawnItem(ev, world)
+	local pos = groundSpot(GameService.worldOrigin(world))
+	if not pos then return end
+	local p = Instance.new("Part")
+	p.Name = "EventItem"
+	p.Shape = Enum.PartType.Ball
+	p.Size = Vector3.new(2.6, 2.6, 2.6)
+	p.Color = ev.color
+	p.Material = Enum.Material.Neon
+	p.Transparency = 0.2
+	p.Anchored = true
+	p.CanCollide = false
+	p.CFrame = CFrame.new(pos + Vector3.new(0, 2.5, 0))
+	local bb = Instance.new("BillboardGui")
+	bb.Size = UDim2.new(3, 0, 3, 0)
+	bb.StudsOffset = Vector3.new(0, 2.2, 0)
+	bb.MaxDistance = 90
+	bb.LightInfluence = 0
+	bb.Parent = p
+	local l = Instance.new("TextLabel")
+	l.Size = UDim2.new(1, 0, 1, 0)
+	l.BackgroundTransparency = 1
+	l.TextScaled = true
+	l.Text = ev.tokenEmoji
+	l.Parent = bb
+	local light = Instance.new("PointLight")
+	light.Color = ev.color
+	light.Range = 10
+	light.Parent = p
+	local taken = false
+	p.Touched:Connect(function(hit)
+		if taken then return end
+		local player = Players:GetPlayerFromCharacter(hit.Parent)
+		local data = player and DataService.get(player)
+		if not data then return end
+		taken = true
+		local amount = 1 + (Logic.isWeekend(os.time()) and 1 or 0)
+		data.eventTokens[ev.id] = Logic.eventTokens(data, ev.id) + amount
+		local aps = math.max(Logic.aps(data, GameService.currentWorld(player), os.time()), 5)
+		GameService.addAura(data, aps * 5)
+		GameService.notify(player, ev.tokenEmoji .. " +" .. amount .. " " .. ev.token, "Du hast jetzt " .. Logic.eventTokens(data, ev.id) .. ". Event-Box in Glow City!", "")
+		GameService.sendFull(player)
+		p:Destroy()
+	end)
+	p.Parent = folder
+	table.insert(items[world], p)
+end
+
+function EventService.init()
+	folder = Instance.new("Folder")
+	folder.Name = "EventItems"
+	folder.Parent = workspace
+	for w = 1, #Config.Worlds do items[w] = {} end
+	task.spawn(function()
+		while true do
+			local ev = Logic.activeEvent(os.time())
+			for w = 1, #Config.Worlds do
+				-- verschwundene (eingesammelte) Objekte aus der Liste entfernen
+				local alive = {}
+				for _, p in ipairs(items[w]) do
+					if p.Parent then
+						if ev then table.insert(alive, p) else p:Destroy() end
+					end
+				end
+				items[w] = alive
+				if ev and #alive < Config.EVENT_ITEMS_PER_WORLD then
+					spawnItem(ev, w)
+				end
+			end
+			task.wait(8)
+		end
+	end)
+end
+
+return EventService
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX0000000C"><Properties><string name="Name">FanService</string><ProtectedString name="Source"><![CDATA[--[[
 	FANSERVICE – in jeder Welt laufen Leute herum, die du als Fans gewinnen kannst.
 	• Promi-Level 1–10: je höher, desto mehr Charisma brauchst du
 	• Du wählst einen von 3 Sprüchen/Aktionen (manche helfen, manche nicht 😄)
@@ -2549,7 +2941,7 @@ local function groundSpot(origin)
 		if math.sqrt(x * x + z * z) > 35 then
 			local from = origin + Vector3.new(x, 300, z)
 			local hit = workspace:Raycast(from, Vector3.new(0, -400, 0), params)
-			if hit and hit.Instance.Name == "Ground" then
+			if hit and (hit.Instance.Name == "Ground" or hit.Instance:IsA("Terrain")) and hit.Position.Y < 4 then
 				return hit.Position
 			end
 		end
@@ -2701,7 +3093,7 @@ Remotes.FanChoice.OnServerEvent:Connect(function(player, index)
 	if rng:NextNumber() < chance then
 		local aps = math.max(Logic.aps(data, GameService.currentWorld(player), os.time()), 5)
 		local aura = aps * 10 * fan.fame
-		local cash = math.floor(5 * fan.fame * fan.world * fan.world)
+		local cash = math.floor(5 * fan.fame * fan.world * fan.world * Logic.cashMult(data))
 		GameService.addAura(data, aura)
 		data.cash = data.cash + cash
 		GameService.track(player, "fans", 1)
@@ -2764,7 +3156,7 @@ end)
 
 return FanService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000000C"><Properties><string name="Name">GameService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000000D"><Properties><string name="Name">GameService</string><ProtectedString name="Source"><![CDATA[--[[
 	GAMESERVICE – das Herzstück auf dem Server:
 	Klicks, Upgrades, Aura pro Sekunde, Rebirth, Welten, Titel,
 	Namensschild & Aussehen des Avatars, Offline-Verdienst.
@@ -2780,6 +3172,7 @@ local Util = require(Shared:WaitForChild("Util"))
 local Remotes = require(script.Parent.Remotes)
 local DataService = require(script.Parent.DataService)
 local LookService = require(script.Parent.LookService)
+local StyleLook = require(script.Parent.StyleLook)
 
 local GameService = {}
 GameService.characterHooks = {}   -- andere Module können sich hier für "Charakter erschienen" eintragen
@@ -2851,7 +3244,7 @@ function GameService.sendLight(player)
 	local now = os.time()
 	local w = GameService.currentWorld(player)
 	Remotes.Data:FireClient(player, "light", {
-		aura = data.aura, cash = data.cash, totalAura = data.totalAura,
+		aura = data.aura, cash = data.cash, totalAura = data.totalAura, gems = data.gems,
 		aps = Logic.aps(data, w, now), click = Logic.clickValue(data, w, now),
 		mult = Logic.multiplier(data, w, now), world = w, serverTime = now,
 	})
@@ -2926,17 +3319,24 @@ function GameService.refreshCharacter(player)
 
 	local glow = Logic.baseGlow(data.levels)
 	hum.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
-	hum.WalkSpeed = 16 + 2 * Logic.perkLevel(data, "speed")
+	hum.WalkSpeed = Logic.walkSpeed(data, player:GetAttribute("Riding") == true)
+	local vehicle = Logic.vehicleById[data.vehicle or ""]
+	hum.UseJumpPower = true
+	hum.JumpPower = 50 + ((player:GetAttribute("Riding") and vehicle) and vehicle.jump or 0)
 
 	-- Namensschild mit Titel
 	local tag = ensureNametag(head)
-	tag.TitleLabel.Text = Config.Titles[Logic.titleIndex(glow)].title
+	tag.TitleLabel.Text = (Logic.hasPass(data, "vip") and "👑 VIP · " or "") .. Config.Titles[Logic.titleIndex(glow)].title
+	tag.TitleLabel.TextColor3 = Logic.hasPass(data, "vip") and Color3.fromRGB(255, 209, 102) or Color3.fromRGB(255, 120, 220)
 	tag.NameLabel.Text = player.DisplayName
 	tag.InfoLabel.Text = "✨ " .. Util.format(glow) .. " Glow  ·  ♻️ " .. data.rebirths
 
 	-- Aussehen verändert sich mit den Upgrades (Pickel, Haare, Haltung, Schultern, Style …)
 	local ok, err = pcall(LookService.apply, player, char, data)
 	if not ok then warn("[Looksmaxxer] LookService:", err) end
+	-- Ausrüstung: Aura, Spur, Hut, Fahrzeug
+	local ok2, err2 = pcall(StyleLook.apply, player, char, data, player:GetAttribute("Riding") == true)
+	if not ok2 then warn("[Looksmaxxer] StyleLook:", err2) end
 
 	-- Glitzer-Aura (stärker mit Glow, Farbe wechselt mit Rebirths)
 	local aura = hrp:FindFirstChild("GlowAura")
@@ -3219,7 +3619,7 @@ end)
 
 return GameService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000000D"><Properties><string name="Name">JobService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000000E"><Properties><string name="Name">JobService</string><ProtectedString name="Source"><![CDATA[--[[
 	JOBSERVICE – Geld verdienen mit Jobs.
 	Ablauf: Spieler startet Job → Minispiel läuft auf dem Gerät →
 	Ergebnis (3 Versuche) wird geschickt → Server prüft und zahlt.
@@ -3279,7 +3679,7 @@ Remotes.FinishJob.OnServerEvent:Connect(function(player, id, scores)
 	end
 	local perf = total / 3
 	if perfect == 3 then perf = perf * 1.25 end
-	local earned = math.max(1, math.floor(Logic.jobPay(data, job) * perf))
+	local earned = math.max(1, math.floor(Logic.jobPay(data, job) * perf * Logic.cashMult(data)))
 	data.cash = data.cash + earned
 	data.jobCd[id] = os.time() + job.cd
 	GameService.track(player, "jobs", 1)
@@ -3295,7 +3695,7 @@ end)
 
 return JobService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000000E"><Properties><string name="Name">LeaderboardService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000000F"><Properties><string name="Name">LeaderboardService</string><ProtectedString name="Source"><![CDATA[--[[
 	LEADERBOARDSERVICE – globale Rangliste (Top 500) über ALLE Server.
 	Gespeichert wird die "Glow-Power" jedes Spielers in einem OrderedDataStore.
 	Alle 2 Minuten: eigene Werte hochladen, Top 500 neu laden.
@@ -3414,7 +3814,7 @@ end
 
 return LeaderboardService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000000F"><Properties><string name="Name">LookService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000010"><Properties><string name="Name">LookService</string><ProtectedString name="Source"><![CDATA[--[[
 	LOOKSERVICE – dein Avatar verändert sich sichtbar mit den Upgrades.
 	Am Anfang: richtig hässlich. Mit jeder Stufe wird es langsam besser.
 
@@ -3518,7 +3918,7 @@ function LookService.apply(player, char, data)
 
 	-- 1) SKINCARE: Hautfarbe & Pickel & Glanz
 	if player:HasAppearanceLoaded() then
-		local tint = 0.55 * (1 - math.min(1, skin / 40))
+		local tint = 0.7 * (1 - math.min(1, skin / 40))
 		for _, p in ipairs(char:GetChildren()) do
 			if p:IsA("BasePart") and p.Name ~= "HumanoidRootPart" then
 				local orig = p:GetAttribute("OrigColor")
@@ -3639,11 +4039,105 @@ function LookService.apply(player, char, data)
 		emitter(stars, Color3.fromRGB(255, 220, 80), math.min(6, conf / 40), { speed = NumberRange.new(1, 2), light = 1,
 			size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.3), NumberSequenceKeypoint.new(1, 0) }) })
 	end
+	------------------------------------------------------------------
+	-- NOCH MEHR VERÄNDERUNG
+	------------------------------------------------------------------
+	-- Größe: geduckt & klein → groß & aufrecht
+	pcall(function()
+		local hsv = hum:FindFirstChild("BodyHeightScale")
+		if hsv then hsv.Value = 0.9 + math.min(0.15, posture / 250 * 0.15) + math.min(0.05, fit / 250 * 0.05) end
+	end)
+
+	-- Bierbauch (verschwindet mit Fitness bis Stufe 40)
+	if fit < 40 then
+		local depth = 0.25 + 0.9 * (1 - fit / 40)
+		attach(folder, torso, Vector3.new(torso.Size.X * 0.85, torso.Size.Y * 0.6, depth), CFrame.new(0, -torso.Size.Y * 0.22, -torso.Size.Z / 2 - depth * 0.25),
+			torso.Color, { ball = true, name = "Bauch" })
+	end
+
+	-- Muskeln: Bizeps (ab 60), Brust (ab 120), Sixpack (ab 180)
+	if fit >= 60 then
+		local m = math.clamp((fit - 60) / 140, 0, 1)
+		for _, armName in ipairs({ "LeftUpperArm", "RightUpperArm", "Left Arm", "Right Arm" }) do
+			local arm = char:FindFirstChild(armName)
+			if arm then
+				local big = 0.3 + 0.4 * m
+				attach(folder, arm, Vector3.new(arm.Size.X * 0.95, arm.Size.Y * 0.5, big), CFrame.new(0, arm.Size.Y * 0.08, -arm.Size.Z / 2 - big * 0.15),
+					arm.Color, { ball = true, name = "Bizeps" })
+			end
+		end
+	end
+	if fit >= 120 then
+		local m2 = math.clamp((fit - 120) / 130, 0, 1)
+		for _, sx in ipairs({ -1, 1 }) do
+			attach(folder, torso, Vector3.new(torso.Size.X * 0.45, torso.Size.Y * 0.3, 0.3 + 0.25 * m2), CFrame.new(sx * torso.Size.X * 0.22, torso.Size.Y * 0.2, -torso.Size.Z / 2),
+				torso.Color, { ball = true, name = "Brust" })
+		end
+	end
+	if fit >= 180 then
+		local absColor = torso.Color:Lerp(Color3.new(0, 0, 0), 0.12)
+		for row = 0, 2 do
+			for _, sx in ipairs({ -1, 1 }) do
+				attach(folder, torso, Vector3.new(torso.Size.X * 0.2, torso.Size.Y * 0.13, 0.18),
+					CFrame.new(sx * torso.Size.X * 0.12, -torso.Size.Y * 0.05 - row * torso.Size.Y * 0.15, -torso.Size.Z / 2 - 0.02), absColor, { ball = true, name = "Sixpack" })
+			end
+		end
+	end
+
+	-- Opa-Brille (bis Style 15)
+	if style < 15 then
+		for _, sx in ipairs({ -1, 1 }) do
+			attach(folder, head, Vector3.new(0.06, hs.X * 0.34, hs.X * 0.34), CFrame.new(sx * hs.X * 0.2, hs.Y * 0.06, front - 0.03) * CFrame.Angles(0, math.rad(90), 0),
+				BLACK, { name = "Brille" })
+			attach(folder, head, Vector3.new(0.03, hs.X * 0.27, hs.X * 0.27), CFrame.new(sx * hs.X * 0.2, hs.Y * 0.06, front - 0.07) * CFrame.Angles(0, math.rad(90), 0),
+				Color3.fromRGB(200, 230, 255), { transparency = 0.5, name = "Brillenglas" })
+		end
+		attach(folder, head, Vector3.new(hs.X * 0.12, 0.05, 0.05), CFrame.new(0, hs.Y * 0.08, front - 0.03), BLACK, { name = "Brille" })
+	end
+
+	-- Kantiges Kinn (ab Haltung 100)
+	if posture >= 100 then
+		local k = math.clamp((posture - 100) / 150, 0, 1)
+		attach(folder, head, Vector3.new(hs.X * (0.55 + 0.15 * k), hs.Y * 0.18, hs.Z * 0.4), CFrame.new(0, -hs.Y / 2 + 0.06, -hs.Z * 0.22), head.Color, { name = "Kinn" })
+	end
+
+	-- Leuchtende Augen (ab Selbstbewusstsein 200)
+	if conf >= 200 then
+		for _, sx in ipairs({ -1, 1 }) do
+			attach(folder, head, Vector3.new(0.14, 0.1, 0.06), CFrame.new(sx * hs.X * 0.18, hs.Y * 0.08, front - 0.02), Color3.fromRGB(80, 240, 255),
+				{ material = Enum.Material.Neon, ball = true, name = "Augenleuchten" })
+		end
+	end
+
+	-- Titel-Effekte: Scheinwerfer (Main Character), goldener Ring (Gigachad), kosmische Teilchen (Kosmisches Glow-Wesen)
+	local hrp = char:FindFirstChild("HumanoidRootPart")
+	local titleIdx = Logic.titleIndex(Logic.baseGlow(data.levels))
+	if hrp and titleIdx >= 6 then
+		local lamp = attach(folder, hrp, Vector3.new(0.3, 0.3, 0.3), CFrame.new(0, 9, 0), Color3.new(1, 1, 1), { transparency = 1, name = "Scheinwerfer" })
+		local spot = Instance.new("SpotLight")
+		spot.Face = Enum.NormalId.Bottom
+		spot.Angle = 50
+		spot.Range = 16
+		spot.Brightness = 2.5
+		spot.Color = Color3.fromRGB(255, 245, 220)
+		spot.Parent = lamp
+	end
+	if hrp and titleIdx >= 10 then
+		local footY = -(hrp.Size.Y / 2 + hum.HipHeight) + 0.15
+		local ring = attach(folder, hrp, Vector3.new(0.1, 6, 6), CFrame.new(0, footY, 0) * CFrame.Angles(0, 0, math.rad(90)), GOLD,
+			{ material = Enum.Material.Neon, transparency = 0.55, name = "Gigachad-Ring" })
+		ring.Shape = Enum.PartType.Cylinder
+	end
+	if hrp and titleIdx >= 12 then
+		local cosmic = attach(folder, hrp, Vector3.new(3, 5, 2), CFrame.new(0, 0, 0), Color3.new(1, 1, 1), { transparency = 1, name = "Kosmos" })
+		emitter(cosmic, Color3.fromRGB(180, 110, 255), 12, { speed = NumberRange.new(0.5, 2), light = 1,
+			size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.4), NumberSequenceKeypoint.new(1, 0) }) })
+	end
 end
 
 return LookService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000010"><Properties><string name="Name">MapBuilder</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000011"><Properties><string name="Name">MapBuilder</string><ProtectedString name="Source"><![CDATA[--[[
 	MAPBUILDER – baut beim Serverstart alle 8 Welten automatisch auf:
 	Boden, Deko je nach Thema, Geschenkbox-Stand, Rivale, Boss, Portale,
 	Ranglisten-Tafel und Info-Tafel.
@@ -3659,12 +4153,14 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Config = require(Shared:WaitForChild("Config"))
 local Util = require(Shared:WaitForChild("Util"))
+local Logic = require(Shared:WaitForChild("Logic"))
 
 local MapBuilder = {}
 MapBuilder.eggPrompts = {}    -- { prompt, egg, count }
 MapBuilder.npcs = {}          -- { prompt, def, world, isBoss }
 MapBuilder.portals = {}       -- { prompt, target }
 MapBuilder.boardRows = {}     -- Textzeilen der Ranglisten-Tafel
+MapBuilder.minigames = { gyms = {} }   -- Parkour, Rennen, Gym-Stationen
 
 local S = Config.WORLD_SIZE
 local HALF = S / 2
@@ -3747,6 +4243,8 @@ end
 local RESERVED = {
 	{ 0, 0, 55 }, { 95, -55, 70 }, { -85, -40, 50 }, { 0, -160, 40 },
 	{ 200, 0, 30 }, { -200, 0, 30 }, { 0, 100, 30 }, { -45, 60, 18 },
+	{ -150, 120, 48 }, { -150, -110, 48 }, { 40, 62, 14 },
+	{ -170, 60, 22 }, { -170, 110, 22 }, { -170, 160, 22 }, { -170, 205, 22 },
 }
 local function isFree(x, z, radius)
 	for _, r in ipairs(RESERVED) do
@@ -3774,8 +4272,15 @@ end
 ----------------------------------------------------------------------------
 local function tree(O, x, z, color, scale)
 	scale = scale or 1
-	part({ Size = Vector3.new(2, 10, 2) * scale, CFrame = CFrame.new(O + Vector3.new(x, 5 * scale, z)), Color = Color3.fromRGB(122, 78, 45), Material = Enum.Material.Wood })
-	part({ Shape = Enum.PartType.Ball, Size = Vector3.new(11, 11, 11) * scale, CFrame = CFrame.new(O + Vector3.new(x, 12 * scale, z)), Color = color or Color3.fromRGB(63, 143, 69), Material = Enum.Material.Grass })
+	local leaf = color or Color3.fromRGB(63, 143, 69)
+	part({ Size = Vector3.new(1.6, 11, 1.6) * scale, CFrame = CFrame.new(O + Vector3.new(x, 5.5 * scale, z)), Color = Color3.fromRGB(105, 70, 45), Material = Enum.Material.Wood })
+	part({ Size = Vector3.new(0.7, 4, 0.7) * scale, CFrame = CFrame.new(O + Vector3.new(x + 1.2 * scale, 8 * scale, z)) * CFrame.Angles(0, 0, math.rad(-40)), Color = Color3.fromRGB(105, 70, 45), Material = Enum.Material.Wood })
+	local blobs = { { 0, 13, 0, 9 }, { 2.6, 11.5, 1.2, 6.5 }, { -2.4, 11.8, -1, 6.8 }, { 0.6, 15.5, -0.8, 6 }, { -1, 12, 2.4, 6 } }
+	for i, b in ipairs(blobs) do
+		local shade = (i % 2 == 0) and 0.12 or -0.05
+		part({ Shape = Enum.PartType.Ball, Size = Vector3.new(b[4], b[4], b[4]) * scale, CFrame = CFrame.new(O + Vector3.new(x + b[1] * scale, b[2] * scale, z + b[3] * scale)),
+			Color = leaf:Lerp(shade > 0 and Color3.new(1, 1, 0.6) or Color3.new(0, 0.2, 0), math.abs(shade)), Material = Enum.Material.Grass })
+	end
 end
 
 local function palm(O, x, z, rng)
@@ -3841,8 +4346,22 @@ end
 local THEMES = {}
 
 THEMES.city = function(O, w, rng)
-	part({ Size = Vector3.new(S, 0.2, 26), CFrame = CFrame.new(O + Vector3.new(0, 0.1, 0)), Color = Color3.fromRGB(60, 58, 74) })
-	part({ Size = Vector3.new(26, 0.2, S), CFrame = CFrame.new(O + Vector3.new(0, 0.12, 0)), Color = Color3.fromRGB(60, 58, 74) })
+	for _, horizontal in ipairs({ true, false }) do
+		local road = horizontal and Vector3.new(S, 0.2, 24) or Vector3.new(24, 0.2, S)
+		part({ Size = road, CFrame = CFrame.new(O + Vector3.new(0, horizontal and 0.1 or 0.12, 0)), Color = Color3.fromRGB(55, 55, 60), Material = Enum.Material.Asphalt })
+		for _, side in ipairs({ -1, 1 }) do
+			local walk = horizontal and Vector3.new(S, 0.5, 4) or Vector3.new(4, 0.5, S)
+			local off = horizontal and Vector3.new(0, 0.25, side * 14) or Vector3.new(side * 14, 0.25, 0)
+			part({ Size = walk, CFrame = CFrame.new(O + off), Color = Color3.fromRGB(190, 188, 182), Material = Enum.Material.Concrete })
+		end
+		for k = -11, 11 do
+			if math.abs(k) > 1 then
+				local dash = horizontal and Vector3.new(6, 0.22, 0.5) or Vector3.new(0.5, 0.22, 6)
+				local pos = horizontal and Vector3.new(k * 20, 0.13, 0) or Vector3.new(0, 0.14, k * 20)
+				part({ Size = dash, CFrame = CFrame.new(O + pos), Color = Color3.fromRGB(245, 245, 240) })
+			end
+		end
+	end
 	local names = { "💪 IRON GYM", "✂️ SALON GLOW", "☕ CAFÉ MEWING", "🛍️ DRIP MALL", "🦷 DR. STRAHLEWEISS", "🪞 SELFIE-STUDIO", "🏋️ PROTEIN-BAR", "💈 BARBER" }
 	for i = 1, 16 do
 		local wdt, dep = rng:NextNumber(26, 40), rng:NextNumber(26, 40)
@@ -3863,9 +4382,9 @@ end
 
 THEMES.beach = function(O, w, rng)
 	-- Meer (man kann ein Stück hineinlaufen)
-	part({ Size = Vector3.new(S, 1, 120), CFrame = CFrame.new(O + Vector3.new(0, 0.35, 190)), Color = Color3.fromRGB(0, 170, 220),
-		Material = Enum.Material.Glass, Transparency = 0.35, CanCollide = false })
-	part({ Size = Vector3.new(S, 0.3, 8), CFrame = CFrame.new(O + Vector3.new(0, 0.2, 128)), Color = Color3.fromRGB(255, 255, 255), Transparency = 0.3, CanCollide = false })
+	pcall(function()
+		workspace.Terrain:FillBlock(CFrame.new(O + Vector3.new(0, 0, 190)), Vector3.new(S, 4, 120), Enum.Material.Water)
+	end)
 	for _ = 1, 26 do
 		local x, z = freeSpot(rng, 5, 60)
 		if x and z < 120 then palm(O, x, z, rng) end
@@ -3901,9 +4420,12 @@ THEMES.mountain = function(O, w, rng)
 		local size = rng:NextNumber(70, 130)
 		local x, z = math.cos(a) * r, math.sin(a) * r
 		if isFree(x, z, 20) then
-			local cf = CFrame.new(O + Vector3.new(x, size / 2, z)) * CFrame.Angles(0, -a + math.rad(90), 0)
-			part({ Class = "WedgePart", Size = Vector3.new(size, size, size * 0.6), CFrame = cf, Color = Color3.fromRGB(110, 110, 118), Material = Enum.Material.Slate })
-			part({ Class = "WedgePart", Size = Vector3.new(size * 0.4, size * 0.3, size * 0.25), CFrame = cf * CFrame.new(0, size * 0.36, size * 0.17), Color = Color3.fromRGB(245, 248, 255), Material = Enum.Material.Snow })
+			local radius = size * 0.55
+			local center = O + Vector3.new(x, -radius * 0.25, z)
+			pcall(function()
+				workspace.Terrain:FillBall(center, radius, Enum.Material.Rock)
+				workspace.Terrain:FillBall(center + Vector3.new(0, radius * 0.62, 0), radius * 0.48, Enum.Material.Snow)
+			end)
 		end
 	end
 	for _ = 1, 30 do
@@ -4503,10 +5025,13 @@ local function decorate(O, w, rng)
 	if extra then extra(O, w, rng) end
 end
 
+
 local GROUND_MATERIAL = {
-	city = Enum.Material.SmoothPlastic, beach = Enum.Material.Sand, mountain = Enum.Material.Grass, temple = Enum.Material.Grass,
-	fashion = Enum.Material.SmoothPlastic, hollywood = Enum.Material.Sandstone, dubai = Enum.Material.Sand, galaxy = Enum.Material.Slate,
+	city = Enum.Material.Concrete, beach = Enum.Material.Sand, mountain = Enum.Material.Grass, temple = Enum.Material.Grass,
+	fashion = Enum.Material.Pavement, hollywood = Enum.Material.Sandstone, dubai = Enum.Material.Sand, galaxy = Enum.Material.Slate,
 }
+-- Welten mit echtem Gelände (Terrain) als Boden
+local TERRAIN_GROUND = { beach = Enum.Material.Sand, mountain = Enum.Material.Grass, temple = Enum.Material.Grass, dubai = Enum.Material.Sand }
 
 ----------------------------------------------------------------------------
 -- NPCs (Rivalen & Bosse)
@@ -4588,6 +5113,149 @@ end
 ----------------------------------------------------------------------------
 -- Eine Welt bauen
 ----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+-- 🎉 EVENT-PLATZ (Glow City)
+----------------------------------------------------------------------------
+local function eventPlaza(O)
+	local P = O + Vector3.new(-150, 0, 120)
+	local ev = Logic.activeEvent(os.time())
+	local color = ev and ev.color or Color3.fromRGB(120, 110, 140)
+	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.6, 78, 78), CFrame = CFrame.new(P + Vector3.new(0, 0.3, 0)) * CFrame.Angles(0, 0, math.rad(90)),
+		Color = color, Material = Enum.Material.SmoothPlastic, Transparency = 0.15 })
+	for _, s in ipairs({ -14, 14 }) do
+		part({ Size = Vector3.new(3, 22, 3), CFrame = CFrame.new(P + Vector3.new(s, 11, 36)), Color = color, Material = Enum.Material.Neon })
+	end
+	local arch = part({ Size = Vector3.new(34, 6, 2), CFrame = CFrame.new(P + Vector3.new(0, 24, 36)), Color = Color3.fromRGB(20, 5, 35) })
+	if not ev then
+		local lines = {}
+		for _, e in ipairs(Config.Events) do
+			table.insert(lines, e.emoji .. " " .. e.name .. " ab " .. string.format("%02d.%02d.", e.from[2], e.from[1]))
+		end
+		surfaceSign(arch, Enum.NormalId.Back, "🎉 EVENT-PLATZ", Color3.fromRGB(20, 5, 35), WHITE)
+		local info = part({ Size = Vector3.new(26, 12, 0.6), CFrame = CFrame.new(P + Vector3.new(0, 8, 0)), Color = Color3.fromRGB(20, 5, 35) })
+		surfaceSign(info, Enum.NormalId.Back, "<b>Nächste Events</b>\n" .. table.concat(lines, "\n"), Color3.fromRGB(20, 5, 35), WHITE)
+		return
+	end
+	surfaceSign(arch, Enum.NormalId.Back, ev.emoji .. " " .. string.upper(ev.name) .. " " .. ev.emoji, Color3.fromRGB(20, 5, 35), WHITE)
+	-- passende Deko
+	local rng = Random.new(42)
+	for k = 1, 8 do
+		local a = k / 8 * math.pi * 2
+		local p = P + Vector3.new(math.cos(a) * 33, 0, math.sin(a) * 33)
+		if ev.id == "winter" then
+			for t = 0, 3 do
+				local r = 9 - t * 2
+				part({ Shape = Enum.PartType.Ball, Size = Vector3.new(r, r * 0.8, r), CFrame = CFrame.new(p + Vector3.new(0, 3 + t * 3.2, 0)), Color = Color3.fromRGB(30, 110, 50), Material = Enum.Material.Grass })
+			end
+			part({ Shape = Enum.PartType.Ball, Size = Vector3.new(1.6, 1.6, 1.6), CFrame = CFrame.new(p + Vector3.new(0, 14.5, 0)), Color = Color3.fromRGB(255, 220, 80), Material = Enum.Material.Neon })
+			for g = 1, 3 do
+				part({ Size = Vector3.new(2, 2, 2), CFrame = CFrame.new(p + Vector3.new(rng:NextNumber(-4, 4), 1, rng:NextNumber(-4, 4))),
+					Color = ({ Color3.fromRGB(230, 40, 40), Color3.fromRGB(40, 120, 230), Color3.fromRGB(240, 200, 40) })[g] })
+			end
+		elseif ev.id == "halloween" then
+			part({ Shape = Enum.PartType.Ball, Size = Vector3.new(4.5, 3.6, 4.5), CFrame = CFrame.new(p + Vector3.new(0, 1.8, 0)), Color = Color3.fromRGB(255, 130, 20) })
+			part({ Size = Vector3.new(0.5, 1, 0.5), CFrame = CFrame.new(p + Vector3.new(0, 4, 0)), Color = Color3.fromRGB(60, 120, 40) })
+			local glow = part({ Size = Vector3.new(0.5, 0.5, 0.5), CFrame = CFrame.new(p + Vector3.new(0, 2, 0)), Transparency = 1, CanCollide = false })
+			local l = Instance.new("PointLight")
+			l.Color = Color3.fromRGB(255, 140, 30)
+			l.Range = 12
+			l.Parent = glow
+			part({ Size = Vector3.new(3, 4, 0.8), CFrame = CFrame.new(p + Vector3.new(4, 2, 2)), Color = Color3.fromRGB(120, 120, 125), Material = Enum.Material.Slate })
+		else
+			palm(O, p.X - O.X, p.Z - O.Z, rng)
+		end
+	end
+	-- Event-Box
+	local egg = Config.Eggs[ev.eggIndex]
+	local ep = P + Vector3.new(16, 0, -8)
+	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(2, 13, 13), CFrame = CFrame.new(ep + Vector3.new(0, 1, 0)) * CFrame.Angles(0, 0, math.rad(90)), Color = Color3.fromRGB(40, 20, 60) })
+	local box = part({ Name = "Geschenkbox", Size = Vector3.new(7, 7, 7), CFrame = CFrame.new(ep + Vector3.new(0, 6, 0)) * CFrame.Angles(0, math.rad(20), 0), Color = ev.color, Material = Enum.Material.Glass, Reflectance = 0.2 })
+	part({ Size = Vector3.new(7.2, 7.2, 0.9), CFrame = box.CFrame, Color = Color3.new(1, 1, 1), Material = Enum.Material.Neon })
+	part({ Size = Vector3.new(0.9, 7.2, 7.2), CFrame = box.CFrame, Color = Color3.new(1, 1, 1), Material = Enum.Material.Neon })
+	billboard(box, ev.emoji .. " " .. egg.name .. "\n<font color='#ffd166'>" .. egg.cost .. " " .. ev.token .. "</font>\n<font size='14'>5 exklusive Event-Pets!</font>", 12, 4.6, 7, WHITE)
+	table.insert(MapBuilder.eggPrompts, { prompt = prompt(box, "Öffnen", egg.name, 0.25), egg = egg, count = 1 })
+	table.insert(MapBuilder.eggPrompts, { prompt = prompt(box, "3x öffnen", egg.name, 0.25, Enum.KeyCode.F), egg = egg, count = 3 })
+	table.insert(MapBuilder.eggPrompts, { prompt = prompt(box, "Inhalt ansehen", egg.name, 0, Enum.KeyCode.R), egg = egg, info = true })
+	-- Event-Boss
+	local def = {}
+	for k, v in pairs(ev.boss) do def[k] = v end
+	def.event = ev.id
+	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(4, 24, 24), CFrame = CFrame.new(P + Vector3.new(-16, 2, -10)) * CFrame.Angles(0, 0, math.rad(90)), Color = ev.color, Material = Enum.Material.Neon, Transparency = 0.3 })
+	table.insert(MapBuilder.npcs, { prompt = makeNPC(def, P + Vector3.new(-16, 4, -10), true), def = def, world = 1, isBoss = true })
+end
+
+----------------------------------------------------------------------------
+-- 🧗 DACH-PARKOUR (Glow City)
+----------------------------------------------------------------------------
+local function obbyCourse(O)
+	local base = O + Vector3.new(-150, 0, -110)
+	local pad = part({ Size = Vector3.new(10, 1, 10), CFrame = CFrame.new(base + Vector3.new(0, 0.5, 34)), Color = Color3.fromRGB(255, 120, 40), Material = Enum.Material.Neon })
+	billboard(pad, "🧗 DACH-PARKOUR\n<font size='15'>Spring bis zum goldenen Pokal!</font>", 14, 4, 6, WHITE)
+	local startPrompt = prompt(pad, "Parkour starten", "Dach-Parkour", 0)
+	local checkpoints, first, last = {}, nil, nil
+	local n = 26
+	for i = 1, n do
+		local a = i * 0.36
+		local pos = base + Vector3.new(math.cos(a) * 30, 6 + i * 3, math.sin(a) * 30)
+		local isCp = (i % 7 == 0)
+		local p = part({ Size = isCp and Vector3.new(7, 1, 7) or Vector3.new(5, 1, 5), CFrame = CFrame.new(pos),
+			Color = isCp and Color3.fromRGB(80, 230, 120) or Color3.fromHSV(i / n * 0.8, 0.55, 1), Material = isCp and Enum.Material.Neon or Enum.Material.SmoothPlastic })
+		if i == 1 then first = p end
+		if isCp then
+			table.insert(checkpoints, p)
+			billboard(p, "🚩 " .. #checkpoints, 3, 2, 3, WHITE)
+		end
+		last = pos
+	end
+	local finishPos = base + Vector3.new(math.cos((n + 1) * 0.36) * 30, 6 + (n + 1) * 3, math.sin((n + 1) * 0.36) * 30)
+	local finish = part({ Size = Vector3.new(10, 1, 10), CFrame = CFrame.new(finishPos), Color = Color3.fromRGB(255, 205, 60), Material = Enum.Material.Neon })
+	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(3, 1.4, 1.4), CFrame = CFrame.new(finishPos + Vector3.new(0, 2, 0)) * CFrame.Angles(0, 0, math.rad(90)),
+		Color = Color3.fromRGB(255, 205, 60), Material = Enum.Material.Foil })
+	part({ Shape = Enum.PartType.Ball, Size = Vector3.new(3, 3, 3), CFrame = CFrame.new(finishPos + Vector3.new(0, 4.4, 0)), Color = Color3.fromRGB(255, 205, 60), Material = Enum.Material.Foil })
+	billboard(finish, "🏆 ZIEL", 6, 2.4, 7, Color3.fromRGB(255, 209, 102))
+	MapBuilder.minigames.obby = { start = startPrompt, first = first, checkpoints = checkpoints, finish = finish }
+end
+
+----------------------------------------------------------------------------
+-- 🏁 LAUFSTEG-RENNEN (Mailand)
+----------------------------------------------------------------------------
+local function raceTrack(O)
+	local x, z0, z1 = -170, 210, 30
+	local len = z0 - z1
+	part({ Size = Vector3.new(16, 0.4, len), CFrame = CFrame.new(O + Vector3.new(x, 0.2, (z0 + z1) / 2)), Color = Color3.fromRGB(245, 245, 245), Material = Enum.Material.Marble })
+	for _, s in ipairs({ -8.5, 8.5 }) do
+		part({ Size = Vector3.new(1, 2.5, len), CFrame = CFrame.new(O + Vector3.new(x + s, 1.25, (z0 + z1) / 2)), Color = Color3.fromRGB(255, 120, 200), Material = Enum.Material.Neon, Transparency = 0.2 })
+	end
+	for z = z0 - 30, z1 + 20, -28 do
+		part({ Size = Vector3.new(15, 1.6, 1), CFrame = CFrame.new(O + Vector3.new(x, 0.8, z)), Color = Color3.fromRGB(30, 30, 35) })
+	end
+	local start = part({ Size = Vector3.new(15, 8, 1), CFrame = CFrame.new(O + Vector3.new(x, 4, z0 - 3)), Color = Color3.fromRGB(80, 230, 120), Material = Enum.Material.Neon, Transparency = 0.6, CanCollide = false })
+	billboard(start, "🏁 LAUFSTEG-RENNEN\n<font size='15'>Lauf durchs grüne Tor – so schnell du kannst!</font>", 16, 4, 7, WHITE)
+	local finish = part({ Size = Vector3.new(15, 8, 1), CFrame = CFrame.new(O + Vector3.new(x, 4, z1 + 2)), Color = Color3.fromRGB(255, 255, 255), Material = Enum.Material.Neon, Transparency = 0.6, CanCollide = false })
+	for k = 0, 7 do
+		part({ Size = Vector3.new(1.9, 0.3, 2), CFrame = CFrame.new(O + Vector3.new(x - 7 + k * 2, 0.45, z1 + 2)), Color = (k % 2 == 0) and Color3.new(0, 0, 0) or Color3.new(1, 1, 1) })
+	end
+	billboard(finish, "🏁 ZIEL", 6, 2.4, 6, WHITE)
+	MapBuilder.minigames.race = { start = start, finish = finish }
+end
+
+----------------------------------------------------------------------------
+-- 💪 GYM-STATION
+----------------------------------------------------------------------------
+local function gymStation(O)
+	local P = O + Vector3.new(40, 0, 62)
+	part({ Size = Vector3.new(4, 1.6, 9), CFrame = CFrame.new(P + Vector3.new(0, 1.6, 0)), Color = Color3.fromRGB(30, 30, 35), Material = Enum.Material.Fabric })
+	for _, s in ipairs({ -3, 3 }) do
+		part({ Size = Vector3.new(0.4, 5, 0.4), CFrame = CFrame.new(P + Vector3.new(s, 2.5, -3)), Color = Color3.fromRGB(80, 80, 90), Material = Enum.Material.Metal })
+	end
+	local bar = part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(9, 0.4, 0.4), CFrame = CFrame.new(P + Vector3.new(0, 5, -3)), Color = Color3.fromRGB(190, 190, 200), Material = Enum.Material.Metal })
+	for _, s in ipairs({ -4, 4 }) do
+		part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.6, 2.6, 2.6), CFrame = CFrame.new(P + Vector3.new(s, 5, -3)), Color = Color3.fromRGB(20, 20, 20) })
+	end
+	billboard(bar, "💪 GYM-TRAINING\n<font size='15'>+50 % Aura (Gym-Pump)</font>", 12, 3.6, 4, WHITE)
+	table.insert(MapBuilder.minigames.gyms, prompt(bar, "Trainieren", "Gym-Station", 0.3))
+end
+
 local function buildWorld(index, mapFolder)
 	local w = Config.Worlds[index]
 	local O = Vector3.new((index - 1) * Config.WORLD_SPACING, 0, 0)
@@ -4597,7 +5265,13 @@ local function buildWorld(index, mapFolder)
 	currentFolder.Parent = mapFolder
 
 	-- Boden & unsichtbare Wände
-	part({ Name = "Ground", Size = Vector3.new(S, 4, S), CFrame = CFrame.new(O + Vector3.new(0, -2, 0)), Color = w.ground, Material = GROUND_MATERIAL[w.theme] })
+	local ground = part({ Name = "Ground", Size = Vector3.new(S, 4, S), CFrame = CFrame.new(O + Vector3.new(0, -2, 0)), Color = w.ground, Material = GROUND_MATERIAL[w.theme] })
+	if TERRAIN_GROUND[w.theme] then
+		local ok = pcall(function()
+			workspace.Terrain:FillBlock(CFrame.new(O + Vector3.new(0, -2, 0)), Vector3.new(S, 4, S), TERRAIN_GROUND[w.theme])
+		end)
+		if ok then ground.Transparency = 1 end   -- das Gelände ersetzt die Bodenplatte optisch
+	end
 	for _, side in ipairs({ { HALF, 0, 2, S }, { -HALF, 0, 2, S }, { 0, HALF, S, 2 }, { 0, -HALF, S, 2 } }) do
 		part({ Name = "Wall", Size = Vector3.new(side[3], 120, side[4]), CFrame = CFrame.new(O + Vector3.new(side[1], 60, side[2])), Transparency = 1 })
 	end
@@ -4698,6 +5372,17 @@ local function buildWorld(index, mapFolder)
 	if index < #Config.Worlds then portal(200, index + 1, "➡️") end
 	if index > 1 then portal(-200, index - 1, "⬅️") end
 
+	-- Minispiele & Event-Platz
+	if index == 1 then
+		eventPlaza(O)
+		obbyCourse(O)
+		gymStation(O)
+	elseif index == 3 then
+		gymStation(O)
+	elseif index == 5 then
+		raceTrack(O)
+	end
+
 	-- Nur in Glow City: Ranglisten-Tafel & Info-Tafel
 	if index == 1 then
 		local board = part({ Name = "Rangliste", Size = Vector3.new(40, 26, 1), CFrame = CFrame.new(O + Vector3.new(0, 15, 100)), Color = Color3.fromRGB(20, 5, 35) })
@@ -4756,6 +5441,22 @@ function MapBuilder.build()
 	pets.Name = "Pets"
 	pets.Parent = workspace
 
+	-- realistischere Beleuchtung (falls in Studio nicht schon eingestellt)
+	local Lighting = game:GetService("Lighting")
+	pcall(function() Lighting.Technology = Enum.Technology.Future end)
+	pcall(function()
+		Lighting.GlobalShadows = true
+		Lighting.EnvironmentDiffuseScale = 1
+		Lighting.EnvironmentSpecularScale = 1
+		Lighting.Brightness = 2.5
+		workspace.Terrain.Decoration = true
+		workspace.Terrain.WaterWaveSize = 0.25
+		workspace.Terrain.WaterTransparency = 0.6
+		workspace.Terrain.WaterColor = Color3.fromRGB(20, 150, 190)
+		workspace.Terrain:SetMaterialColor(Enum.Material.Grass, Color3.fromRGB(95, 150, 70))
+		workspace.Terrain:SetMaterialColor(Enum.Material.Sand, Color3.fromRGB(230, 205, 150))
+	end)
+
 	for i = 1, #Config.Worlds do
 		local ok, err = pcall(buildWorld, i, mapFolder)
 		if not ok then
@@ -4766,7 +5467,276 @@ end
 
 return MapBuilder
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000011"><Properties><string name="Name">PetService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000012"><Properties><string name="Name">MinigameService</string><ProtectedString name="Source"><![CDATA[--[[
+	MINIGAMESERVICE – Minispiele auf der Karte
+	🧗 Dach-Parkour (Glow City): Springe von Plattform zu Plattform bis ganz nach oben. Mit Checkpoints.
+	🏁 Laufsteg-Rennen (Mailand): So schnell wie möglich vom Start zum Ziel. Bestzeit wird gespeichert.
+	💪 Gym-Training (Glow City & Iron Mountain): Rhythmus-Minispiel → Gym-Pump (+50 % Aura für 3 Minuten).
+]]
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local Config = require(Shared:WaitForChild("Config"))
+local Logic = require(Shared:WaitForChild("Logic"))
+local Util = require(Shared:WaitForChild("Util"))
+local Remotes = require(script.Parent.Remotes)
+local DataService = require(script.Parent.DataService)
+local GameService = require(script.Parent.GameService)
+local RewardService = require(script.Parent.RewardService)
+
+local MinigameService = {}
+local raceStart = {}     -- [player] = os.clock()
+local gymStart = {}      -- [player] = os.clock()
+local touchDebounce = {} -- [player .. part] = Zeit
+
+local function playerFromHit(hit)
+	local char = hit and hit.Parent
+	local player = char and Players:GetPlayerFromCharacter(char)
+	if not player then
+		-- Teil eines Fahrzeugs/Huts? Eine Ebene höher suchen
+		char = char and char.Parent
+		player = char and Players:GetPlayerFromCharacter(char)
+	end
+	return player
+end
+
+local function debounce(player, key, seconds)
+	local k = player.UserId .. key
+	local now = os.clock()
+	if touchDebounce[k] and now - touchDebounce[k] < seconds then return false end
+	touchDebounce[k] = now
+	return true
+end
+
+local function teleportTo(player, cf)
+	local char = player.Character
+	if char then char:PivotTo(cf) end
+end
+
+----------------------------------------------------------------------------
+-- 🧗 Dach-Parkour
+----------------------------------------------------------------------------
+local function initObby(obby)
+	obby.start.Triggered:Connect(function(player)
+		local cp = player:GetAttribute("ObbyCheckpoint") or 0
+		local target = (cp > 0 and obby.checkpoints[cp]) or obby.first
+		teleportTo(player, target.CFrame * CFrame.new(0, 4, 0))
+		GameService.notify(player, "🧗 Dach-Parkour", cp > 0 and ("Weiter ab Checkpoint " .. cp .. "!") or "Spring nach oben bis zum goldenen Pokal!", "")
+	end)
+	for i, cpPart in ipairs(obby.checkpoints) do
+		cpPart.Touched:Connect(function(hit)
+			local player = playerFromHit(hit)
+			if player and (player:GetAttribute("ObbyCheckpoint") or 0) < i then
+				player:SetAttribute("ObbyCheckpoint", i)
+				GameService.notify(player, "🚩 Checkpoint " .. i, "Falls du fällst: am Start-Knopf geht's hier weiter.", "")
+			end
+		end)
+	end
+	obby.finish.Touched:Connect(function(hit)
+		local player = playerFromHit(hit)
+		local data = player and DataService.get(player)
+		if not data or not debounce(player, "obbyFinish", 5) then return end
+		player:SetAttribute("ObbyCheckpoint", 0)
+		local now = os.time()
+		if now - data.records.obbyLast < Config.OBBY_COOLDOWN then
+			GameService.notify(player, "🏆 Geschafft!", "Nächste Belohnung in " .. Util.formatTime(Config.OBBY_COOLDOWN - (now - data.records.obbyLast)) .. ".", "good")
+		else
+			data.records.obbyLast = now
+			GameService.track(player, "obby", 1)
+			local text = RewardService.give(player, data, Config.ObbyReward)
+			GameService.notify(player, "🏆 DACH-PARKOUR GESCHAFFT!", text, "title")
+			GameService.sendFull(player)
+		end
+		task.delay(2, function()
+			if player.Parent then teleportTo(player, obby.start.Parent.CFrame * CFrame.new(0, 4, 6)) end
+		end)
+	end)
+end
+
+----------------------------------------------------------------------------
+-- 🏁 Laufsteg-Rennen
+----------------------------------------------------------------------------
+local function initRace(race)
+	race.start.Touched:Connect(function(hit)
+		local player = playerFromHit(hit)
+		if not player or not debounce(player, "raceStart", 2) then return end
+		raceStart[player] = os.clock()
+		player:SetAttribute("RaceStart", workspace:GetServerTimeNow())
+	end)
+	race.finish.Touched:Connect(function(hit)
+		local player = playerFromHit(hit)
+		local data = player and DataService.get(player)
+		local started = player and raceStart[player]
+		if not data or not started then return end
+		raceStart[player] = nil
+		player:SetAttribute("RaceStart", nil)
+		local t = os.clock() - started
+		if t < 3 then return end   -- zu schnell = unmöglich
+		local factor = math.clamp(Config.RACE_TARGET / t, 0.3, 2)
+		local cash = math.floor(Config.RaceReward.cash * Logic.jobPayMult(data) * factor * Logic.cashMult(data))
+		data.cash = data.cash + cash
+		local best = data.records.raceBest
+		local newBest = best == 0 or t < best
+		if newBest then data.records.raceBest = t end
+		GameService.track(player, "race", 1)
+		GameService.notify(player, "🏁 Ziel! " .. string.format("%.2f", t) .. " s" .. (newBest and " – NEUE BESTZEIT!" or ""),
+			"+" .. Util.format(cash) .. " Geld · Bestzeit: " .. string.format("%.2f", data.records.raceBest) .. " s", newBest and "title" or "good")
+		GameService.sendFull(player)
+	end)
+end
+
+----------------------------------------------------------------------------
+-- 💪 Gym-Training
+----------------------------------------------------------------------------
+local function initGym(prompt)
+	prompt.Triggered:Connect(function(player)
+		local data = DataService.get(player)
+		if not data then return end
+		local wait = Config.GYM_COOLDOWN - (os.time() - data.records.gymLast)
+		if wait > 0 then
+			GameService.notify(player, "😮‍💨 Pause", "Deine Muskeln brauchen noch " .. wait .. " s.", "")
+			return
+		end
+		gymStart[player] = os.clock()
+		Remotes.GymStart:FireClient(player)
+	end)
+end
+
+Remotes.GymFinish.OnServerEvent:Connect(function(player, hits)
+	local data = DataService.get(player)
+	local started = gymStart[player]
+	gymStart[player] = nil
+	if not data or not started then return end
+	local elapsed = os.clock() - started
+	if elapsed < 3 or elapsed > 90 then return end
+	hits = math.clamp(math.floor(tonumber(hits) or 0), 0, 8)
+	data.records.gymLast = os.time()
+	GameService.track(player, "gym", 1)
+	if hits >= 4 then
+		RewardService.addPotion(data, "pump")
+		local cash = math.floor(40 * hits * Logic.jobPayMult(data) * Logic.cashMult(data))
+		data.cash = data.cash + cash
+		GameService.notify(player, "💪 GYM-PUMP! (" .. hits .. "/8)", "+50 % Aura für 3 Minuten · +" .. Util.format(cash) .. " Geld", "title")
+	else
+		GameService.notify(player, "😅 Zu wenig Wiederholungen (" .. hits .. "/8)", "Mindestens 4 Treffer für den Gym-Pump. Gleich nochmal!", "bad")
+	end
+	GameService.sendFull(player)
+end)
+
+function MinigameService.init(info)
+	if info.obby then initObby(info.obby) end
+	if info.race then initRace(info.race) end
+	for _, prompt in ipairs(info.gyms or {}) do initGym(prompt) end
+end
+
+Players.PlayerRemoving:Connect(function(player)
+	raceStart[player] = nil
+	gymStart[player] = nil
+end)
+
+return MinigameService
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX00000013"><Properties><string name="Name">MonetizationService</string><ProtectedString name="Source"><![CDATA[--[[
+	MONETIZATIONSERVICE – Robux-Einnahmen
+	• Gamepasses (einmal kaufen, für immer): VIP, Doppelte Aura, Glückspilz, +3 Pet-Plätze, 3er-Öffnen, Turbo-Laufen
+	• Entwicklerprodukte (mehrfach kaufbar): Gems-Pakete, Starter-Paket, Aura-Paket
+
+	Die IDs trägst du in Config.GamePasses / Config.DevProducts ein (siehe ANLEITUNG.md).
+	Wichtig: Für Robux gibt es hier KEINE Zufallsbelohnungen (Roblox-Regeln für "paid random items").
+]]
+
+local Players = game:GetService("Players")
+local MarketplaceService = game:GetService("MarketplaceService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local Config = require(Shared:WaitForChild("Config"))
+local DataService = require(script.Parent.DataService)
+local GameService = require(script.Parent.GameService)
+local RewardService = require(script.Parent.RewardService)
+local PetService = require(script.Parent.PetService)
+
+local MonetizationService = {}
+
+local passByKey, passById, productById = {}, {}, {}
+for _, gp in ipairs(Config.GamePasses) do
+	passByKey[gp.key] = gp
+	if gp.id > 0 then passById[gp.id] = gp end
+end
+for _, dp in ipairs(Config.DevProducts) do
+	if dp.id > 0 then productById[dp.id] = dp end
+end
+
+local function passGranted(player, data, gp)
+	data.passes[gp.key] = true
+	GameService.refreshCharacter(player)
+	PetService.rebuildModels(player)
+	GameService.sendFull(player)
+end
+
+-- Beim Betreten: Gamepasses prüfen
+table.insert(GameService.joinHooks, function(player, data)
+	for _, gp in ipairs(Config.GamePasses) do
+		if gp.id > 0 and not data.passes[gp.key] then
+			local ok, owns = pcall(function()
+				return MarketplaceService:UserOwnsGamePassAsync(player.UserId, gp.id)
+			end)
+			if ok and owns then
+				data.passes[gp.key] = true
+			end
+		end
+	end
+	GameService.sendFull(player)
+end)
+
+MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(player, passId, purchased)
+	local gp = passById[passId]
+	local data = DataService.get(player)
+	if purchased and gp and data then
+		passGranted(player, data, gp)
+		GameService.notify(player, gp.emoji .. " " .. gp.name .. " freigeschaltet!", "Danke für deine Unterstützung! 💖", "title")
+		DataService.save(player)
+	end
+end)
+
+-- Entwicklerprodukte: wird von Roblox aufgerufen, bis wir "Granted" zurückgeben
+MarketplaceService.ProcessReceipt = function(info)
+	local player = Players:GetPlayerByUserId(info.PlayerId)
+	if not player then
+		return Enum.ProductPurchaseDecision.NotProcessedYet
+	end
+	local data = DataService.get(player)
+	if not data then
+		return Enum.ProductPurchaseDecision.NotProcessedYet
+	end
+	-- Schon gutgeschrieben? (Roblox kann denselben Kauf mehrmals melden)
+	if data.purchases[info.PurchaseId] then
+		return Enum.ProductPurchaseDecision.PurchaseGranted
+	end
+	local product = productById[info.ProductId]
+	if not product then
+		warn("[Looksmaxxer] Unbekanntes Produkt:", info.ProductId)
+		return Enum.ProductPurchaseDecision.NotProcessedYet
+	end
+	-- Liste der Käufe klein halten
+	local count = 0
+	for _ in pairs(data.purchases) do count = count + 1 end
+	if count > 300 then data.purchases = {} end
+
+	if product.once then data.starterPack = true end
+	local text = RewardService.give(player, data, product.reward)
+	data.purchases[info.PurchaseId] = true
+	DataService.save(player)
+	GameService.notify(player, product.emoji .. " " .. product.name .. " erhalten!", text .. " · Danke! 💖", "title")
+	GameService.sendFull(player)
+	return Enum.ProductPurchaseDecision.PurchaseGranted
+end
+
+return MonetizationService
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX00000014"><Properties><string name="Name">PetService</string><ProtectedString name="Source"><![CDATA[--[[
 	PETSERVICE – Geschenkboxen öffnen, Pets ausrüsten, fusionieren, löschen.
 	Die Pet-Figuren in der Welt werden hier erstellt; bewegt werden sie
 	auf jedem Gerät vom Client-Skript "PetFollow".
@@ -4943,7 +5913,7 @@ function PetService.hatch(player, eggIndex, count, free)
 	local egg = Config.Eggs[eggIndex]
 	if not data or not egg then return end
 	count = (count == 3) and 3 or 1
-	if count == 3 and Logic.perkLevel(data, "triple") < 1 then
+	if count == 3 and Logic.perkLevel(data, "triple") < 1 and not Logic.hasPass(data, "triple") then
 		GameService.notify(player, "🎁 3er-Öffnen gesperrt", "Kaufe 3er-Öffnen im Rebirth-Shop.", "bad")
 		return
 	end
@@ -4956,6 +5926,20 @@ function PetService.hatch(player, eggIndex, count, free)
 		return
 	end
 	local cost = egg.cost * count
+	if egg.event and not free then
+		-- Event-Box: kostet Event-Münzen und gibt es nur während des Events
+		local ev = Logic.activeEvent(os.time())
+		if not ev or ev.id ~= egg.event then
+			GameService.notify(player, "🎉 Event vorbei", "Diese Box gibt es nur während des Events.", "bad")
+			return
+		end
+		if Logic.eventTokens(data, egg.event) < cost then
+			GameService.notify(player, ev.tokenEmoji .. " Zu wenig " .. ev.token, "Die Box kostet " .. cost .. " " .. ev.token .. ". Sammle sie in allen Welten!", "bad")
+			return
+		end
+		data.eventTokens[egg.event] = Logic.eventTokens(data, egg.event) - cost
+		free = true
+	end
 	if not free then
 		if data.aura < cost then
 			GameService.notify(player, "💸 Zu wenig Aura", egg.name .. " kostet " .. Util.format(cost) .. " Aura.", "bad")
@@ -5092,7 +6076,7 @@ end)
 
 return PetService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000012"><Properties><string name="Name">QuestService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000015"><Properties><string name="Name">QuestService</string><ProtectedString name="Source"><![CDATA[--[[
 	QUESTSERVICE – tägliche Aufträge (3 pro Tag) und Erfolge (je 4 Stufen).
 
 	Aufträge: Beim ersten Login des Tages werden 3 zufällige Aufträge gewählt.
@@ -5208,7 +6192,7 @@ end)
 
 return QuestService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000013"><Properties><string name="Name">Remotes</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000016"><Properties><string name="Name">Remotes</string><ProtectedString name="Source"><![CDATA[--[[
 	REMOTES – die "Leitungen" zwischen Server und Spieler.
 	Der Server erstellt sie beim Start in ReplicatedStorage/Remotes.
 ]]
@@ -5231,6 +6215,8 @@ local EVENTS = {
 	"TradeRequest",   -- jemand will mit dir handeln
 	"TradeUpdate",    -- aktueller Stand des Handels
 	"TradeClosed",    -- Handel beendet
+	"WheelResult",    -- Ergebnis des Glücksrads
+	"GymStart",       -- Gym-Minispiel starten
 	-- Spieler -> Server
 	"Click", "BuyUpgrade", "Rebirth", "BuyPerk",
 	"EquipPet", "EquipBest", "FusePet", "DeletePet", "HatchEgg",
@@ -5242,6 +6228,9 @@ local EVENTS = {
 	"FanChoice",
 	"BuyWeapon", "UpgradeWeapon", "EquipWeapon",
 	"TradeRespond", "TradeOffer", "TradeReady", "TradeConfirm", "TradeCancel",
+	"SpinWheel", "ClaimPlaytime",
+	"BuyItem", "EquipItem", "ToggleRide",
+	"GymFinish",
 }
 
 -- Erst alle Leitungen anlegen, dann den Ordner sichtbar machen
@@ -5264,7 +6253,7 @@ folder.Parent = ReplicatedStorage
 
 return Remotes
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000014"><Properties><string name="Name">RewardService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000017"><Properties><string name="Name">RewardService</string><ProtectedString name="Source"><![CDATA[--[[
 	REWARDSERVICE – tägliche Belohnungen (7-Tage-Serie), Promo-Codes und Tränke.
 ]]
 
@@ -5294,8 +6283,18 @@ end
 local function give(player, data, reward)
 	local parts = {}
 	if reward.cash then
-		data.cash = data.cash + reward.cash
-		table.insert(parts, "💵 " .. Util.format(reward.cash) .. " Geld")
+		-- scale = mit Lohn-Bonus (Glow & Rebirths) verrechnen, damit es auch später noch lohnt
+		local cash = math.floor(reward.cash * (reward.scale and Logic.jobPayMult(data) or 1))
+		data.cash = data.cash + cash
+		table.insert(parts, "💵 " .. Util.format(cash) .. " Geld")
+	end
+	if reward.gems then
+		data.gems = data.gems + reward.gems
+		table.insert(parts, "💎 " .. Util.format(reward.gems) .. " Gems")
+	end
+	if reward.spins then
+		data.wheel.spins = data.wheel.spins + reward.spins
+		table.insert(parts, "🎡 " .. reward.spins .. "x Glücksrad")
 	end
 	if reward.auraSeconds then
 		local aps = math.max(Logic.aps(data, GameService.currentWorld(player), os.time()), 5)
@@ -5314,10 +6313,11 @@ local function give(player, data, reward)
 		for i = 1, #Config.Worlds do
 			if Logic.worldUnlocked(data, i) then best = i end
 		end
+		local station = (type(reward.freeEgg) == "number") and reward.freeEgg or 2   -- Standard: Silber-Box
 		task.delay(1, function()
-			if player.Parent then PetService.hatch(player, Config.eggIndex(best, 2), 1, true) end   -- gratis Silber-Box
+			if player.Parent then PetService.hatch(player, Config.eggIndex(best, station), 1, true) end
 		end)
-		table.insert(parts, "🎁 gratis Geschenkbox")
+		table.insert(parts, Config.EggStations[station].emoji .. " gratis " .. Config.EggStations[station].name)
 	end
 	return table.concat(parts, " · ")
 end
@@ -5362,10 +6362,21 @@ Remotes.RedeemCode.OnServerEvent:Connect(function(player, code)
 	GameService.sendFull(player)
 end)
 
-Remotes.BuyPotion.OnServerEvent:Connect(function(player, id)
+Remotes.BuyPotion.OnServerEvent:Connect(function(player, id, withGems)
 	local data = DataService.get(player)
 	local p = Logic.potionById[id]
-	if not data or not p then return end
+	if not data or not p or p.hidden then return end
+	if withGems and p.gems then
+		if data.gems < p.gems then
+			GameService.notify(player, "💎 Zu wenig Gems", p.name .. " kostet " .. p.gems .. " Gems.", "bad")
+			return
+		end
+		data.gems = data.gems - p.gems
+		addPotion(data, id)
+		GameService.notify(player, p.emoji .. " " .. p.name, p.desc, "good")
+		GameService.sendFull(player)
+		return
+	end
 	if data.cash < p.price then
 		GameService.notify(player, "💸 Zu wenig Geld", p.name .. " kostet " .. Util.format(p.price) .. " Geld.", "bad")
 		return
@@ -5376,9 +6387,408 @@ Remotes.BuyPotion.OnServerEvent:Connect(function(player, id)
 	GameService.sendFull(player)
 end)
 
+----------------------------------------------------------------------------
+-- 🎡 GLÜCKSRAD
+----------------------------------------------------------------------------
+Remotes.SpinWheel.OnServerEvent:Connect(function(player)
+	local data = DataService.get(player)
+	if not data then return end
+	local now = os.time()
+	if data.wheel.spins > 0 then
+		data.wheel.spins = data.wheel.spins - 1
+	elseif now - data.wheel.last >= Config.WHEEL_COOLDOWN then
+		data.wheel.last = now
+	else
+		GameService.notify(player, "🎡 Noch nicht", "Nächste Gratis-Drehung in " .. Util.formatTime(Config.WHEEL_COOLDOWN - (now - data.wheel.last)) .. ".", "")
+		return
+	end
+	local total = 0
+	for _, seg in ipairs(Config.Wheel) do total = total + seg.weight end
+	local x = Random.new():NextNumber() * total
+	local index = #Config.Wheel
+	for i, seg in ipairs(Config.Wheel) do
+		x = x - seg.weight
+		if x <= 0 then index = i break end
+	end
+	local seg = Config.Wheel[index]
+	-- Ergebnis erst nach der Dreh-Animation gutschreiben
+	Remotes.WheelResult:FireClient(player, index)
+	task.delay(4, function()
+		if not player.Parent then return end
+		local text = give(player, data, seg.reward)
+		GameService.notify(player, "🎡 Gewonnen: " .. seg.label, text, "good")
+		GameService.sendFull(player)
+	end)
+end)
+
+----------------------------------------------------------------------------
+-- 🎁 SPIELZEIT-GESCHENKE (pro Spielsitzung)
+----------------------------------------------------------------------------
+local claimedGifts = {}   -- [player] = { [i] = true }
+table.insert(GameService.joinHooks, function(player)
+	player:SetAttribute("JoinTime", os.time())
+	claimedGifts[player] = {}
+end)
+Remotes.ClaimPlaytime.OnServerEvent:Connect(function(player, i)
+	local data = DataService.get(player)
+	local gift = Config.PlaytimeGifts[tonumber(i) or 0]
+	if not data or not gift then return end
+	claimedGifts[player] = claimedGifts[player] or {}
+	if claimedGifts[player][i] then return end
+	local joined = player:GetAttribute("JoinTime") or os.time()
+	if os.time() - joined < gift.minutes * 60 then
+		GameService.notify(player, "⏳ Noch nicht", "Dieses Geschenk gibt es nach " .. gift.minutes .. " Minuten Spielzeit.", "")
+		return
+	end
+	claimedGifts[player][i] = true
+	player:SetAttribute("Gift" .. tostring(i), true)
+	local text = give(player, data, gift.reward)
+	GameService.notify(player, "🎁 Spielzeit-Geschenk!", text, "good")
+	GameService.sendFull(player)
+end)
+game:GetService("Players").PlayerRemoving:Connect(function(player)
+	claimedGifts[player] = nil
+end)
+
+
 return RewardService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000015"><Properties><string name="Name">TradeService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000018"><Properties><string name="Name">ShopService</string><ProtectedString name="Source"><![CDATA[--[[
+	SHOPSERVICE – Ausrüstung & Fahrzeuge kaufen/ausrüsten (mit Geld oder Gems),
+	Fahrzeug aufsteigen/absteigen.
+]]
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local Logic = require(Shared:WaitForChild("Logic"))
+local Util = require(Shared:WaitForChild("Util"))
+local Remotes = require(script.Parent.Remotes)
+local DataService = require(script.Parent.DataService)
+local GameService = require(script.Parent.GameService)
+
+local ShopService = {}
+local KINDS = { aura = true, trail = true, hat = true, emote = true, vehicle = true }
+
+local function pay(player, data, def)
+	if def.currency == "gems" then
+		if data.gems < def.price then
+			GameService.notify(player, "💎 Zu wenig Gems", def.name .. " kostet " .. Util.format(def.price) .. " Gems. Gems gibt's im 💎 Shop, am Glücksrad & bei Events.", "bad")
+			return false
+		end
+		data.gems = data.gems - def.price
+	else
+		if data.cash < def.price then
+			GameService.notify(player, "💸 Zu wenig Geld", def.name .. " kostet " .. Util.format(def.price) .. " Geld. Tipp: 💼 Jobs & Bosse!", "bad")
+			return false
+		end
+		data.cash = data.cash - def.price
+	end
+	return true
+end
+
+Remotes.BuyItem.OnServerEvent:Connect(function(player, kind, id)
+	local data = DataService.get(player)
+	if not data or not KINDS[kind] then return end
+	local def = Logic.itemDef(kind, id)
+	if not def or Logic.ownsItem(data, kind, id) then return end
+	if not pay(player, data, def) then return end
+	if kind == "vehicle" then
+		data.vehicles[id] = true
+		data.vehicle = id
+	else
+		data.cosmetics.owned[id] = true
+		if kind ~= "emote" then data.cosmetics[kind] = id end
+	end
+	GameService.notify(player, def.emoji .. " " .. def.name .. " gekauft!", kind == "vehicle" and "Drücke V (oder den Knopf) zum Aufsteigen." or "Ausgerüstet!", "good")
+	GameService.refreshCharacter(player)
+	GameService.sendFull(player)
+end)
+
+Remotes.EquipItem.OnServerEvent:Connect(function(player, kind, id)
+	local data = DataService.get(player)
+	if not data or not KINDS[kind] or kind == "emote" then return end
+	id = tostring(id or "")
+	if id ~= "" and not Logic.ownsItem(data, kind, id) then return end
+	if kind == "vehicle" then
+		data.vehicle = id
+		if id == "" then player:SetAttribute("Riding", false) end
+	else
+		-- gleiches Teil nochmal = ablegen
+		if data.cosmetics[kind] == id then id = "" end
+		data.cosmetics[kind] = id
+	end
+	GameService.refreshCharacter(player)
+	GameService.sendFull(player)
+end)
+
+Remotes.ToggleRide.OnServerEvent:Connect(function(player)
+	local data = DataService.get(player)
+	if not data then return end
+	if (data.vehicle or "") == "" or not Logic.ownsItem(data, "vehicle", data.vehicle) then
+		GameService.notify(player, "🛹 Kein Fahrzeug", "Kaufe eins im Menü ✨ Ausrüstung → Fahrzeuge.", "")
+		return
+	end
+	player:SetAttribute("Riding", not player:GetAttribute("Riding"))
+	GameService.refreshCharacter(player)
+end)
+
+-- Nach dem Respawn nicht mehr fahren
+table.insert(GameService.characterHooks, function(player)
+	player:SetAttribute("Riding", false)
+end)
+
+return ShopService
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX00000019"><Properties><string name="Name">StyleLook</string><ProtectedString name="Source"><![CDATA[--[[
+	STYLELOOK – zeigt die Ausrüstung am Avatar:
+	Aura (Glitzer, Feuer, Rauch, Regenbogen), Spur beim Laufen, Hut, Fahrzeug unter den Füßen.
+	Wird bei jeder Änderung neu gebaut (GameService.refreshCharacter).
+]]
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local Logic = require(Shared:WaitForChild("Logic"))
+
+local StyleLook = {}
+
+local GOLD = Color3.fromRGB(255, 205, 60)
+local BLACK = Color3.fromRGB(25, 25, 30)
+
+local function weldPart(folder, base, size, offset, color, opts)
+	opts = opts or {}
+	local p = Instance.new(opts.class or "Part")
+	p.Name = opts.name or "Style"
+	p.Size = size
+	p.Color = color
+	p.Material = opts.material or Enum.Material.SmoothPlastic
+	p.Transparency = opts.transparency or 0
+	p.Reflectance = opts.reflectance or 0
+	p.CanCollide = false
+	p.CanQuery = false
+	p.CanTouch = false
+	p.Massless = true
+	p.CastShadow = false
+	if opts.shape == "ball" then
+		local m = Instance.new("SpecialMesh")
+		m.MeshType = Enum.MeshType.Sphere
+		m.Parent = p
+	elseif opts.shape == "cyl" then
+		p.Shape = Enum.PartType.Cylinder
+	end
+	p.CFrame = base.CFrame * offset
+	local w = Instance.new("WeldConstraint")
+	w.Part0 = base
+	w.Part1 = p
+	w.Parent = p
+	p.Parent = folder
+	return p
+end
+
+----------------------------------------------------------------------------
+-- Hüte
+----------------------------------------------------------------------------
+local HATS = {}
+local function top(head) return head.Size.Y / 2 end
+
+HATS.cap = function(f, head)
+	weldPart(f, head, Vector3.new(head.Size.X * 1.05, head.Size.Y * 0.45, head.Size.Z * 1.05), CFrame.new(0, top(head) * 0.75, 0), Color3.fromRGB(230, 50, 60), { shape = "ball" })
+	weldPart(f, head, Vector3.new(head.Size.X * 0.9, 0.08, head.Size.Z * 0.6), CFrame.new(0, top(head) * 0.65, -head.Size.Z * 0.6), Color3.fromRGB(230, 50, 60))
+end
+HATS.headphones = function(f, head)
+	for i = 0, 8 do
+		local a = math.rad(-90 + i * 22.5)
+		weldPart(f, head, Vector3.new(0.18, 0.18, 0.18), CFrame.new(math.sin(a) * head.Size.X * 0.62, math.cos(a) * top(head) * 1.15, 0), BLACK, { shape = "ball" })
+	end
+	for _, s in ipairs({ -1, 1 }) do
+		weldPart(f, head, Vector3.new(0.25, 0.6, 0.6), CFrame.new(s * head.Size.X * 0.6, 0, 0), Color3.fromRGB(255, 79, 216), { shape = "cyl", material = Enum.Material.Neon })
+	end
+end
+HATS.cowboy = function(f, head)
+	weldPart(f, head, Vector3.new(0.12, head.Size.X * 2, head.Size.Z * 2), CFrame.new(0, top(head) * 0.9, 0) * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(140, 90, 50), { shape = "cyl" })
+	weldPart(f, head, Vector3.new(head.Size.X * 0.85, head.Size.Y * 0.55, head.Size.Z * 0.85), CFrame.new(0, top(head) * 1.25, 0), Color3.fromRGB(140, 90, 50))
+	weldPart(f, head, Vector3.new(head.Size.X * 0.87, 0.12, head.Size.Z * 0.87), CFrame.new(0, top(head) * 1.0, 0), BLACK)
+end
+HATS.halo = function(f, head)
+	for i = 0, 11 do
+		local a = i / 12 * math.pi * 2
+		weldPart(f, head, Vector3.new(0.16, 0.16, 0.16), CFrame.new(math.cos(a) * head.Size.X * 0.45, top(head) + 0.7, math.sin(a) * head.Size.Z * 0.45), GOLD,
+			{ shape = "ball", material = Enum.Material.Neon })
+	end
+end
+local function crown(f, head, color, material, gem)
+	weldPart(f, head, Vector3.new(0.35, head.Size.X * 0.95, head.Size.Z * 0.95), CFrame.new(0, top(head) + 0.1, 0) * CFrame.Angles(0, 0, math.rad(90)), color,
+		{ shape = "cyl", material = material, reflectance = 0.3 })
+	for i = 0, 5 do
+		local a = i / 6 * math.pi * 2
+		weldPart(f, head, Vector3.new(0.18, 0.45, 0.18), CFrame.new(math.cos(a) * head.Size.X * 0.42, top(head) + 0.45, math.sin(a) * head.Size.Z * 0.42), color,
+			{ material = material, reflectance = 0.3 })
+		weldPart(f, head, Vector3.new(0.14, 0.14, 0.14), CFrame.new(math.cos(a) * head.Size.X * 0.42, top(head) + 0.72, math.sin(a) * head.Size.Z * 0.42), gem,
+			{ shape = "ball", material = Enum.Material.Neon })
+	end
+end
+HATS.crown = function(f, head) crown(f, head, GOLD, Enum.Material.Foil, Color3.fromRGB(255, 60, 90)) end
+HATS.diamond = function(f, head) crown(f, head, Color3.fromRGB(170, 240, 255), Enum.Material.Glass, Color3.fromRGB(255, 255, 255)) end
+HATS.viking = function(f, head)
+	weldPart(f, head, Vector3.new(head.Size.X * 1.08, head.Size.Y * 0.7, head.Size.Z * 1.08), CFrame.new(0, top(head) * 0.55, 0), Color3.fromRGB(150, 150, 160),
+		{ shape = "ball", material = Enum.Material.Metal })
+	for _, s in ipairs({ -1, 1 }) do
+		weldPart(f, head, Vector3.new(0.22, 0.8, 0.22), CFrame.new(s * head.Size.X * 0.6, top(head) * 0.9, 0) * CFrame.Angles(0, 0, math.rad(-s * 35)), Color3.fromRGB(245, 240, 225),
+			{ shape = "ball" })
+	end
+end
+
+----------------------------------------------------------------------------
+-- Fahrzeuge (unter den Füßen festgeschweißt)
+----------------------------------------------------------------------------
+local VEHICLES = {}
+local function wheels(f, hrp, y, xs, zs, size)
+	for _, x in ipairs(xs) do
+		for _, z in ipairs(zs) do
+			weldPart(f, hrp, Vector3.new(size * 0.6, size, size), CFrame.new(x, y, z), BLACK, { shape = "cyl" })
+		end
+	end
+end
+VEHICLES.board = function(f, hrp, def, foot)
+	weldPart(f, hrp, Vector3.new(1.4, 0.15, 4), CFrame.new(0, foot + 0.35, 0), Color3.fromRGB(230, 70, 90), { shape = "ball" })
+	wheels(f, hrp, foot + 0.12, { -0.5, 0.5 }, { -1.3, 1.3 }, 0.35)
+end
+VEHICLES.scooter = function(f, hrp, def, foot)
+	weldPart(f, hrp, Vector3.new(1.2, 0.2, 3.6), CFrame.new(0, foot + 0.35, 0), Color3.fromRGB(60, 160, 230))
+	weldPart(f, hrp, Vector3.new(0.2, 3.2, 0.2), CFrame.new(0, foot + 1.9, -1.6), Color3.fromRGB(80, 80, 90), { material = Enum.Material.Metal })
+	weldPart(f, hrp, Vector3.new(1.8, 0.2, 0.2), CFrame.new(0, foot + 3.5, -1.6), BLACK)
+	wheels(f, hrp, foot + 0.2, { 0 }, { -1.6, 1.6 }, 0.5)
+end
+VEHICLES.car = function(f, hrp, def, foot)
+	local color = def.gold and GOLD or Color3.fromRGB(230, 40, 50)
+	local mat = def.gold and Enum.Material.Foil or Enum.Material.SmoothPlastic
+	weldPart(f, hrp, Vector3.new(4.4, 1.4, 8), CFrame.new(0, foot + 1.3, 0), color, { material = mat, reflectance = 0.25 })
+	weldPart(f, hrp, Vector3.new(4.2, 0.9, 2.5), CFrame.new(0, foot + 2.3, -1.8), Color3.fromRGB(150, 210, 240), { material = Enum.Material.Glass, transparency = 0.4 })
+	weldPart(f, hrp, Vector3.new(4.5, 0.4, 1.4), CFrame.new(0, foot + 2.1, 3.6), BLACK)   -- Spoiler
+	wheels(f, hrp, foot + 0.7, { -2.2, 2.2 }, { -2.6, 2.6 }, 1.4)
+	for _, s in ipairs({ -1.4, 1.4 }) do
+		weldPart(f, hrp, Vector3.new(0.8, 0.4, 0.15), CFrame.new(s, foot + 1.4, -4.05), Color3.fromRGB(255, 250, 200), { material = Enum.Material.Neon })
+	end
+end
+VEHICLES.hover = function(f, hrp, def, foot)
+	weldPart(f, hrp, Vector3.new(0.25, 4.2, 4.2), CFrame.new(0, foot + 0.3, 0) * CFrame.Angles(0, 0, math.rad(90)), Color3.fromRGB(62, 242, 255), { shape = "cyl", material = Enum.Material.Neon, transparency = 0.2 })
+	local glow = weldPart(f, hrp, Vector3.new(0.2, 0.2, 0.2), CFrame.new(0, foot, 0), Color3.new(1, 1, 1), { transparency = 1 })
+	local e = Instance.new("ParticleEmitter")
+	e.Color = ColorSequence.new(Color3.fromRGB(62, 242, 255))
+	e.Rate = 25
+	e.Speed = NumberRange.new(2, 4)
+	e.Lifetime = NumberRange.new(0.3, 0.6)
+	e.EmissionDirection = Enum.NormalId.Bottom
+	e.LightEmission = 1
+	e.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.4), NumberSequenceKeypoint.new(1, 0) })
+	e.Parent = glow
+end
+
+----------------------------------------------------------------------------
+-- Aura & Spur
+----------------------------------------------------------------------------
+local function auraEffect(f, hrp, def)
+	local holder = weldPart(f, hrp, Vector3.new(2, 4, 1), CFrame.new(0, 0, 0), Color3.new(1, 1, 1), { transparency = 1, name = "Aura" })
+	if def.style == "fire" then
+		local fire = Instance.new("Fire")
+		fire.Color = def.color
+		fire.SecondaryColor = Color3.fromRGB(255, 220, 80)
+		fire.Size = 6
+		fire.Heat = 6
+		fire.Parent = holder
+	elseif def.style == "smoke" then
+		local smoke = Instance.new("Smoke")
+		smoke.Color = def.color
+		smoke.Size = 4
+		smoke.RiseVelocity = 2
+		smoke.Opacity = 0.25
+		smoke.Parent = holder
+	end
+	local e = Instance.new("ParticleEmitter")
+	if def.style == "rainbow" then
+		e.Color = ColorSequence.new({
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 60, 60)), ColorSequenceKeypoint.new(0.25, Color3.fromRGB(255, 220, 60)),
+			ColorSequenceKeypoint.new(0.5, Color3.fromRGB(60, 255, 120)), ColorSequenceKeypoint.new(0.75, Color3.fromRGB(60, 160, 255)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(220, 80, 255)),
+		})
+	else
+		e.Color = ColorSequence.new(def.color)
+	end
+	e.Rate = def.strong and 30 or 15
+	e.Lifetime = NumberRange.new(0.8, 1.5)
+	e.Speed = NumberRange.new(1, 3)
+	e.SpreadAngle = Vector2.new(180, 180)
+	e.LightEmission = 1
+	e.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, def.strong and 0.6 or 0.4), NumberSequenceKeypoint.new(1, 0) })
+	e.Parent = holder
+end
+
+local function trailEffect(f, hrp, def)
+	local a0 = Instance.new("Attachment")
+	a0.Name = "TrailTop"
+	a0.Position = Vector3.new(0, 0.8, 0.4)
+	a0.Parent = hrp
+	local a1 = Instance.new("Attachment")
+	a1.Name = "TrailBottom"
+	a1.Position = Vector3.new(0, -1.6, 0.4)
+	a1.Parent = hrp
+	local tr = Instance.new("Trail")
+	tr.Attachment0 = a0
+	tr.Attachment1 = a1
+	tr.Lifetime = 0.7
+	tr.LightEmission = 0.8
+	tr.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.2), NumberSequenceKeypoint.new(1, 1) })
+	if def.rainbow then
+		tr.Color = ColorSequence.new({
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 60, 60)), ColorSequenceKeypoint.new(0.33, Color3.fromRGB(255, 220, 60)),
+			ColorSequenceKeypoint.new(0.66, Color3.fromRGB(60, 200, 255)), ColorSequenceKeypoint.new(1, Color3.fromRGB(220, 80, 255)),
+		})
+	else
+		tr.Color = ColorSequence.new(def.c1, def.c2)
+	end
+	tr.Parent = f
+	-- Attachments mit aufräumen, wenn der Ordner gelöscht wird
+	f.Destroying:Connect(function()
+		a0:Destroy()
+		a1:Destroy()
+	end)
+end
+
+----------------------------------------------------------------------------
+-- Anwenden
+----------------------------------------------------------------------------
+function StyleLook.apply(player, char, data, riding)
+	local head = char:FindFirstChild("Head")
+	local hrp = char:FindFirstChild("HumanoidRootPart")
+	local hum = char:FindFirstChildOfClass("Humanoid")
+	if not head or not hrp or not hum then return end
+	local old = char:FindFirstChild("StyleLook")
+	if old then old:Destroy() end
+	local f = Instance.new("Folder")
+	f.Name = "StyleLook"
+	f.Parent = char
+
+	local cos = data.cosmetics or {}
+	local hat = Logic.hatById[cos.hat or ""]
+	if hat and HATS[hat.id] then HATS[hat.id](f, head) end
+	local aura = Logic.auraById[cos.aura or ""]
+	if aura then auraEffect(f, hrp, aura) end
+	local trail = Logic.trailById[cos.trail or ""]
+	if trail then trailEffect(f, hrp, trail) end
+	if riding then
+		local v = Logic.vehicleById[data.vehicle or ""]
+		if v and VEHICLES[v.plan] then
+			local foot = -(hrp.Size.Y / 2 + hum.HipHeight)
+			VEHICLES[v.plan](f, hrp, v, foot)
+		end
+	end
+end
+
+return StyleLook
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX0000001A"><Properties><string name="Name">TradeService</string><ProtectedString name="Source"><![CDATA[--[[
 	TRADESERVICE – Pets & Geld zwischen Spielern tauschen.
 
 	Sicherheit gegen Betrug:
@@ -5619,7 +7029,7 @@ return TradeService
 ]]></ProtectedString></Properties></Item>
 </Item>
 </Item>
-<Item class="StarterPlayer" referent="RBX00000025"><Properties><string name="Name">StarterPlayer</string></Properties><Item class="StarterPlayerScripts" referent="RBX00000024"><Properties><string name="Name">StarterPlayerScripts</string></Properties><Item class="LocalScript" referent="RBX00000023"><Properties><string name="Name">Client</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="StarterPlayer" referent="RBX0000002B"><Properties><string name="Name">StarterPlayer</string></Properties><Item class="StarterPlayerScripts" referent="RBX0000002A"><Properties><string name="Name">StarterPlayerScripts</string></Properties><Item class="LocalScript" referent="RBX00000029"><Properties><string name="Name">Client</string><ProtectedString name="Source"><![CDATA[--[[
 	CLIENT – startet die Oberfläche auf dem Gerät des Spielers
 	und empfängt alle Nachrichten vom Server.
 ]]
@@ -5722,6 +7132,27 @@ Remotes:WaitForChild("DamagePopup").OnClientEvent:Connect(function(amount, crit,
 	Effects.damagePopup(amount, crit, position)
 end)
 
+-- Glücksrad dreht sich auf das gewonnene Feld
+Remotes:WaitForChild("WheelResult").OnClientEvent:Connect(function(index)
+	Menus.spinTo(index)
+end)
+
+-- Gym-Minispiel
+Remotes:WaitForChild("GymStart").OnClientEvent:Connect(function()
+	Menus.close()
+	Effects.gymGame(function(hits)
+		Remotes.GymFinish:FireServer(hits)
+	end)
+end)
+
+-- Robux-Käufe: nach dem Kauf Danke sagen (die Belohnung gibt der Server)
+local MarketplaceService = game:GetService("MarketplaceService")
+MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(plr, _, purchased)
+	if plr == player and purchased then
+		Effects.banner("💎 DANKE FÜR DEINEN KAUF!", "Dein Gamepass ist jetzt aktiv.", UI.C.gold)
+	end
+end)
+
 -- Begrüßung
 task.delay(2, function()
 	Effects.toast("✨ Willkommen bei Looksmaxxer 3000!", "Klicke auf Daily Routine, kauf Upgrades und öffne die 🎁 Geschenkbox!", "title")
@@ -5732,7 +7163,7 @@ task.delay(2, function()
 		Effects.toast("🖱️ Kamera", "Maustaste halten + ziehen = drehen · Mausrad = zoomen · Strg = Maus-Kamera", "")
 	end
 end)
-]]></ProtectedString></Properties><Item class="ModuleScript" referent="RBX00000018"><Properties><string name="Name">CameraController</string><ProtectedString name="Source"><![CDATA[--[[
+]]></ProtectedString></Properties><Item class="ModuleScript" referent="RBX0000001D"><Properties><string name="Name">CameraController</string><ProtectedString name="Source"><![CDATA[--[[
 	CAMERACONTROLLER – eigene Kamerasteuerung für alle Geräte
 
 	PC:
@@ -5953,7 +7384,7 @@ end
 
 return CameraController
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000019"><Properties><string name="Name">Effects</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000001E"><Properties><string name="Name">Effects</string><ProtectedString name="Source"><![CDATA[--[[
 	EFFECTS – alles, was kurz aufpoppt:
 	Nachrichten (Toasts), große Banner, fliegende Zahlen,
 	Box-Öffnen-Animation, Mog-Battle-Ansicht, Herausforderungen, Bestätigungen.
@@ -6383,9 +7814,110 @@ function Effects.jobGame(job, onFinish)
 end
 
 
+----------------------------------------------------------------------------
+-- Gym-Minispiel: 8 Wiederholungen im Takt (Hantel im grünen Bereich stemmen)
+----------------------------------------------------------------------------
+function Effects.gymGame(onFinish)
+	local RunService = game:GetService("RunService")
+	local o = overlay()
+	local p = UI.panel(o, { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0.5, 0, 0.6, 0), Color = UI.C.bg })
+	UI.new("UISizeConstraint", { MinSize = Vector2.new(320, 320), MaxSize = Vector2.new(560, 480), Parent = p })
+	UI.stroke(p, UI.C.orange, 3, 0)
+	UI.padding(p, 14)
+	UI.text(p, "<b>🏋️ BANKDRÜCKEN</b>", { Size = UDim2.new(1, 0, 0.11, 0), MaxText = 26 })
+	UI.text(p, "Tippe, wenn die Hantel im <font color='" .. UI.hex(UI.C.green) .. "'>grünen</font> Bereich ist. 8 Wiederholungen – ab 4 Treffern gibt's den GYM-PUMP (+50 % Aura)!",
+		{ Size = UDim2.new(1, 0, 0.13, 0), Position = UDim2.new(0, 0, 0.11, 0), Font = Enum.Font.GothamBold, Color = UI.C.muted, MaxText = 14 })
+	-- senkrechte Leiste
+	local bar = UI.panel(p, { AnchorPoint = Vector2.new(0.5, 0), Size = UDim2.new(0.16, 0, 0.42, 0), Position = UDim2.new(0.3, 0, 0.26, 0), Color = UI.C.panel2, Radius = 10 })
+	bar.ClipsDescendants = true
+	local zone = UI.new("Frame", { BackgroundColor3 = UI.C.green, BackgroundTransparency = 0.25, BorderSizePixel = 0, Size = UDim2.new(1, 0, 0.22, 0), Parent = bar })
+	local weight = UI.text(bar, "🏋️", { AnchorPoint = Vector2.new(0.5, 0.5), Size = UDim2.new(1.4, 0, 0.18, 0), MaxText = 40 })
+	local counter = UI.text(p, "0 / 8", { Size = UDim2.new(0.45, 0, 0.16, 0), Position = UDim2.new(0.5, 0, 0.3, 0), Color = UI.C.gold, MaxText = 44 })
+	local feedback = UI.text(p, "", { Size = UDim2.new(0.45, 0, 0.12, 0), Position = UDim2.new(0.5, 0, 0.48, 0), MaxText = 24 })
+	local reps, hits = 0, 0
+	local pos, dir, speed = 0, 1, 0.8
+	local zoneStart = 0.39
+	local function newZone()
+		zoneStart = 0.08 + math.random() * 0.62
+		zone.Position = UDim2.new(0, 0, zoneStart, 0)
+	end
+	newZone()
+	local conn = RunService.RenderStepped:Connect(function(dt)
+		pos = pos + dir * speed * dt
+		if pos > 1 then pos = 1; dir = -1 end
+		if pos < 0 then pos = 0; dir = 1 end
+		weight.Position = UDim2.new(0.5, 0, pos, 0)
+	end)
+	local done = false
+	local btn
+	btn = UI.button(p, "💪 DRÜCKEN!", UI.C.orange, function()
+		if done then return end
+		reps = reps + 1
+		if pos >= zoneStart - 0.02 and pos <= zoneStart + 0.24 then
+			hits = hits + 1
+			feedback.Text = "✅ Sauber!"
+			feedback.TextColor3 = UI.C.green
+		else
+			feedback.Text = "❌ Daneben"
+			feedback.TextColor3 = UI.C.red
+		end
+		counter.Text = hits .. " / 8"
+		Sounds.play("Click")
+		speed = speed + 0.12
+		if reps < 8 then
+			newZone()
+			return
+		end
+		done = true
+		conn:Disconnect()
+		btn.Text = hits >= 4 and "🔥 PUMP!" or "😮‍💨 Geschafft"
+		onFinish(hits)
+		task.delay(1.2, function() o:Destroy() end)
+	end, { Size = UDim2.new(1, 0, 0.17, 0), Position = UDim2.new(0, 0, 0.72, 0), TextColor = UI.C.dark, MaxText = 30 })
+	UI.button(p, "Abbrechen", UI.C.grey, function()
+		done = true
+		conn:Disconnect()
+		o:Destroy()
+	end, { Size = UDim2.new(0.4, 0, 0.08, 0), Position = UDim2.new(0.3, 0, 0.92, 0), MaxText = 14 })
+end
+
+
 return Effects
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000001A"><Properties><string name="Name">Hud</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000001F"><Properties><string name="Name">Emotes</string><ProtectedString name="Source"><![CDATA[--[[
+	EMOTES – spielt Emotes (Animationen) am eigenen Avatar ab.
+	Eigene Animationen sieht jeder andere Spieler automatisch auch.
+]]
+
+local Players = game:GetService("Players")
+
+local Emotes = {}
+local current = nil
+
+function Emotes.play(def)
+	local char = Players.LocalPlayer.Character
+	local hum = char and char:FindFirstChildOfClass("Humanoid")
+	local animator = hum and hum:FindFirstChildOfClass("Animator")
+	if not animator or not def or not def.anim then return end
+	if current then current:Stop() end
+	local anim = Instance.new("Animation")
+	anim.AnimationId = def.anim
+	local ok, track = pcall(function() return animator:LoadAnimation(anim) end)
+	if ok and track then
+		track.Priority = Enum.AnimationPriority.Action
+		track:Play()
+		current = track
+	end
+	if def.bubble then
+		pcall(function()
+			game:GetService("TextChatService"):DisplayBubble(char:FindFirstChild("Head"), def.bubble)
+		end)
+	end
+end
+
+return Emotes
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX00000020"><Properties><string name="Name">Hud</string><ProtectedString name="Source"><![CDATA[--[[
 	HUD – die ständige Anzeige:
 	oben die Werte, links die Menü-Knöpfe, unten der Daily-Routine-Knopf
 	mit Titel und Fortschritt zum nächsten Titel.
@@ -6409,9 +7941,10 @@ local Hud = {}
 local C = UI.C
 local chips = {}
 local titleLabel, nextLabel, progressBar, routineSub, routineBtn, rewardsDot
+local wheelDot, eventBtn, rideBtn, raceLabel
 
 local function chip(parent, key, caption, color, order)
-	local f = UI.panel(parent, { Size = UDim2.new(0.19, 0, 1, 0), Color = C.dark, Transparency = 0.15, LayoutOrder = order })
+	local f = UI.panel(parent, { Size = UDim2.new(0.155, 0, 1, 0), Color = C.dark, Transparency = 0.15, LayoutOrder = order })
 	UI.stroke(f, color, 2, 0.3)
 	UI.text(f, caption, { Size = UDim2.new(1, 0, 0.34, 0), Position = UDim2.new(0, 0, 0.04, 0), Color = C.muted, Font = Enum.Font.GothamBold, MaxText = 12 })
 	chips[key] = UI.text(f, "0", { Size = UDim2.new(1, -8, 0.58, 0), Position = UDim2.new(0, 4, 0.38, 0), Color = color, MaxText = 24 })
@@ -6428,6 +7961,7 @@ function Hud.init(gui)
 	chip(top, "cash", "💵 GELD", C.money, 3)
 	chip(top, "glow", "💖 GLOW", C.pink, 4)
 	chip(top, "reb", "♻️ REBIRTHS", C.cyan, 5)
+	chip(top, "gems", "💎 GEMS", C.cyan, 6)
 
 	-- Menü-Knöpfe links
 	local side = UI.new("Frame", { Name = "Side", BackgroundTransparency = 1, AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 8, 0.5, 0),
@@ -6456,6 +7990,62 @@ function Hud.init(gui)
 			rewardsDot.Visible = false
 		end
 	end
+
+	-- Knöpfe rechts: Shop, Glücksrad, Event, Ausrüstung, Emotes, Fahrzeug
+	local right = UI.new("Frame", { Name = "Right", BackgroundTransparency = 1, AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.45, 0),
+		Size = UDim2.new(0.07, 0, 0.56, 0), Parent = gui })
+	UI.new("UISizeConstraint", { MinSize = Vector2.new(44, 220), MaxSize = Vector2.new(74, 520), Parent = right })
+	UI.list(right, false, 6, Enum.HorizontalAlignment.Center, Enum.VerticalAlignment.Center)
+	local rightButtons = {
+		{ "shop", "💎", "Shop", C.cyan }, { "wheel", "🎡", "Glücksrad", C.gold }, { "event", "🎉", "Events", C.orange },
+		{ "style", "✨", "Style", C.purple }, { "emote", "🕺", "Emotes", C.pink }, { "ride", "🛹", "Fahren (V)", C.green },
+	}
+	for i, b in ipairs(rightButtons) do
+		local btn = UI.new("TextButton", { Text = "", AutoButtonColor = true, BackgroundColor3 = b[4], Size = UDim2.new(1, 0, 1 / 6, -6),
+			LayoutOrder = i, Parent = right })
+		UI.new("UIAspectRatioConstraint", { AspectRatio = 1, Parent = btn })
+		UI.corner(btn, 14)
+		UI.stroke(btn, Color3.new(1, 1, 1), 2, 0.6)
+		UI.text(btn, b[2], { Size = UDim2.new(1, 0, 0.62, 0), MaxText = 34 })
+		UI.text(btn, b[3], { Size = UDim2.new(1, -4, 0.3, 0), Position = UDim2.new(0, 2, 0.66, 0), MaxText = 12 })
+		btn.Activated:Connect(function()
+			if b[1] == "emote" then
+				Menus.open("style", "emote")
+			elseif b[1] == "ride" then
+				Hud.toggleRide()
+			else
+				Menus.toggle(b[1])
+			end
+		end)
+		if b[1] == "wheel" then
+			wheelDot = UI.panel(btn, { Size = UDim2.new(0, 16, 0, 16), Position = UDim2.new(1, -12, 0, -4), Color = C.red, Radius = 8 })
+			wheelDot.Visible = false
+		elseif b[1] == "event" then
+			eventBtn = btn
+		elseif b[1] == "ride" then
+			rideBtn = btn
+		end
+	end
+	game:GetService("UserInputService").InputBegan:Connect(function(input, processed)
+		if not processed and input.KeyCode == Enum.KeyCode.V then
+			Hud.toggleRide()
+		end
+	end)
+
+	-- Stoppuhr fürs Laufrennen
+	raceLabel = UI.text(gui, "", { AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0.21, 0), Size = UDim2.new(0, 260, 0, 46),
+		Color = C.gold, MaxText = 36 })
+	raceLabel.TextStrokeTransparency = 0.2
+	raceLabel.Visible = false
+	game:GetService("RunService").Heartbeat:Connect(function()
+		local start = game:GetService("Players").LocalPlayer:GetAttribute("RaceStart")
+		if start then
+			raceLabel.Visible = true
+			raceLabel.Text = "⏱️ " .. string.format("%.2f", workspace:GetServerTimeNow() - start) .. " s"
+		else
+			raceLabel.Visible = false
+		end
+	end)
 
 	-- Unten: Titel, Fortschritt, Daily Routine
 	local bottom = UI.new("Frame", { Name = "Bottom", BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 1, -10),
@@ -6549,6 +8139,17 @@ function Hud.init(gui)
 	State.onChange(Hud.update)
 end
 
+function Hud.toggleRide()
+	local s = State.snap
+	if not s then return end
+	if s.data.vehicle == "" then
+		Effects.toast("🛹 Kein Fahrzeug", "Kauf dir im Menü ✨ Style → Fahrzeuge ein Skateboard, Auto oder Hoverboard!", "")
+		Menus.open("style", "vehicle")
+		return
+	end
+	Remotes.ToggleRide:FireServer()
+end
+
 function Hud.update()
 	local s = State.snap
 	if not s then return end
@@ -6558,6 +8159,18 @@ function Hud.update()
 	chips.cash.Text = Util.format(d.cash)
 	chips.glow.Text = Util.format(s.glow)
 	chips.reb.Text = tostring(d.rebirths)
+	chips.gems.Text = Util.format(d.gems)
+	if wheelDot then
+		wheelDot.Visible = d.wheel.spins > 0 or os.time() - d.wheel.last >= Config.WHEEL_COOLDOWN
+	end
+	if eventBtn then
+		local now = os.time()
+		eventBtn.BackgroundColor3 = (Logic.activeEvent(now) or Logic.isWeekend(now)) and C.orange or C.grey
+	end
+	if rideBtn then
+		local riding = game:GetService("Players").LocalPlayer:GetAttribute("Riding") == true
+		rideBtn.BackgroundColor3 = riding and C.gold or C.green
+	end
 	routineSub.Text = "+" .. Util.format(s.click) .. " Aura pro Klick"
 
 	local idx = Logic.titleIndex(s.glow)
@@ -6578,7 +8191,7 @@ end
 
 return Hud
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000001B"><Properties><string name="Name">Menus</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000021"><Properties><string name="Name">Menus</string><ProtectedString name="Source"><![CDATA[--[[
 	MENUS – alle Menüfenster:
 	💪 Upgrades · 🐾 Pets · 🌍 Welten · ♻️ Rebirth · 🏆 Rangliste · 🎁 Belohnungen · ⚙️ Einstellungen
 ]]
@@ -6597,6 +8210,7 @@ local Sounds = require(script.Parent:WaitForChild("Sounds"))
 local Effects = require(script.Parent:WaitForChild("Effects"))
 local CameraController = require(script.Parent:WaitForChild("CameraController"))
 local PetView = require(script.Parent:WaitForChild("PetView"))
+local Emotes = require(script.Parent:WaitForChild("Emotes"))
 local UserInputService = game:GetService("UserInputService")
 
 local Menus = {}
@@ -6637,6 +8251,7 @@ local TITLES = {
 	upgrades = "💪 Upgrades", pets = "🐾 Pets", worlds = "🌍 Welten", rebirth = "♻️ Rebirth",
 	leaderboard = "🏆 Globale Rangliste", rewards = "🎁 Belohnungen", settings = "⚙️ Einstellungen",
 	quests = "📋 Aufträge & Erfolge", jobs = "💼 Jobs", weapons = "⚔️ Waffen & Bosskampf", egginfo = "🎁 Box-Inhalt",
+	shop = "💎 Shop", style = "✨ Ausrüstung", wheel = "🎡 Glücksrad & Geschenke", event = "🎉 Events",
 }
 
 function Menus.open(name, arg)
@@ -7074,6 +8689,7 @@ BUILDERS.rewards = function(root)
 	UI.padding(list, 2)
 	local potionRows = {}
 	for i, p in ipairs(Config.Potions) do
+	if not p.hidden then
 		local row = UI.panel(list, { Size = UDim2.new(1, -10, 0, 56), Color = C.panel2, LayoutOrder = i })
 		UI.text(row, p.emoji, { Size = UDim2.new(0, 46, 1, 0), MaxText = 30 })
 		UI.text(row, p.name, { Size = UDim2.new(1, -190, 0.5, 0), Position = UDim2.new(0, 50, 0.04, 0), XAlign = Enum.TextXAlignment.Left, MaxText = 17 })
@@ -7083,6 +8699,7 @@ BUILDERS.rewards = function(root)
 			Remotes.BuyPotion:FireServer(p.id)
 		end, { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.new(0, 120, 0, 40), TextColor = C.dark, MaxText = 16 })
 		potionRows[p.id] = { sub = sub, btn = btn, p = p }
+	end
 	end
 
 	return function()
@@ -7355,11 +8972,17 @@ end
 BUILDERS.egginfo = function(root, eggIndex)
 	local egg = Config.Eggs[eggIndex or 1]
 	if not egg then return nil end
-	local station = Config.EggStations[egg.station]
+	local station = Config.EggStations[egg.station] or { emoji = egg.emoji or "🎁" }
 	local d = data()
 	local total = 0
 	for _, e in ipairs(egg.pets) do total = total + e.weight end
-	UI.text(root, station.emoji .. " <b>" .. egg.name .. "</b>  ·  <font color='" .. UI.hex(C.gold) .. "'>" .. Util.format(egg.cost) .. " Aura</font>  ·  🍀 Glück "
+	local costText = Util.format(egg.cost) .. " Aura"
+	if egg.event then
+		for _, ev in ipairs(Config.Events) do
+			if ev.id == egg.event then costText = egg.cost .. " " .. ev.token end
+		end
+	end
+	UI.text(root, station.emoji .. " <b>" .. egg.name .. "</b>  ·  <font color='" .. UI.hex(C.gold) .. "'>" .. costText .. "</font>  ·  🍀 Glück "
 		.. Util.formatMult(snap().luck), { Size = UDim2.new(1, -250, 0, 34), XAlign = Enum.TextXAlignment.Left, MaxText = 18 })
 	UI.button(root, "🎁 Öffnen", C.gold, function()
 		Remotes.HatchEgg:FireServer(egg.index, 1)
@@ -7387,9 +9010,294 @@ BUILDERS.egginfo = function(root, eggIndex)
 end
 
 
+----------------------------------------------------------------------------
+-- 💎 ROBUX-SHOP
+----------------------------------------------------------------------------
+local MarketplaceService = game:GetService("MarketplaceService")
+
+BUILDERS.shop = function(root)
+	local list = UI.scroll(root)
+	UI.list(list, false, 6)
+	UI.padding(list, 2)
+	local function build()
+		UI.clear(list)
+		local d = data()
+		local order = 0
+		local function o() order = order + 1 return order end
+		UI.text(list, "💎 Du hast <font color='" .. UI.hex(C.cyan) .. "'>" .. Util.format(d.gems) .. " Gems</font> · Gems gibt's auch am 🎡 Glücksrad, bei Spielzeit-Geschenken & Events",
+			{ Size = UDim2.new(1, -10, 0, 30), XAlign = Enum.TextXAlignment.Left, Font = Enum.Font.GothamBold, MaxText = 15, LayoutOrder = o() })
+		local function row(emoji, name, desc, btnText, btnColor, onClick, highlight)
+			local r = UI.panel(list, { Size = UDim2.new(1, -10, 0, 64), Color = highlight and C.purple or C.panel2, LayoutOrder = o() })
+			UI.text(r, emoji, { Size = UDim2.new(0, 54, 1, 0), MaxText = 34 })
+			UI.text(r, name, { Size = UDim2.new(1, -200, 0.5, 0), Position = UDim2.new(0, 58, 0.04, 0), XAlign = Enum.TextXAlignment.Left, MaxText = 18 })
+			UI.text(r, desc or "", { Size = UDim2.new(1, -200, 0.42, 0), Position = UDim2.new(0, 58, 0.54, 0), XAlign = Enum.TextXAlignment.Left,
+				Font = Enum.Font.Gotham, Color = C.muted, MaxText = 13 })
+			UI.button(r, btnText, btnColor, onClick, { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.new(0, 128, 0, 44),
+				TextColor = C.dark, MaxText = 16 })
+		end
+		UI.text(list, "🎟️ Gamepasses (einmal kaufen, für immer)", { Size = UDim2.new(1, -10, 0, 28), XAlign = Enum.TextXAlignment.Left, MaxText = 18, LayoutOrder = o() })
+		for _, gp in ipairs(Config.GamePasses) do
+			local owned = Logic.hasPass(d, gp.key)
+			row(gp.emoji, gp.name, gp.desc, owned and "✅ Besitzt du" or (gp.id > 0 and ("R$ " .. gp.robux) or "Bald verfügbar"),
+				owned and C.grey or (gp.id > 0 and C.green or C.grey), function()
+					if not owned and gp.id > 0 then
+						MarketplaceService:PromptGamePassPurchase(Players.LocalPlayer, gp.id)
+					end
+				end, gp.key == "vip")
+		end
+		UI.text(list, "💎 Gems & Pakete", { Size = UDim2.new(1, -10, 0, 28), XAlign = Enum.TextXAlignment.Left, MaxText = 18, LayoutOrder = o() })
+		for _, dp in ipairs(Config.DevProducts) do
+			if not (dp.once and d.starterPack) then
+				row(dp.emoji, dp.name, dp.desc or "", dp.id > 0 and ("R$ " .. dp.robux) or "Bald verfügbar", dp.id > 0 and C.cyan or C.grey, function()
+					if dp.id > 0 then
+						MarketplaceService:PromptProductPurchase(Players.LocalPlayer, dp.id)
+					end
+				end, dp.key == "starter")
+			end
+		end
+		UI.text(list, "🧪 Tränke für Gems", { Size = UDim2.new(1, -10, 0, 28), XAlign = Enum.TextXAlignment.Left, MaxText = 18, LayoutOrder = o() })
+		for _, p in ipairs(Config.Potions) do
+			if p.gems and not p.hidden then
+				row(p.emoji, p.name, p.desc, "💎 " .. p.gems, d.gems >= p.gems and C.cyan or C.grey, function()
+					Remotes.BuyPotion:FireServer(p.id, true)
+				end)
+			end
+		end
+		UI.text(list, "Mit Gems kaufst du auch exklusive Auren, Spuren, Hüte, Emotes & Fahrzeuge (Menü ✨).",
+			{ Size = UDim2.new(1, -10, 0, 30), Color = C.muted, Font = Enum.Font.GothamBold, MaxText = 14, LayoutOrder = o() })
+	end
+	return function(kind)
+		if kind == "full" then build() end
+	end
+end
+
+----------------------------------------------------------------------------
+-- ✨ AUSRÜSTUNG: Auren, Spuren, Hüte, Emotes, Fahrzeuge
+----------------------------------------------------------------------------
+local styleTab = "aura"
+local STYLE_TABS = {
+	{ id = "aura", name = "✨ Auren", list = Config.Auras },
+	{ id = "trail", name = "💫 Spuren", list = Config.Trails },
+	{ id = "hat", name = "👑 Hüte", list = Config.Hats },
+	{ id = "emote", name = "🕺 Emotes", list = Config.Emotes },
+	{ id = "vehicle", name = "🛹 Fahrzeuge", list = Config.Vehicles },
+}
+
+local function boostText(def, kind)
+	if kind == "hat" then
+		local parts = {}
+		if def.boost.aura then table.insert(parts, Util.formatPercent(def.boost.aura) .. " Aura") end
+		if def.boost.cash then table.insert(parts, Util.formatPercent(def.boost.cash) .. " Geld") end
+		if def.boost.luck then table.insert(parts, Util.formatPercent(def.boost.luck) .. " Glück") end
+		if def.boost.speed then table.insert(parts, "+" .. def.boost.speed .. " Tempo") end
+		return table.concat(parts, " · ")
+	elseif kind == "vehicle" then
+		return "+" .. def.speed .. " Tempo" .. (def.jump > 0 and (" · +" .. def.jump .. " Sprung") or "") .. " · Taste V"
+	elseif kind == "emote" then
+		return "Spielt eine Animation ab"
+	end
+	return "Nur Optik – sieht aber krass aus"
+end
+
+BUILDERS.style = function(root, startTab)
+	if startTab then styleTab = startTab end
+	local tabs = UI.scroll(root, { Size = UDim2.new(1, 0, 0, 40), Horizontal = true })
+	UI.list(tabs, true, 6)
+	local list = UI.scroll(root, { Size = UDim2.new(1, 0, 1, -48), Position = UDim2.new(0, 0, 0, 48) })
+	UI.list(list, false, 6)
+	UI.padding(list, 2)
+	local tabButtons = {}
+
+	local function build()
+		UI.clear(list)
+		local d = data()
+		for id, b in pairs(tabButtons) do b.BackgroundColor3 = (id == styleTab) and C.pink or C.panel2 end
+		local tab
+		for _, t in ipairs(STYLE_TABS) do if t.id == styleTab then tab = t end end
+		for i, def in ipairs(tab.list) do
+			local owned = Logic.ownsItem(d, styleTab, def.id)
+			local equipped
+			if styleTab == "vehicle" then equipped = d.vehicle == def.id else equipped = d.cosmetics[styleTab] == def.id end
+			local r = UI.panel(list, { Size = UDim2.new(1, -10, 0, 64), Color = equipped and C.purple or C.panel2, LayoutOrder = i })
+			UI.text(r, def.emoji, { Size = UDim2.new(0, 54, 1, 0), MaxText = 34 })
+			UI.text(r, def.name, { Size = UDim2.new(1, -200, 0.5, 0), Position = UDim2.new(0, 58, 0.04, 0), XAlign = Enum.TextXAlignment.Left, MaxText = 18 })
+			UI.text(r, boostText(def, styleTab), { Size = UDim2.new(1, -200, 0.42, 0), Position = UDim2.new(0, 58, 0.54, 0), XAlign = Enum.TextXAlignment.Left,
+				Font = Enum.Font.GothamBold, Color = C.green, MaxText = 13 })
+			local btnText, btnColor, action
+			if not owned then
+				local price = (def.currency == "gems" and "💎 " or "💵 ") .. Util.format(def.price)
+				local can = (def.currency == "gems" and d.gems or d.cash) >= def.price
+				btnText, btnColor = price, can and C.gold or C.grey
+				action = function() Remotes.BuyItem:FireServer(styleTab, def.id) end
+			elseif styleTab == "emote" then
+				btnText, btnColor = "▶ Abspielen", C.cyan
+				action = function()
+					Menus.close()
+					Emotes.play(def)
+				end
+			else
+				btnText, btnColor = equipped and "Ablegen" or "Ausrüsten", equipped and C.grey or C.green
+				action = function() Remotes.EquipItem:FireServer(styleTab, equipped and (styleTab == "vehicle" and "" or def.id) or def.id) end
+			end
+			UI.button(r, btnText, btnColor, action, { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.new(0, 128, 0, 44),
+				TextColor = C.dark, MaxText = 16 })
+		end
+	end
+	for i, t in ipairs(STYLE_TABS) do
+		tabButtons[t.id] = UI.button(tabs, t.name, C.panel2, function()
+			styleTab = t.id
+			build()
+		end, { Size = UDim2.new(0, 140, 1, -6), LayoutOrder = i, MaxText = 16 })
+	end
+	return function(kind)
+		if kind == "full" then build() end
+	end
+end
+
+----------------------------------------------------------------------------
+-- 🎡 GLÜCKSRAD & SPIELZEIT-GESCHENKE
+----------------------------------------------------------------------------
+local wheelFrame = nil
+function Menus.spinTo(index)
+	if not wheelFrame or not wheelFrame.Parent then return end
+	local seg = 360 / #Config.Wheel
+	local target = -((index - 0.5) * seg) - 360 * 6
+	wheelFrame.Rotation = wheelFrame.Rotation % 360
+	game:GetService("TweenService"):Create(wheelFrame, TweenInfo.new(3.6, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), { Rotation = target }):Play()
+end
+
+BUILDERS.wheel = function(root)
+	-- Rad links
+	local left = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(0.5, -6, 1, 0), Parent = root })
+	local holder = UI.new("Frame", { BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, 0),
+		Size = UDim2.new(1, 0, 0.78, 0), Parent = left })
+	UI.new("UIAspectRatioConstraint", { AspectRatio = 1, Parent = holder })
+	wheelFrame = UI.new("Frame", { BackgroundColor3 = C.panel2, Size = UDim2.new(1, 0, 1, 0), Parent = holder })
+	UI.new("UICorner", { CornerRadius = UDim.new(0.5, 0), Parent = wheelFrame })
+	UI.stroke(wheelFrame, C.gold, 4, 0)
+	local seg = 360 / #Config.Wheel
+	for i, s in ipairs(Config.Wheel) do
+		local a = math.rad((i - 0.5) * seg)
+		local chip = UI.panel(wheelFrame, { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5 + 0.36 * math.sin(a), 0, 0.5 - 0.36 * math.cos(a), 0),
+			Size = UDim2.new(0.3, 0, 0.12, 0), Color = s.color, Radius = 8 })
+		chip.Rotation = (i - 0.5) * seg
+		UI.text(chip, s.label, { Color = C.dark, MaxText = 13 })
+	end
+	UI.text(holder, "▼", { AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 0, 6), Size = UDim2.new(0, 40, 0, 34), Color = C.red, MaxText = 34 })
+	local spinBtn = UI.button(left, "", C.gold, function()
+		Remotes.SpinWheel:FireServer()
+	end, { AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 1, 0), Size = UDim2.new(0.9, 0, 0.16, 0), TextColor = C.dark, MaxText = 20 })
+
+	-- Chancen & Spielzeit-Geschenke rechts
+	local right = UI.scroll(root, { Size = UDim2.new(0.5, -6, 1, 0), Position = UDim2.new(0.5, 6, 0, 0) })
+	UI.list(right, false, 5)
+	local total = 0
+	for _, s in ipairs(Config.Wheel) do total = total + s.weight end
+	UI.text(right, "🎯 Chancen am Glücksrad", { Size = UDim2.new(1, -8, 0, 24), XAlign = Enum.TextXAlignment.Left, MaxText = 16, LayoutOrder = 1 })
+	for i, s in ipairs(Config.Wheel) do
+		UI.text(right, s.label .. "  <font color='" .. UI.hex(C.gold) .. "'>" .. Util.format(s.weight / total * 100) .. " %</font>",
+			{ Size = UDim2.new(1, -8, 0, 20), XAlign = Enum.TextXAlignment.Left, Font = Enum.Font.GothamBold, MaxText = 13, LayoutOrder = 1 + i })
+	end
+	UI.text(right, "🎁 Spielzeit-Geschenke (diese Sitzung)", { Size = UDim2.new(1, -8, 0, 26), XAlign = Enum.TextXAlignment.Left, MaxText = 16, LayoutOrder = 50 })
+	local giftButtons = {}
+	for i, g in ipairs(Config.PlaytimeGifts) do
+		giftButtons[i] = UI.button(right, "", C.grey, function()
+			Remotes.ClaimPlaytime:FireServer(i)
+		end, { Size = UDim2.new(1, -8, 0, 36), LayoutOrder = 50 + i, MaxText = 15 })
+	end
+
+	return function()
+		local d = data()
+		local remaining = Config.WHEEL_COOLDOWN - (os.time() - d.wheel.last)
+		if d.wheel.spins > 0 then
+			spinBtn.Text = "🎡 Drehen! (" .. d.wheel.spins .. " übrig)"
+			spinBtn.BackgroundColor3 = C.gold
+		elseif remaining <= 0 then
+			spinBtn.Text = "🎡 Gratis drehen!"
+			spinBtn.BackgroundColor3 = C.gold
+		else
+			spinBtn.Text = "⏳ " .. Util.formatTime(remaining)
+			spinBtn.BackgroundColor3 = C.grey
+		end
+		local player = Players.LocalPlayer
+		local joined = player:GetAttribute("JoinTime") or os.time()
+		local played = os.time() - joined
+		for i, g in ipairs(Config.PlaytimeGifts) do
+			local b = giftButtons[i]
+			if player:GetAttribute("Gift" .. i) then
+				b.Text = "✅ " .. g.label
+				b.BackgroundColor3 = C.panel2
+			elseif played >= g.minutes * 60 then
+				b.Text = "🎁 " .. g.label .. " – abholen!"
+				b.BackgroundColor3 = C.gold
+				b.TextColor3 = C.dark
+			else
+				b.Text = "⏳ " .. g.label .. " in " .. Util.formatTime(g.minutes * 60 - played)
+				b.BackgroundColor3 = C.grey
+				b.TextColor3 = C.text
+			end
+		end
+	end
+end
+
+----------------------------------------------------------------------------
+-- 🎉 EVENT
+----------------------------------------------------------------------------
+BUILDERS.event = function(root)
+	local list = UI.scroll(root)
+	UI.list(list, false, 6)
+	UI.padding(list, 2)
+	local function build()
+		UI.clear(list)
+		local d = data()
+		local now = os.time()
+		local ev = Logic.activeEvent(now)
+		local order = 0
+		local function o() order = order + 1 return order end
+		local weekend = Logic.isWeekend(now)
+		local wk = UI.panel(list, { Size = UDim2.new(1, -10, 0, 50), Color = weekend and C.green or C.panel2, LayoutOrder = o() })
+		UI.text(wk, weekend and "🎉 WOCHENEND-BOOST AKTIV: x2 Aura & x2 Glück!" or "📅 Jeden Samstag & Sonntag: x2 Aura & x2 Glück (automatisch)",
+			{ Size = UDim2.new(1, -16, 1, 0), Position = UDim2.new(0, 8, 0, 0), XAlign = Enum.TextXAlignment.Left, MaxText = 17, Color = weekend and C.dark or C.text })
+		if ev then
+			local head = UI.panel(list, { Size = UDim2.new(1, -10, 0, 96), Color = ev.color:Lerp(C.dark, 0.55), LayoutOrder = o() })
+			UI.stroke(head, ev.color, 2, 0)
+			UI.padding(head, 8)
+			UI.text(head, ev.emoji .. " <b>" .. ev.name .. "</b> läuft gerade!", { Size = UDim2.new(1, 0, 0.36, 0), XAlign = Enum.TextXAlignment.Left, MaxText = 22 })
+			UI.text(head, "Deine " .. ev.token .. ": <font color='" .. UI.hex(C.gold) .. "'>" .. Logic.eventTokens(d, ev.id) .. "</font> · Sammle " .. ev.tokenEmoji
+				.. " in allen Welten & besiege den Event-Boss am Event-Platz in Glow City!", { Size = UDim2.new(1, 0, 0.6, 0), Position = UDim2.new(0, 0, 0.38, 0),
+				XAlign = Enum.TextXAlignment.Left, Font = Enum.Font.GothamBold, MaxText = 15 })
+			UI.button(list, "🎁 Event-Box ansehen (" .. Config.EVENT_EGG_COST .. " " .. ev.token .. ")", C.gold, function()
+				Menus.open("egginfo", ev.eggIndex)
+			end, { Size = UDim2.new(1, -10, 0, 42), LayoutOrder = o(), TextColor = C.dark, MaxText = 17 })
+			UI.text(list, "Exklusive Event-Pets:", { Size = UDim2.new(1, -10, 0, 24), XAlign = Enum.TextXAlignment.Left, MaxText = 16, LayoutOrder = o() })
+			local row = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, -10, 0, 120), LayoutOrder = o(), Parent = list })
+			UI.list(row, true, 6, Enum.HorizontalAlignment.Center)
+			for _, e in ipairs(Config.Eggs[ev.eggIndex].pets) do
+				local def = Logic.petById[e.id]
+				local rarity = Config.Rarities[def.rarity]
+				local cell = UI.panel(row, { Size = UDim2.new(0.19, 0, 1, 0), Color = rarity.color:Lerp(C.dark, 0.6), Radius = 10 })
+				UI.stroke(cell, rarity.color, 2, 0)
+				PetView.make(cell, def.id, 1, false, { Size = UDim2.new(1, 0, 0.7, 0) })
+				UI.text(cell, def.name, { Size = UDim2.new(1, -4, 0.28, 0), Position = UDim2.new(0, 2, 0.7, 0), Color = rarity.color, MaxText = 12 })
+			end
+		else
+			UI.text(list, "Gerade läuft kein saisonales Event.", { Size = UDim2.new(1, -10, 0, 30), MaxText = 18, LayoutOrder = o() })
+		end
+		UI.text(list, "📅 Event-Kalender", { Size = UDim2.new(1, -10, 0, 26), XAlign = Enum.TextXAlignment.Left, MaxText = 17, LayoutOrder = o() })
+		for _, e in ipairs(Config.Events) do
+			UI.text(list, e.emoji .. " " .. e.name .. ": " .. string.format("%02d.%02d.", e.from[2], e.from[1]) .. " – " .. string.format("%02d.%02d.", e.to[2], e.to[1]),
+				{ Size = UDim2.new(1, -10, 0, 22), XAlign = Enum.TextXAlignment.Left, Font = Enum.Font.GothamBold, Color = C.muted, MaxText = 14, LayoutOrder = o() })
+		end
+	end
+	return function(kind)
+		if kind == "full" then build() end
+	end
+end
+
+
 return Menus
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000001C"><Properties><string name="Name">PetFollow</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000022"><Properties><string name="Name">PetFollow</string><ProtectedString name="Source"><![CDATA[--[[
 	PETFOLLOW – bewegt alle Pets (von allen Spielern) flüssig hinter ihren Besitzern her.
 	Läuft auf jedem Gerät selbst, damit es ruckelfrei aussieht.
 	Pets laufen leicht hüpfend, schauen in Laufrichtung, Regenbogen-Pets wechseln die Farbe.
@@ -7450,7 +9358,7 @@ end
 
 return PetFollow
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000001D"><Properties><string name="Name">PetView</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000023"><Properties><string name="Name">PetView</string><ProtectedString name="Source"><![CDATA[--[[
 	PETVIEW – zeigt ein Pet als drehbare 3D-Vorschau in Menüs (ViewportFrame).
 ]]
 
@@ -7508,7 +9416,7 @@ end
 
 return PetView
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000001E"><Properties><string name="Name">Sounds</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000024"><Properties><string name="Name">Sounds</string><ProtectedString name="Source"><![CDATA[--[[
 	SOUNDS – spielt Soundeffekte und Hintergrundmusik.
 	Die Sound-IDs stehen in Config.Sounds / Config.Music.
 ]]
@@ -7571,7 +9479,7 @@ end
 
 return Sounds
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000001F"><Properties><string name="Name">State</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000025"><Properties><string name="Name">State</string><ProtectedString name="Source"><![CDATA[--[[
 	STATE – speichert auf dem Gerät den letzten Spielstand vom Server
 	und informiert alle Menüs, wenn sich etwas ändert.
 ]]
@@ -7603,6 +9511,7 @@ function State.setLight(l)
 	if not s then return end
 	s.data.aura = l.aura
 	s.data.cash = l.cash
+	s.data.gems = l.gems or s.data.gems
 	s.data.totalAura = l.totalAura
 	s.aps = l.aps
 	s.click = l.click
@@ -7619,7 +9528,7 @@ end
 
 return State
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000020"><Properties><string name="Name">TradeUI</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000026"><Properties><string name="Name">TradeUI</string><ProtectedString name="Source"><![CDATA[--[[
 	TRADEUI – das Handelsfenster.
 	Links: dein Angebot + deine Pets (antippen = hinzufügen/entfernen) + Geld.
 	Rechts: was der andere anbietet.
@@ -7801,7 +9710,7 @@ end
 
 return TradeUI
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000021"><Properties><string name="Name">UI</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000027"><Properties><string name="Name">UI</string><ProtectedString name="Source"><![CDATA[--[[
 	UI – kleine Helfer, um Oberflächen per Code zu bauen.
 	Farben und Schriften des Spiels sind hier festgelegt.
 ]]
@@ -7984,8 +9893,8 @@ end
 
 return UI
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000022"><Properties><string name="Name">WorldFx</string><ProtectedString name="Source"><![CDATA[--[[
-	WORLDFX – Licht, Nebel und Musik passend zur Welt,
+<Item class="ModuleScript" referent="RBX00000028"><Properties><string name="Name">WorldFx</string><ProtectedString name="Source"><![CDATA[--[[
+	WORLDFX – Licht, Atmosphäre, Wolken, Bloom und Musik passend zur Welt,
 	und versteckt den eigenen "Mog Battle"-Knopf am eigenen Körper.
 ]]
 
@@ -8001,16 +9910,79 @@ local WorldFx = {}
 local player = Players.LocalPlayer
 local lastWorld = nil
 
+-- Nachbearbeitung für eine realistischere Optik (wie in großen Roblox-Spielen)
+local fx = {}
+local function ensure(className, parent, name)
+	local inst = parent:FindFirstChild(name)
+	if not inst then
+		local ok, created = pcall(function()
+			local i = Instance.new(className)
+			i.Name = name
+			i.Parent = parent
+			return i
+		end)
+		if ok then inst = created end
+	end
+	return inst
+end
+
+local function setupPost()
+	fx.atmo = ensure("Atmosphere", Lighting, "LMX_Atmosphere")
+	fx.bloom = ensure("BloomEffect", Lighting, "LMX_Bloom")
+	fx.cc = ensure("ColorCorrectionEffect", Lighting, "LMX_Color")
+	fx.rays = ensure("SunRaysEffect", Lighting, "LMX_SunRays")
+	fx.depth = ensure("DepthOfFieldEffect", Lighting, "LMX_Depth")
+	fx.clouds = ensure("Clouds", workspace.Terrain, "LMX_Clouds")
+	pcall(function()
+		Lighting.Brightness = 2.6
+		Lighting.EnvironmentDiffuseScale = 1
+		Lighting.EnvironmentSpecularScale = 1
+		Lighting.ShadowSoftness = 0.25
+		fx.bloom.Intensity = 0.7
+		fx.bloom.Size = 28
+		fx.bloom.Threshold = 1.4
+		fx.rays.Intensity = 0.07
+		fx.rays.Spread = 0.6
+		fx.depth.FarIntensity = 0.12
+		fx.depth.FocusDistance = 60
+		fx.depth.InFocusRadius = 80
+		fx.depth.NearIntensity = 0
+	end)
+end
+
 local function apply(index)
 	if index == lastWorld then return end
 	lastWorld = index
 	local w = Config.Worlds[index]
 	if not w then return end
 	local L = w.light
+	local night = L.ClockTime < 6 or L.ClockTime > 19
 	TweenService:Create(Lighting, TweenInfo.new(1.5), {
-		ClockTime = L.ClockTime, Ambient = L.Ambient, OutdoorAmbient = L.Ambient,
+		ClockTime = L.ClockTime, Ambient = L.Ambient, OutdoorAmbient = L.Ambient:Lerp(Color3.new(1, 1, 1), 0.15),
 		FogColor = L.Fog, FogEnd = L.FogEnd,
 	}):Play()
+	pcall(function()
+		local info = TweenInfo.new(1.5)
+		if fx.atmo then
+			TweenService:Create(fx.atmo, info, {
+				Density = night and 0.42 or 0.3, Offset = 0.15, Haze = night and 2.2 or 1.4, Glare = night and 0 or 0.6,
+				Color = L.Fog, Decay = L.Fog:Lerp(Color3.new(0, 0, 0), 0.45),
+			}):Play()
+		end
+		if fx.cc then
+			TweenService:Create(fx.cc, info, {
+				Saturation = 0.15, Contrast = 0.1, Brightness = night and 0.02 or 0,
+				TintColor = Color3.new(1, 1, 1):Lerp(L.Fog, 0.12),
+			}):Play()
+		end
+		if fx.bloom then fx.bloom.Threshold = night and 1.1 or 1.4 end
+		if fx.clouds then
+			fx.clouds.Enabled = index ~= #Config.Worlds   -- im Weltall keine Wolken
+			fx.clouds.Cover = night and 0.45 or 0.62
+			fx.clouds.Density = 0.55
+			fx.clouds.Color = night and L.Fog or Color3.new(1, 1, 1)
+		end
+	end)
 	Sounds.setWorld(index)
 end
 
@@ -8025,6 +9997,7 @@ local function hideOwnPrompt(char)
 end
 
 function WorldFx.init()
+	setupPost()
 	apply(player:GetAttribute("World") or 1)
 	player:GetAttributeChangedSignal("World"):Connect(function()
 		apply(player:GetAttribute("World") or 1)

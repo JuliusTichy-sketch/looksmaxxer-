@@ -428,4 +428,72 @@ function Effects.jobGame(job, onFinish)
 end
 
 
+----------------------------------------------------------------------------
+-- Gym-Minispiel: 8 Wiederholungen im Takt (Hantel im grünen Bereich stemmen)
+----------------------------------------------------------------------------
+function Effects.gymGame(onFinish)
+	local RunService = game:GetService("RunService")
+	local o = overlay()
+	local p = UI.panel(o, { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0.5, 0, 0.6, 0), Color = UI.C.bg })
+	UI.new("UISizeConstraint", { MinSize = Vector2.new(320, 320), MaxSize = Vector2.new(560, 480), Parent = p })
+	UI.stroke(p, UI.C.orange, 3, 0)
+	UI.padding(p, 14)
+	UI.text(p, "<b>🏋️ BANKDRÜCKEN</b>", { Size = UDim2.new(1, 0, 0.11, 0), MaxText = 26 })
+	UI.text(p, "Tippe, wenn die Hantel im <font color='" .. UI.hex(UI.C.green) .. "'>grünen</font> Bereich ist. 8 Wiederholungen – ab 4 Treffern gibt's den GYM-PUMP (+50 % Aura)!",
+		{ Size = UDim2.new(1, 0, 0.13, 0), Position = UDim2.new(0, 0, 0.11, 0), Font = Enum.Font.GothamBold, Color = UI.C.muted, MaxText = 14 })
+	-- senkrechte Leiste
+	local bar = UI.panel(p, { AnchorPoint = Vector2.new(0.5, 0), Size = UDim2.new(0.16, 0, 0.42, 0), Position = UDim2.new(0.3, 0, 0.26, 0), Color = UI.C.panel2, Radius = 10 })
+	bar.ClipsDescendants = true
+	local zone = UI.new("Frame", { BackgroundColor3 = UI.C.green, BackgroundTransparency = 0.25, BorderSizePixel = 0, Size = UDim2.new(1, 0, 0.22, 0), Parent = bar })
+	local weight = UI.text(bar, "🏋️", { AnchorPoint = Vector2.new(0.5, 0.5), Size = UDim2.new(1.4, 0, 0.18, 0), MaxText = 40 })
+	local counter = UI.text(p, "0 / 8", { Size = UDim2.new(0.45, 0, 0.16, 0), Position = UDim2.new(0.5, 0, 0.3, 0), Color = UI.C.gold, MaxText = 44 })
+	local feedback = UI.text(p, "", { Size = UDim2.new(0.45, 0, 0.12, 0), Position = UDim2.new(0.5, 0, 0.48, 0), MaxText = 24 })
+	local reps, hits = 0, 0
+	local pos, dir, speed = 0, 1, 0.8
+	local zoneStart = 0.39
+	local function newZone()
+		zoneStart = 0.08 + math.random() * 0.62
+		zone.Position = UDim2.new(0, 0, zoneStart, 0)
+	end
+	newZone()
+	local conn = RunService.RenderStepped:Connect(function(dt)
+		pos = pos + dir * speed * dt
+		if pos > 1 then pos = 1; dir = -1 end
+		if pos < 0 then pos = 0; dir = 1 end
+		weight.Position = UDim2.new(0.5, 0, pos, 0)
+	end)
+	local done = false
+	local btn
+	btn = UI.button(p, "💪 DRÜCKEN!", UI.C.orange, function()
+		if done then return end
+		reps = reps + 1
+		if pos >= zoneStart - 0.02 and pos <= zoneStart + 0.24 then
+			hits = hits + 1
+			feedback.Text = "✅ Sauber!"
+			feedback.TextColor3 = UI.C.green
+		else
+			feedback.Text = "❌ Daneben"
+			feedback.TextColor3 = UI.C.red
+		end
+		counter.Text = hits .. " / 8"
+		Sounds.play("Click")
+		speed = speed + 0.12
+		if reps < 8 then
+			newZone()
+			return
+		end
+		done = true
+		conn:Disconnect()
+		btn.Text = hits >= 4 and "🔥 PUMP!" or "😮‍💨 Geschafft"
+		onFinish(hits)
+		task.delay(1.2, function() o:Destroy() end)
+	end, { Size = UDim2.new(1, 0, 0.17, 0), Position = UDim2.new(0, 0, 0.72, 0), TextColor = UI.C.dark, MaxText = 30 })
+	UI.button(p, "Abbrechen", UI.C.grey, function()
+		done = true
+		conn:Disconnect()
+		o:Destroy()
+	end, { Size = UDim2.new(0.4, 0, 0.08, 0), Position = UDim2.new(0.3, 0, 0.92, 0), MaxText = 14 })
+end
+
+
 return Effects

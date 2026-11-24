@@ -21,7 +21,8 @@
    (Ohne Veröffentlichung kann Roblox keine Spielstände speichern.)
 2. **Speichern in Studio erlauben:** Home → **Game Settings → Security** → **„Enable Studio Access to API Services“** einschalten → Save.
 3. **Avatar-Typ R15:** Game Settings → **Avatar** → Avatar Type **R15** (sonst werden die Schultern beim Fitness-Training nicht breiter).
-4. **100 Spieler pro Server:** Das stellst du im **Creator Hub** (create.roblox.com) ein: deine Experience → **Places** → Platz anklicken → bei der **Server-Größe / Max Players** 100 eintragen.
+4. **Realistische Grafik:** Im Explorer **Lighting** anklicken → bei **Technology** „**Future**“ wählen (macht das Spiel meist schon automatisch – kurz prüfen schadet nicht).
+5. **100 Spieler pro Server:** Das stellst du im **Creator Hub** (create.roblox.com) ein: deine Experience → **Places** → Platz anklicken → bei der **Server-Größe / Max Players** 100 eintragen.
 
 ## 4. Testen
 - **Play** (F5): Du spawnst in Glow City. Probiere: Daily Routine klicken, Upgrades kaufen, 🎁 Geschenkbox öffnen (Taste **E**), Rivale/Boss herausfordern, Portal benutzen.
@@ -47,12 +48,20 @@ Die Kamera geht nicht durch Wände. Einstellungen dazu (Empfindlichkeit, Zoom-Gr
 | Mit Spieler handeln | **F** beim Spieler | Knopf „Handeln“ |
 | Waffe in die Hand nehmen | **1** | Waffe unten antippen |
 | Zuschlagen (Bosskampf) | Linksklick | Bildschirm antippen |
+| Aufs Fahrzeug steigen / absteigen | **V** | Knopf 🛹 rechts |
+| Emote abspielen | Knopf 🕺 rechts | Knopf 🕺 rechts |
 
 ### Neue Inhalte testen
 - **Bosskampf:** Waffe nehmen (Taste 1), zum Boss laufen (Podest hinter dem Spawn), klicken. Rote Kreise am Boden = schnell rauslaufen!
 - **Fans:** In jeder Welt laufen 6 Leute herum – hingehen, **E** halten, Spruch wählen.
 - **Jobs:** Menü 💼 → Job wählen → im richtigen Moment tippen.
 - **Aufträge & Erfolge:** Menü 📋.
+- **Robux-Shop (💎 rechts):** zeigt „Bald verfügbar“, bis du die IDs einträgst (siehe Abschnitt **💎 Geld verdienen** unten).
+- **Glücksrad (🎡 rechts):** 1x am Tag gratis drehen + Spielzeit-Geschenke nach 5/10/20/30/45/60 Minuten.
+- **Events (🎉 rechts):** Vom 20.11. bis 6.1. läuft automatisch das **Winter-Event**: Schneeflocken in allen Welten einsammeln, am Event-Platz in Glow City die Winter-Box öffnen und den Event-Boss besiegen. Außerdem Halloween (10.10.–7.11.) und Sommer (1.7.–20.8.). Jedes **Wochenende** gibt's automatisch x2 Aura & x2 Glück.
+  Zum Testen eines anderen Events: in `Shared › Config` bei `Config.EVENT_OVERRIDE = ""` z. B. `"halloween"` eintragen (danach wieder leeren!).
+- **Minispiele:** 🏃 Dach-Parkour (Turm in Glow City, Checkpoints, Belohnung alle 10 Min.), 🏁 Laufrennen in Welt 5 mit Stoppuhr, 🏋️ Gym in Welt 1 und 3 (8 Wiederholungen im Takt → Gym-Pump +50 % Aura).
+- **Ausrüstung (✨ rechts):** Auren, Spuren, Hüte (mit Boosts!), Emotes und Fahrzeuge kaufen & anziehen.
 - **Handel:** mit **2 Spielern** testen (Test → Clients and Servers → 2 Players), beim anderen Spieler **F** halten.
 
 ## 5. Sounds einbauen
@@ -94,12 +103,39 @@ Die Karte wird per Code gebaut (`Modules › MapBuilder`). Wenn du sie selbst be
 2. **Stop** → `Workspace` anklicken → **Strg+V**
 3. In `ServerScriptService › Main` die Zeile `MapBuilder.build()` lassen, aber in **MapBuilder** die Welt-Bauten nicht doppelt erzeugen – sag mir Bescheid, dann baue ich dir dafür einen Schalter ein.
 
+## 💎 Geld verdienen (Robux) – so richtest du es ein
+Das Spiel hat einen fertigen Shop wie bei Pet Simulator, Blox Fruits & Co. Du musst nur noch die Produkte bei Roblox anlegen und die Nummern (IDs) eintragen.
+Das geht erst, **nachdem** das Spiel veröffentlicht ist.
+
+**A) Gamepasses** (einmal kaufen, für immer – VIP, x2 Aura, Glückspilz, +3 Pet-Plätze, 3er-Öffnen, Turbo-Laufen)
+1. create.roblox.com → **Creations** → dein Spiel → links **Monetization → Passes** → **Create a Pass**.
+2. Name + Bild hochladen (z. B. „VIP“) → Create.
+3. Den Pass anklicken → **Sales** → „Item for Sale“ einschalten → Preis eintragen (Vorschlag steht in `Config.GamePasses` bei `robux`) → Save.
+4. Die **ID** kopieren (steht in der Adresse/Webseite des Passes, eine lange Zahl).
+5. In Studio: `ReplicatedStorage › Shared › Config` → `Config.GamePasses` → beim passenden Eintrag `id = 0` durch die Zahl ersetzen, z. B. `id = 123456789`.
+
+**B) Entwickler-Produkte** (mehrfach kaufbar – Gems-Pakete, Starter-Paket, Aura-Paket)
+1. Gleiche Seite → **Monetization → Developer Products** → **Create a Developer Product**.
+2. Name, Bild und Preis eintragen → Save → **ID** kopieren.
+3. In `Config.DevProducts` bei `id = 0` eintragen.
+
+Danach neu veröffentlichen (**File → Publish to Roblox**). Im Shop steht dann statt „Bald verfügbar“ der Preis.
+**Wichtig:** Käufe kannst du in Studio testen – Roblox zieht dabei **keine echten Robux** ab. Glücksrad & Boxen sind absichtlich **nicht** für Robux kaufbar (Roblox-Regeln für Zufallsbelohnungen); Gems gibt es auch kostenlos über Rad, Geschenke und Events, damit das Spiel fair bleibt.
+
 ## 8. Für alle veröffentlichen
 1. Creator Hub → deine Experience → **Questionnaire** (Fragebogen zur Altersfreigabe) ausfüllen.
 2. Beschreibung, Icon und Thumbnails hochladen.
 3. Bei **Privacy/Zugriff** auf **Public** stellen.
 
 ## Was ist drin?
+- 💎 **Robux-Shop:** 6 Gamepasses + 6 Entwickler-Produkte, Gems als zweite Währung, VIP-Namensschild in Gold
+- 🎉 **Events:** Winter, Halloween & Sommer mit eigenen Sammel-Items, Event-Box (5 exklusive Pets) und Event-Boss; Wochenend-Boost x2
+- 🎡 **Glücksrad** (täglich gratis) + 🎁 **Spielzeit-Geschenke**
+- 🏃 **Minispiele:** Dach-Parkour, Laufrennen mit Stoppuhr, Gym-Rhythmus
+- 🛹 **5 Fahrzeuge** (Skateboard, E-Scooter, Sportwagen, Hoverboard, Gold-Sportwagen) – Taste V
+- ✨ **Kosmetik:** 6 Auren, 5 Spuren, 7 Hüte mit Boosts, 5 Emotes (inkl. Mewing-Pose)
+- 🧍 **Noch stärkere Verwandlung:** Bierbauch → Bizeps → Brustmuskeln → Sixpack, Opa-Brille, kantiges Kinn, leuchtende Augen, Größe wächst mit, Lichtschein, goldener Ring und kosmische Partikel bei hohen Titeln
+- 🌅 **Realistischere Grafik:** Terrain-Wasser, Felsberge mit Schneekappen, Gras/Sand, Asphaltstraßen mit Gehwegen, Atmosphäre, Wolken, Bloom, Sonnenstrahlen, Farbkorrektur
 - 🧟➡️😎 Dein Avatar startet hässlich (Pickel, kränkliche Haut, struppige Haare, Buckel, Augenringe, Ketchup-Fleck, Mundgeruch, Schweißtropfen) und wird mit den Upgrades **langsam** zum Gigachad (glänzende Haut, goldene Strähne, Krone, breite Schultern, Uhr, Goldkette, Sonnenbrille, Umhang, Sterne)
 - 🐾 105 echte 3D-Pets (13 pro Welt + 1 geheimes), 9 Seltenheiten inkl. **Exotisch** und **Göttlich**, 3D-Vorschau in allen Menüs
 - 🎁 5 Pet-Stationen pro Welt (Basis → Silber → Gold → Diamant → Göttlich): teurer = bessere Chancen

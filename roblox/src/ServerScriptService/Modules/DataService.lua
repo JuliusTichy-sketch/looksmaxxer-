@@ -50,6 +50,16 @@ local function defaultData()
 		jobCd = {},                  -- [jobId] = Ende der Pause (os.time)
 		weapons = { zahnbuerste = 1 }, -- [waffeId] = Stufe
 		weapon = "zahnbuerste",      -- ausgerüstete Waffe
+		gems = 0,                    -- Premium-Währung (Robux-Shop, Glücksrad, Events)
+		passes = {},                 -- gekaufte Gamepasses
+		purchases = {},              -- verarbeitete Robux-Käufe (gegen doppeltes Gutschreiben)
+		starterPack = false,
+		eventTokens = {},            -- [eventId] = Anzahl Event-Münzen
+		wheel = { last = 0, spins = 0 },
+		vehicles = {},               -- [fahrzeugId] = true
+		vehicle = "",                -- ausgewähltes Fahrzeug
+		cosmetics = { owned = {}, aura = "", trail = "", hat = "" },
+		records = { obbyLast = 0, raceBest = 0, gymLast = 0 },
 	}
 end
 DataService.defaultData = defaultData

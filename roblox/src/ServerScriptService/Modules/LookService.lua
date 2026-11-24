@@ -102,7 +102,7 @@ function LookService.apply(player, char, data)
 
 	-- 1) SKINCARE: Hautfarbe & Pickel & Glanz
 	if player:HasAppearanceLoaded() then
-		local tint = 0.55 * (1 - math.min(1, skin / 40))
+		local tint = 0.7 * (1 - math.min(1, skin / 40))
 		for _, p in ipairs(char:GetChildren()) do
 			if p:IsA("BasePart") and p.Name ~= "HumanoidRootPart" then
 				local orig = p:GetAttribute("OrigColor")
@@ -222,6 +222,100 @@ function LookService.apply(player, char, data)
 		local stars = attach(folder, head, Vector3.new(0.2, 0.2, 0.2), CFrame.new(0, hs.Y * 0.8, 0), Color3.new(1, 1, 1), { transparency = 1 })
 		emitter(stars, Color3.fromRGB(255, 220, 80), math.min(6, conf / 40), { speed = NumberRange.new(1, 2), light = 1,
 			size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.3), NumberSequenceKeypoint.new(1, 0) }) })
+	end
+	------------------------------------------------------------------
+	-- NOCH MEHR VERÄNDERUNG
+	------------------------------------------------------------------
+	-- Größe: geduckt & klein → groß & aufrecht
+	pcall(function()
+		local hsv = hum:FindFirstChild("BodyHeightScale")
+		if hsv then hsv.Value = 0.9 + math.min(0.15, posture / 250 * 0.15) + math.min(0.05, fit / 250 * 0.05) end
+	end)
+
+	-- Bierbauch (verschwindet mit Fitness bis Stufe 40)
+	if fit < 40 then
+		local depth = 0.25 + 0.9 * (1 - fit / 40)
+		attach(folder, torso, Vector3.new(torso.Size.X * 0.85, torso.Size.Y * 0.6, depth), CFrame.new(0, -torso.Size.Y * 0.22, -torso.Size.Z / 2 - depth * 0.25),
+			torso.Color, { ball = true, name = "Bauch" })
+	end
+
+	-- Muskeln: Bizeps (ab 60), Brust (ab 120), Sixpack (ab 180)
+	if fit >= 60 then
+		local m = math.clamp((fit - 60) / 140, 0, 1)
+		for _, armName in ipairs({ "LeftUpperArm", "RightUpperArm", "Left Arm", "Right Arm" }) do
+			local arm = char:FindFirstChild(armName)
+			if arm then
+				local big = 0.3 + 0.4 * m
+				attach(folder, arm, Vector3.new(arm.Size.X * 0.95, arm.Size.Y * 0.5, big), CFrame.new(0, arm.Size.Y * 0.08, -arm.Size.Z / 2 - big * 0.15),
+					arm.Color, { ball = true, name = "Bizeps" })
+			end
+		end
+	end
+	if fit >= 120 then
+		local m2 = math.clamp((fit - 120) / 130, 0, 1)
+		for _, sx in ipairs({ -1, 1 }) do
+			attach(folder, torso, Vector3.new(torso.Size.X * 0.45, torso.Size.Y * 0.3, 0.3 + 0.25 * m2), CFrame.new(sx * torso.Size.X * 0.22, torso.Size.Y * 0.2, -torso.Size.Z / 2),
+				torso.Color, { ball = true, name = "Brust" })
+		end
+	end
+	if fit >= 180 then
+		local absColor = torso.Color:Lerp(Color3.new(0, 0, 0), 0.12)
+		for row = 0, 2 do
+			for _, sx in ipairs({ -1, 1 }) do
+				attach(folder, torso, Vector3.new(torso.Size.X * 0.2, torso.Size.Y * 0.13, 0.18),
+					CFrame.new(sx * torso.Size.X * 0.12, -torso.Size.Y * 0.05 - row * torso.Size.Y * 0.15, -torso.Size.Z / 2 - 0.02), absColor, { ball = true, name = "Sixpack" })
+			end
+		end
+	end
+
+	-- Opa-Brille (bis Style 15)
+	if style < 15 then
+		for _, sx in ipairs({ -1, 1 }) do
+			attach(folder, head, Vector3.new(0.06, hs.X * 0.34, hs.X * 0.34), CFrame.new(sx * hs.X * 0.2, hs.Y * 0.06, front - 0.03) * CFrame.Angles(0, math.rad(90), 0),
+				BLACK, { name = "Brille" })
+			attach(folder, head, Vector3.new(0.03, hs.X * 0.27, hs.X * 0.27), CFrame.new(sx * hs.X * 0.2, hs.Y * 0.06, front - 0.07) * CFrame.Angles(0, math.rad(90), 0),
+				Color3.fromRGB(200, 230, 255), { transparency = 0.5, name = "Brillenglas" })
+		end
+		attach(folder, head, Vector3.new(hs.X * 0.12, 0.05, 0.05), CFrame.new(0, hs.Y * 0.08, front - 0.03), BLACK, { name = "Brille" })
+	end
+
+	-- Kantiges Kinn (ab Haltung 100)
+	if posture >= 100 then
+		local k = math.clamp((posture - 100) / 150, 0, 1)
+		attach(folder, head, Vector3.new(hs.X * (0.55 + 0.15 * k), hs.Y * 0.18, hs.Z * 0.4), CFrame.new(0, -hs.Y / 2 + 0.06, -hs.Z * 0.22), head.Color, { name = "Kinn" })
+	end
+
+	-- Leuchtende Augen (ab Selbstbewusstsein 200)
+	if conf >= 200 then
+		for _, sx in ipairs({ -1, 1 }) do
+			attach(folder, head, Vector3.new(0.14, 0.1, 0.06), CFrame.new(sx * hs.X * 0.18, hs.Y * 0.08, front - 0.02), Color3.fromRGB(80, 240, 255),
+				{ material = Enum.Material.Neon, ball = true, name = "Augenleuchten" })
+		end
+	end
+
+	-- Titel-Effekte: Scheinwerfer (Main Character), goldener Ring (Gigachad), kosmische Teilchen (Kosmisches Glow-Wesen)
+	local hrp = char:FindFirstChild("HumanoidRootPart")
+	local titleIdx = Logic.titleIndex(Logic.baseGlow(data.levels))
+	if hrp and titleIdx >= 6 then
+		local lamp = attach(folder, hrp, Vector3.new(0.3, 0.3, 0.3), CFrame.new(0, 9, 0), Color3.new(1, 1, 1), { transparency = 1, name = "Scheinwerfer" })
+		local spot = Instance.new("SpotLight")
+		spot.Face = Enum.NormalId.Bottom
+		spot.Angle = 50
+		spot.Range = 16
+		spot.Brightness = 2.5
+		spot.Color = Color3.fromRGB(255, 245, 220)
+		spot.Parent = lamp
+	end
+	if hrp and titleIdx >= 10 then
+		local footY = -(hrp.Size.Y / 2 + hum.HipHeight) + 0.15
+		local ring = attach(folder, hrp, Vector3.new(0.1, 6, 6), CFrame.new(0, footY, 0) * CFrame.Angles(0, 0, math.rad(90)), GOLD,
+			{ material = Enum.Material.Neon, transparency = 0.55, name = "Gigachad-Ring" })
+		ring.Shape = Enum.PartType.Cylinder
+	end
+	if hrp and titleIdx >= 12 then
+		local cosmic = attach(folder, hrp, Vector3.new(3, 5, 2), CFrame.new(0, 0, 0), Color3.new(1, 1, 1), { transparency = 1, name = "Kosmos" })
+		emitter(cosmic, Color3.fromRGB(180, 110, 255), 12, { speed = NumberRange.new(0.5, 2), light = 1,
+			size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.4), NumberSequenceKeypoint.new(1, 0) }) })
 	end
 end
 

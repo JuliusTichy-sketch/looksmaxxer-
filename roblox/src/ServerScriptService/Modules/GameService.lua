@@ -14,6 +14,7 @@ local Util = require(Shared:WaitForChild("Util"))
 local Remotes = require(script.Parent.Remotes)
 local DataService = require(script.Parent.DataService)
 local LookService = require(script.Parent.LookService)
+local StyleLook = require(script.Parent.StyleLook)
 
 local GameService = {}
 GameService.characterHooks = {}   -- andere Module können sich hier für "Charakter erschienen" eintragen
@@ -85,7 +86,7 @@ function GameService.sendLight(player)
 	local now = os.time()
 	local w = GameService.currentWorld(player)
 	Remotes.Data:FireClient(player, "light", {
-		aura = data.aura, cash = data.cash, totalAura = data.totalAura,
+		aura = data.aura, cash = data.cash, totalAura = data.totalAura, gems = data.gems,
 		aps = Logic.aps(data, w, now), click = Logic.clickValue(data, w, now),
 		mult = Logic.multiplier(data, w, now), world = w, serverTime = now,
 	})
@@ -160,17 +161,24 @@ function GameService.refreshCharacter(player)
 
 	local glow = Logic.baseGlow(data.levels)
 	hum.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
-	hum.WalkSpeed = 16 + 2 * Logic.perkLevel(data, "speed")
+	hum.WalkSpeed = Logic.walkSpeed(data, player:GetAttribute("Riding") == true)
+	local vehicle = Logic.vehicleById[data.vehicle or ""]
+	hum.UseJumpPower = true
+	hum.JumpPower = 50 + ((player:GetAttribute("Riding") and vehicle) and vehicle.jump or 0)
 
 	-- Namensschild mit Titel
 	local tag = ensureNametag(head)
-	tag.TitleLabel.Text = Config.Titles[Logic.titleIndex(glow)].title
+	tag.TitleLabel.Text = (Logic.hasPass(data, "vip") and "👑 VIP · " or "") .. Config.Titles[Logic.titleIndex(glow)].title
+	tag.TitleLabel.TextColor3 = Logic.hasPass(data, "vip") and Color3.fromRGB(255, 209, 102) or Color3.fromRGB(255, 120, 220)
 	tag.NameLabel.Text = player.DisplayName
 	tag.InfoLabel.Text = "✨ " .. Util.format(glow) .. " Glow  ·  ♻️ " .. data.rebirths
 
 	-- Aussehen verändert sich mit den Upgrades (Pickel, Haare, Haltung, Schultern, Style …)
 	local ok, err = pcall(LookService.apply, player, char, data)
 	if not ok then warn("[Looksmaxxer] LookService:", err) end
+	-- Ausrüstung: Aura, Spur, Hut, Fahrzeug
+	local ok2, err2 = pcall(StyleLook.apply, player, char, data, player:GetAttribute("Riding") == true)
+	if not ok2 then warn("[Looksmaxxer] StyleLook:", err2) end
 
 	-- Glitzer-Aura (stärker mit Glow, Farbe wechselt mit Rebirths)
 	local aura = hrp:FindFirstChild("GlowAura")

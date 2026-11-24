@@ -30,6 +30,7 @@ function State.setLight(l)
 	if not s then return end
 	s.data.aura = l.aura
 	s.data.cash = l.cash
+	s.data.gems = l.gems or s.data.gems
 	s.data.totalAura = l.totalAura
 	s.aps = l.aps
 	s.click = l.click

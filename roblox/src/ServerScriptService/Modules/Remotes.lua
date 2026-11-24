@@ -21,6 +21,8 @@ local EVENTS = {
 	"TradeRequest",   -- jemand will mit dir handeln
 	"TradeUpdate",    -- aktueller Stand des Handels
 	"TradeClosed",    -- Handel beendet
+	"WheelResult",    -- Ergebnis des Glücksrads
+	"GymStart",       -- Gym-Minispiel starten
 	-- Spieler -> Server
 	"Click", "BuyUpgrade", "Rebirth", "BuyPerk",
 	"EquipPet", "EquipBest", "FusePet", "DeletePet", "HatchEgg",
@@ -32,6 +34,9 @@ local EVENTS = {
 	"FanChoice",
 	"BuyWeapon", "UpgradeWeapon", "EquipWeapon",
 	"TradeRespond", "TradeOffer", "TradeReady", "TradeConfirm", "TradeCancel",
+	"SpinWheel", "ClaimPlaytime",
+	"BuyItem", "EquipItem", "ToggleRide",
+	"GymFinish",
 }
 
 -- Erst alle Leitungen anlegen, dann den Ordner sichtbar machen

@@ -58,7 +58,7 @@ Remotes.FinishJob.OnServerEvent:Connect(function(player, id, scores)
 	end
 	local perf = total / 3
 	if perfect == 3 then perf = perf * 1.25 end
-	local earned = math.max(1, math.floor(Logic.jobPay(data, job) * perf))
+	local earned = math.max(1, math.floor(Logic.jobPay(data, job) * perf * Logic.cashMult(data)))
 	data.cash = data.cash + earned
 	data.jobCd[id] = os.time() + job.cd
 	GameService.track(player, "jobs", 1)

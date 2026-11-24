@@ -460,9 +460,10 @@ Config.MogLose = {
 -- TRÄNKE (kosten Geld)
 ----------------------------------------------------------------------------
 Config.Potions = {
-	{ id = "aura2",  emoji = "🧪", name = "Aura-Trank",  desc = "Doppelte Aura für 10 Minuten.",                 price = 300, duration = 600, aura = 2 },
-	{ id = "luck2",  emoji = "🍀", name = "Glücks-Trank", desc = "Doppeltes Glück beim Öffnen für 10 Minuten.",  price = 500, duration = 600, luck = 2 },
+	{ id = "aura2",  emoji = "🧪", name = "Aura-Trank",  desc = "Doppelte Aura für 10 Minuten.",                 gems = 20, price = 300, duration = 600, aura = 2 },
+	{ id = "luck2",  emoji = "🍀", name = "Glücks-Trank", desc = "Doppeltes Glück beim Öffnen für 10 Minuten.",  gems = 30, price = 500, duration = 600, luck = 2 },
 	{ id = "click3", emoji = "🥤", name = "Klick-Shake", desc = "Dreifacher Klick-Wert für 5 Minuten.",          price = 150, duration = 300, click = 3 },
+	{ id = "pump",   emoji = "💪", name = "Gym-Pump",    desc = "+50 % Aura für 3 Minuten (aus dem Gym-Training).", price = 0, duration = 180, aura = 1.5, hidden = true },
 }
 
 ----------------------------------------------------------------------------
@@ -636,5 +637,170 @@ Config.BOSS_HIT_PERCENT = 0.35        -- ein Treffer kostet 35 % deines Selbstbe
 ----------------------------------------------------------------------------
 Config.TRADE_MAX_PETS = 8
 Config.TRADE_COOLDOWN = 15
+
+----------------------------------------------------------------------------
+-- 🎉 EVENTS (laufen automatisch nach Kalender, Zeitzone UTC)
+-- from/to = { Monat, Tag }. Zum Testen: Config.EVENT_OVERRIDE = "halloween" usw.
+----------------------------------------------------------------------------
+Config.EVENT_OVERRIDE = ""
+Config.EVENT_EGG_COST = 25          -- Event-Box kostet 25 Event-Münzen
+Config.EVENT_ITEMS_PER_WORLD = 6    -- so viele Sammelobjekte liegen gleichzeitig in jeder Welt
+Config.WEEKEND_BOOST = { aura = 2, luck = 2 }   -- Samstag & Sonntag automatisch
+
+local EC = Color3.fromRGB
+Config.Events = {
+	{ id = "winter", name = "Winter-Glow", emoji = "❄️", from = { 11, 20 }, to = { 1, 6 }, color = EC(140, 220, 255),
+	  token = "Schneeflocken", tokenEmoji = "❄️",
+	  boss = { name = "Frost-Chad", level = 30, rebirths = 6, hp = 2e6, shirt = EC(200, 230, 255), pants = EC(80, 120, 200), skin = EC(220, 235, 255), scale = 1.5 },
+	  pets = {
+		{ "Schneemann-Mops", "⛄", "rare", { plan = "quad", c1 = EC(250, 250, 255), c2 = EC(255, 140, 40), ears = "floppy", tail = "curl" } },
+		{ "Rentier-Chad", "🦌", "epic", { plan = "quad", c1 = EC(150, 100, 60), c2 = EC(230, 40, 40), ears = "pointy", tail = "short", horns = true, shades = true } },
+		{ "Pinguin-Elf", "🐧", "legendary", { plan = "bird", style = "penguin", c1 = EC(40, 150, 60), c2 = EC(230, 40, 40) } },
+		{ "Eis-Yeti", "🧊", "mythic", { plan = "quad", c1 = EC(190, 235, 255), c2 = EC(255, 255, 255), ears = "round", tail = "fluffy", mane = true, glass = true } },
+		{ "Weihnachts-Drache", "🎄", "divine", { plan = "dragon", c1 = EC(220, 30, 40), c2 = EC(255, 215, 90), neon = true, halo = true } },
+	  } },
+	{ id = "halloween", name = "Halloween-Glow", emoji = "🎃", from = { 10, 10 }, to = { 11, 7 }, color = EC(255, 140, 30),
+	  token = "Kürbisse", tokenEmoji = "🎃",
+	  boss = { name = "Kürbis-König", level = 30, rebirths = 6, hp = 2e6, shirt = EC(255, 130, 20), pants = EC(30, 20, 30), skin = EC(120, 200, 80), scale = 1.5 },
+	  pets = {
+		{ "Kürbis-Katze", "🎃", "rare", { plan = "quad", c1 = EC(255, 140, 30), c2 = EC(30, 25, 30), ears = "pointy", tail = "long" } },
+		{ "Fledermaus-Bro", "🦇", "epic", { plan = "bird", style = "eagle", c1 = EC(40, 30, 50), c2 = EC(150, 60, 200) } },
+		{ "Geister-Moai", "👻", "legendary", { plan = "ghost", c1 = EC(230, 240, 255), c2 = EC(120, 255, 150) } },
+		{ "Vampir-Wolf", "🧛", "mythic", { plan = "quad", c1 = EC(60, 20, 30), c2 = EC(200, 20, 40), ears = "pointy", tail = "long" } },
+		{ "Skelett-Drache", "💀", "divine", { plan = "dragon", c1 = EC(245, 245, 235), c2 = EC(120, 255, 120), glass = true, halo = true } },
+	  } },
+	{ id = "summer", name = "Sommer-Glow", emoji = "☀️", from = { 7, 1 }, to = { 8, 20 }, color = EC(255, 210, 60),
+	  token = "Kokosnüsse", tokenEmoji = "🥥",
+	  boss = { name = "Sonnenbrand-Brad", level = 30, rebirths = 6, hp = 2e6, shirt = EC(255, 90, 60), pants = EC(60, 160, 220), skin = EC(255, 150, 120), scale = 1.5 },
+	  pets = {
+		{ "Kokos-Krabbe", "🦀", "rare", { plan = "crab", c1 = EC(150, 100, 60), c2 = EC(255, 240, 220) } },
+		{ "Surf-Delfin", "🏄", "epic", { plan = "sea", style = "dolphin", c1 = EC(60, 200, 230), c2 = EC(255, 255, 255), shades = true } },
+		{ "Sonnen-Flamingo", "🦩", "legendary", { plan = "bird", style = "longleg", c1 = EC(255, 200, 60), c2 = EC(255, 120, 160), gold = true } },
+		{ "Strand-Gott-Hai", "🦈", "mythic", { plan = "sea", style = "shark", c1 = EC(255, 180, 80), c2 = EC(255, 255, 255) } },
+		{ "Sonnen-Phönix", "🌞", "divine", { plan = "bird", style = "phoenix", c1 = EC(255, 200, 40), c2 = EC(255, 90, 40), neon = true, halo = true } },
+	  } },
+}
+-- Event-Pets & Event-Boxen erzeugen (Stärke wie Pets aus Welt 4)
+Config.EVENT_WEIGHTS = { rare = 60, epic = 28, legendary = 9, mythic = 2.6, divine = 0.4 }
+for _, ev in ipairs(Config.Events) do
+	local egg = { index = #Config.Eggs + 1, world = 1, station = 0, event = ev.id, name = ev.name .. "-Box", emoji = ev.emoji,
+		cost = Config.EVENT_EGG_COST, pets = {} }
+	local counts = {}
+	for _, p in ipairs(ev.pets) do counts[p[3]] = (counts[p[3]] or 0) + 1 end
+	for i, p in ipairs(ev.pets) do
+		local pet = { id = "ev_" .. ev.id .. "_" .. i, name = p[1], emoji = p[2], rarity = p[3], world = 4, event = ev.id, look = p[4],
+			boost = Config.PET_BASE_BOOST * Config.PET_WORLD_GROWTH ^ 3 * Config.Rarities[p[3]].mult }
+		table.insert(Config.Pets, pet)
+		table.insert(egg.pets, { id = pet.id, weight = Config.EVENT_WEIGHTS[p[3]] / counts[p[3]] })
+	end
+	ev.eggIndex = egg.index
+	table.insert(Config.Eggs, egg)
+end
+
+----------------------------------------------------------------------------
+-- 🎡 GLÜCKSRAD & SPIELZEIT-GESCHENKE
+-- Glücksrad: 1x pro Tag gratis (+ Drehungen aus Spielzeit-Geschenken). Kein Robux-Kauf (Roblox-Regeln für Zufall).
+----------------------------------------------------------------------------
+Config.WHEEL_COOLDOWN = 20 * 3600
+Config.Wheel = {
+	{ label = "💵 Geld",          weight = 25, color = EC(124, 252, 154), reward = { cash = 500, scale = true } },
+	{ label = "💵 Viel Geld",     weight = 12, color = EC(80, 200, 120),  reward = { cash = 2500, scale = true } },
+	{ label = "💎 10 Gems",       weight = 15, color = EC(120, 200, 255), reward = { gems = 10 } },
+	{ label = "💎 50 Gems",       weight = 4,  color = EC(60, 140, 255),  reward = { gems = 50 } },
+	{ label = "🧪 Aura-Trank",    weight = 14, color = EC(255, 120, 220), reward = { potion = "aura2" } },
+	{ label = "🍀 Glücks-Trank",  weight = 12, color = EC(120, 230, 120), reward = { potion = "luck2" } },
+	{ label = "🥈 Silber-Box",    weight = 12, color = EC(200, 205, 215), reward = { freeEgg = 2 } },
+	{ label = "🌈 Göttliche Box", weight = 1,  color = EC(255, 120, 240), reward = { freeEgg = 5 } },
+	{ label = "✨ 10 Min. Aura",  weight = 5,  color = EC(255, 209, 102), reward = { auraSeconds = 600 } },
+}
+Config.PlaytimeGifts = {
+	{ minutes = 5,  label = "💵 Geld",           reward = { cash = 300, scale = true } },
+	{ minutes = 10, label = "🎡 Glücksrad-Dreh", reward = { spins = 1 } },
+	{ minutes = 20, label = "🧪 Aura-Trank",     reward = { potion = "aura2" } },
+	{ minutes = 30, label = "💎 15 Gems",        reward = { gems = 15 } },
+	{ minutes = 45, label = "🥈 Silber-Box",     reward = { freeEgg = 2 } },
+	{ minutes = 60, label = "🎡 2 Drehungen",    reward = { spins = 2 } },
+}
+
+----------------------------------------------------------------------------
+-- 💎 ROBUX-SHOP
+-- Die IDs musst du im Creator Hub anlegen und hier eintragen (siehe ANLEITUNG.md).
+-- id = 0 → im Spiel steht "Bald verfügbar".
+----------------------------------------------------------------------------
+Config.GamePasses = {
+	{ key = "vip",      id = 0, emoji = "👑", name = "VIP",               robux = 299, desc = "+25 % Aura & Geld, goldenes VIP-Namensschild." },
+	{ key = "x2aura",   id = 0, emoji = "✨", name = "Doppelte Aura",     robux = 399, desc = "Für immer x2 Aura." },
+	{ key = "lucky",    id = 0, emoji = "🍀", name = "Glückspilz",        robux = 249, desc = "Für immer x2 Glück beim Box-Öffnen." },
+	{ key = "petslots", id = 0, emoji = "🐾", name = "+3 Pet-Plätze",     robux = 299, desc = "3 Pets mehr gleichzeitig ausrüsten." },
+	{ key = "triple",   id = 0, emoji = "🎁", name = "3er-Öffnen",        robux = 199, desc = "Öffne 3 Boxen auf einmal – sofort, ohne Rebirth-Shop." },
+	{ key = "speed",    id = 0, emoji = "⚡", name = "Turbo-Laufen",      robux = 99,  desc = "+8 Laufgeschwindigkeit für immer." },
+}
+Config.DevProducts = {
+	{ key = "gems100",  id = 0, emoji = "💎", name = "100 Gems",          robux = 49,  reward = { gems = 100 } },
+	{ key = "gems550",  id = 0, emoji = "💎", name = "550 Gems",          robux = 199, reward = { gems = 550 } },
+	{ key = "gems1200", id = 0, emoji = "💎", name = "1.200 Gems",        robux = 399, reward = { gems = 1200 } },
+	{ key = "gems3000", id = 0, emoji = "💎", name = "3.000 Gems",        robux = 899, reward = { gems = 3000 } },
+	{ key = "starter",  id = 0, emoji = "🎁", name = "Starter-Paket",     robux = 99,  once = true,
+	  reward = { gems = 150, cash = 2000, scale = true, potion = "aura2" }, desc = "Nur einmal kaufbar!" },
+	{ key = "aurapack", id = 0, emoji = "✨", name = "Aura-Paket",        robux = 79,  reward = { auraSeconds = 900 }, desc = "Sofort 15 Minuten deiner Aura/s." },
+}
+
+----------------------------------------------------------------------------
+-- 🛹 FAHRZEUGE (Taste V = aufsteigen/absteigen)
+-- currency = "cash" (Geld) oder "gems"
+----------------------------------------------------------------------------
+Config.Vehicles = {
+	{ id = "skateboard", emoji = "🛹", name = "Skateboard",        speed = 8,  jump = 0,  price = 2000,  currency = "cash", plan = "board" },
+	{ id = "scooter",    emoji = "🛴", name = "E-Scooter",         speed = 14, jump = 0,  price = 50000, currency = "cash", plan = "scooter" },
+	{ id = "sportwagen", emoji = "🏎️", name = "Sportwagen",        speed = 24, jump = 0,  price = 5e6,   currency = "cash", plan = "car" },
+	{ id = "hoverboard", emoji = "🛸", name = "Hoverboard",        speed = 30, jump = 20, price = 400,   currency = "gems", plan = "hover" },
+	{ id = "goldcar",    emoji = "🚗", name = "Gold-Sportwagen",   speed = 36, jump = 0,  price = 1500,  currency = "gems", plan = "car", gold = true },
+}
+
+----------------------------------------------------------------------------
+-- ✨ AUSRÜSTUNG: Auren, Spuren, Hüte (mit Boosts), Emotes
+----------------------------------------------------------------------------
+Config.Auras = {
+	{ id = "aura_pink",    emoji = "💖", name = "Pinke Glitzer-Aura", price = 1000,  currency = "cash", style = "sparkle", color = EC(255, 120, 220) },
+	{ id = "aura_fire",    emoji = "🔥", name = "Feuer-Aura",         price = 25000, currency = "cash", style = "fire",    color = EC(255, 120, 30) },
+	{ id = "aura_ice",     emoji = "❄️", name = "Eis-Aura",           price = 250000, currency = "cash", style = "sparkle", color = EC(140, 220, 255) },
+	{ id = "aura_gold",    emoji = "🌟", name = "Gold-Aura",          price = 2.5e6, currency = "cash", style = "sparkle", color = EC(255, 205, 60), strong = true },
+	{ id = "aura_dark",    emoji = "🌑", name = "Dunkle Aura",        price = 2.5e7, currency = "cash", style = "smoke",   color = EC(70, 20, 110) },
+	{ id = "aura_rainbow", emoji = "🌈", name = "Regenbogen-Aura",    price = 500,   currency = "gems", style = "rainbow", color = EC(255, 255, 255), strong = true },
+}
+Config.Trails = {
+	{ id = "trail_pink",    emoji = "💗", name = "Pinke Spur",       price = 5000,  currency = "cash", c1 = EC(255, 120, 220), c2 = EC(255, 255, 255) },
+	{ id = "trail_fire",    emoji = "🔥", name = "Feuer-Spur",       price = 100000, currency = "cash", c1 = EC(255, 220, 60), c2 = EC(255, 60, 20) },
+	{ id = "trail_neon",    emoji = "💠", name = "Neon-Spur",        price = 2e6,   currency = "cash", c1 = EC(62, 242, 255), c2 = EC(155, 92, 255) },
+	{ id = "trail_rainbow", emoji = "🌈", name = "Regenbogen-Spur",  price = 300,   currency = "gems", rainbow = true },
+	{ id = "trail_galaxy",  emoji = "🌌", name = "Galaxie-Spur",     price = 800,   currency = "gems", c1 = EC(120, 60, 255), c2 = EC(20, 10, 40) },
+}
+-- Hüte geben Boosts: aura/cash/luck = Prozent (0.1 = +10 %), speed = Laufgeschwindigkeit
+Config.Hats = {
+	{ id = "cap",        emoji = "🧢", name = "Gym-Cap",            price = 3000,   currency = "cash", boost = { aura = 0.05 } },
+	{ id = "headphones", emoji = "🎧", name = "Phonk-Kopfhörer",    price = 60000,  currency = "cash", boost = { cash = 0.05, speed = 3 } },
+	{ id = "cowboy",     emoji = "🤠", name = "Sheriff-Hut",        price = 800000, currency = "cash", boost = { cash = 0.1 } },
+	{ id = "halo",       emoji = "😇", name = "Heiligenschein",     price = 1e7,    currency = "cash", boost = { aura = 0.15 } },
+	{ id = "crown",      emoji = "👑", name = "Gigachad-Krone",     price = 2e8,    currency = "cash", boost = { aura = 0.25 } },
+	{ id = "viking",     emoji = "🪖", name = "Wikinger-Helm",      price = 600,    currency = "gems", boost = { luck = 0.15 } },
+	{ id = "diamond",    emoji = "💎", name = "Diamant-Krone",      price = 1500,   currency = "gems", boost = { aura = 0.3, luck = 0.1 } },
+}
+-- Emotes (Standard-Roblox-Animationen für R15)
+Config.Emotes = {
+	{ id = "wave",   emoji = "👋", name = "Winken",       price = 0,     currency = "cash", anim = "rbxassetid://507770239" },
+	{ id = "cheer",  emoji = "🙌", name = "Jubeln",       price = 1000,  currency = "cash", anim = "rbxassetid://507770677" },
+	{ id = "laugh",  emoji = "😂", name = "Lachen",       price = 5000,  currency = "cash", anim = "rbxassetid://507770818" },
+	{ id = "dance",  emoji = "🕺", name = "Tanzen",       price = 25000, currency = "cash", anim = "rbxassetid://507771019" },
+	{ id = "mewing", emoji = "🗿", name = "Mewing-Pose",  price = 100,   currency = "gems", anim = "rbxassetid://507770453", bubble = "*mewt intensiv* 🗿" },
+}
+
+----------------------------------------------------------------------------
+-- 🏃 MINISPIELE
+----------------------------------------------------------------------------
+Config.OBBY_COOLDOWN = 600            -- Belohnung für den Dach-Parkour höchstens alle 10 Minuten
+Config.ObbyReward = { cash = 400, scale = true, gems = 5 }
+Config.RACE_TARGET = 14               -- Sekunden für volle Belohnung im Laufsteg-Rennen
+Config.RaceReward = { cash = 250 }    -- wird mit Lohn-Bonus und Tempo verrechnet
+Config.GYM_COOLDOWN = 45
 
 return Config

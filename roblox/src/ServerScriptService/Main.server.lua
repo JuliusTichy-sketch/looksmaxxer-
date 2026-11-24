@@ -18,6 +18,10 @@ require(Modules.QuestService)
 require(Modules.JobService)
 require(Modules.TradeService)
 local FanService = require(Modules.FanService)
+local EventService = require(Modules.EventService)
+local MinigameService = require(Modules.MinigameService)
+require(Modules.ShopService)
+require(Modules.MonetizationService)
 local CombatService = require(Modules.CombatService)
 
 -- 1) Karte mit allen 8 Welten bauen
@@ -53,6 +57,8 @@ BattleService.init(MapBuilder.npcs)
 CombatService.init(MapBuilder.npcs)
 task.spawn(FanService.init)   -- im Hintergrund (das Erstellen der Figuren dauert kurz)
 LeaderboardService.init(MapBuilder.boardRows)
+MinigameService.init(MapBuilder.minigames)
+EventService.init()
 
 -- 5) Spieler
 Players.PlayerAdded:Connect(GameService.playerAdded)

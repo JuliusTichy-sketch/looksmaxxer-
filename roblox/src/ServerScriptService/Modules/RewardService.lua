@@ -28,8 +28,18 @@ end
 local function give(player, data, reward)
 	local parts = {}
 	if reward.cash then
-		data.cash = data.cash + reward.cash
-		table.insert(parts, "💵 " .. Util.format(reward.cash) .. " Geld")
+		-- scale = mit Lohn-Bonus (Glow & Rebirths) verrechnen, damit es auch später noch lohnt
+		local cash = math.floor(reward.cash * (reward.scale and Logic.jobPayMult(data) or 1))
+		data.cash = data.cash + cash
+		table.insert(parts, "💵 " .. Util.format(cash) .. " Geld")
+	end
+	if reward.gems then
+		data.gems = data.gems + reward.gems
+		table.insert(parts, "💎 " .. Util.format(reward.gems) .. " Gems")
+	end
+	if reward.spins then
+		data.wheel.spins = data.wheel.spins + reward.spins
+		table.insert(parts, "🎡 " .. reward.spins .. "x Glücksrad")
 	end
 	if reward.auraSeconds then
 		local aps = math.max(Logic.aps(data, GameService.currentWorld(player), os.time()), 5)
@@ -48,10 +58,11 @@ local function give(player, data, reward)
 		for i = 1, #Config.Worlds do
 			if Logic.worldUnlocked(data, i) then best = i end
 		end
+		local station = (type(reward.freeEgg) == "number") and reward.freeEgg or 2   -- Standard: Silber-Box
 		task.delay(1, function()
-			if player.Parent then PetService.hatch(player, Config.eggIndex(best, 2), 1, true) end   -- gratis Silber-Box
+			if player.Parent then PetService.hatch(player, Config.eggIndex(best, station), 1, true) end
 		end)
-		table.insert(parts, "🎁 gratis Geschenkbox")
+		table.insert(parts, Config.EggStations[station].emoji .. " gratis " .. Config.EggStations[station].name)
 	end
 	return table.concat(parts, " · ")
 end
@@ -96,10 +107,21 @@ Remotes.RedeemCode.OnServerEvent:Connect(function(player, code)
 	GameService.sendFull(player)
 end)
 
-Remotes.BuyPotion.OnServerEvent:Connect(function(player, id)
+Remotes.BuyPotion.OnServerEvent:Connect(function(player, id, withGems)
 	local data = DataService.get(player)
 	local p = Logic.potionById[id]
-	if not data or not p then return end
+	if not data or not p or p.hidden then return end
+	if withGems and p.gems then
+		if data.gems < p.gems then
+			GameService.notify(player, "💎 Zu wenig Gems", p.name .. " kostet " .. p.gems .. " Gems.", "bad")
+			return
+		end
+		data.gems = data.gems - p.gems
+		addPotion(data, id)
+		GameService.notify(player, p.emoji .. " " .. p.name, p.desc, "good")
+		GameService.sendFull(player)
+		return
+	end
 	if data.cash < p.price then
 		GameService.notify(player, "💸 Zu wenig Geld", p.name .. " kostet " .. Util.format(p.price) .. " Geld.", "bad")
 		return
@@ -109,5 +131,69 @@ Remotes.BuyPotion.OnServerEvent:Connect(function(player, id)
 	GameService.notify(player, p.emoji .. " " .. p.name, p.desc, "good")
 	GameService.sendFull(player)
 end)
+
+----------------------------------------------------------------------------
+-- 🎡 GLÜCKSRAD
+----------------------------------------------------------------------------
+Remotes.SpinWheel.OnServerEvent:Connect(function(player)
+	local data = DataService.get(player)
+	if not data then return end
+	local now = os.time()
+	if data.wheel.spins > 0 then
+		data.wheel.spins = data.wheel.spins - 1
+	elseif now - data.wheel.last >= Config.WHEEL_COOLDOWN then
+		data.wheel.last = now
+	else
+		GameService.notify(player, "🎡 Noch nicht", "Nächste Gratis-Drehung in " .. Util.formatTime(Config.WHEEL_COOLDOWN - (now - data.wheel.last)) .. ".", "")
+		return
+	end
+	local total = 0
+	for _, seg in ipairs(Config.Wheel) do total = total + seg.weight end
+	local x = Random.new():NextNumber() * total
+	local index = #Config.Wheel
+	for i, seg in ipairs(Config.Wheel) do
+		x = x - seg.weight
+		if x <= 0 then index = i break end
+	end
+	local seg = Config.Wheel[index]
+	-- Ergebnis erst nach der Dreh-Animation gutschreiben
+	Remotes.WheelResult:FireClient(player, index)
+	task.delay(4, function()
+		if not player.Parent then return end
+		local text = give(player, data, seg.reward)
+		GameService.notify(player, "🎡 Gewonnen: " .. seg.label, text, "good")
+		GameService.sendFull(player)
+	end)
+end)
+
+----------------------------------------------------------------------------
+-- 🎁 SPIELZEIT-GESCHENKE (pro Spielsitzung)
+----------------------------------------------------------------------------
+local claimedGifts = {}   -- [player] = { [i] = true }
+table.insert(GameService.joinHooks, function(player)
+	player:SetAttribute("JoinTime", os.time())
+	claimedGifts[player] = {}
+end)
+Remotes.ClaimPlaytime.OnServerEvent:Connect(function(player, i)
+	local data = DataService.get(player)
+	local gift = Config.PlaytimeGifts[tonumber(i) or 0]
+	if not data or not gift then return end
+	claimedGifts[player] = claimedGifts[player] or {}
+	if claimedGifts[player][i] then return end
+	local joined = player:GetAttribute("JoinTime") or os.time()
+	if os.time() - joined < gift.minutes * 60 then
+		GameService.notify(player, "⏳ Noch nicht", "Dieses Geschenk gibt es nach " .. gift.minutes .. " Minuten Spielzeit.", "")
+		return
+	end
+	claimedGifts[player][i] = true
+	player:SetAttribute("Gift" .. tostring(i), true)
+	local text = give(player, data, gift.reward)
+	GameService.notify(player, "🎁 Spielzeit-Geschenk!", text, "good")
+	GameService.sendFull(player)
+end)
+game:GetService("Players").PlayerRemoving:Connect(function(player)
+	claimedGifts[player] = nil
+end)
+
 
 return RewardService

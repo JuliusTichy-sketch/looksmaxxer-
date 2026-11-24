@@ -22,9 +22,10 @@ local Hud = {}
 local C = UI.C
 local chips = {}
 local titleLabel, nextLabel, progressBar, routineSub, routineBtn, rewardsDot
+local wheelDot, eventBtn, rideBtn, raceLabel
 
 local function chip(parent, key, caption, color, order)
-	local f = UI.panel(parent, { Size = UDim2.new(0.19, 0, 1, 0), Color = C.dark, Transparency = 0.15, LayoutOrder = order })
+	local f = UI.panel(parent, { Size = UDim2.new(0.155, 0, 1, 0), Color = C.dark, Transparency = 0.15, LayoutOrder = order })
 	UI.stroke(f, color, 2, 0.3)
 	UI.text(f, caption, { Size = UDim2.new(1, 0, 0.34, 0), Position = UDim2.new(0, 0, 0.04, 0), Color = C.muted, Font = Enum.Font.GothamBold, MaxText = 12 })
 	chips[key] = UI.text(f, "0", { Size = UDim2.new(1, -8, 0.58, 0), Position = UDim2.new(0, 4, 0.38, 0), Color = color, MaxText = 24 })
@@ -41,6 +42,7 @@ function Hud.init(gui)
 	chip(top, "cash", "💵 GELD", C.money, 3)
 	chip(top, "glow", "💖 GLOW", C.pink, 4)
 	chip(top, "reb", "♻️ REBIRTHS", C.cyan, 5)
+	chip(top, "gems", "💎 GEMS", C.cyan, 6)
 
 	-- Menü-Knöpfe links
 	local side = UI.new("Frame", { Name = "Side", BackgroundTransparency = 1, AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 8, 0.5, 0),
@@ -69,6 +71,62 @@ function Hud.init(gui)
 			rewardsDot.Visible = false
 		end
 	end
+
+	-- Knöpfe rechts: Shop, Glücksrad, Event, Ausrüstung, Emotes, Fahrzeug
+	local right = UI.new("Frame", { Name = "Right", BackgroundTransparency = 1, AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.45, 0),
+		Size = UDim2.new(0.07, 0, 0.56, 0), Parent = gui })
+	UI.new("UISizeConstraint", { MinSize = Vector2.new(44, 220), MaxSize = Vector2.new(74, 520), Parent = right })
+	UI.list(right, false, 6, Enum.HorizontalAlignment.Center, Enum.VerticalAlignment.Center)
+	local rightButtons = {
+		{ "shop", "💎", "Shop", C.cyan }, { "wheel", "🎡", "Glücksrad", C.gold }, { "event", "🎉", "Events", C.orange },
+		{ "style", "✨", "Style", C.purple }, { "emote", "🕺", "Emotes", C.pink }, { "ride", "🛹", "Fahren (V)", C.green },
+	}
+	for i, b in ipairs(rightButtons) do
+		local btn = UI.new("TextButton", { Text = "", AutoButtonColor = true, BackgroundColor3 = b[4], Size = UDim2.new(1, 0, 1 / 6, -6),
+			LayoutOrder = i, Parent = right })
+		UI.new("UIAspectRatioConstraint", { AspectRatio = 1, Parent = btn })
+		UI.corner(btn, 14)
+		UI.stroke(btn, Color3.new(1, 1, 1), 2, 0.6)
+		UI.text(btn, b[2], { Size = UDim2.new(1, 0, 0.62, 0), MaxText = 34 })
+		UI.text(btn, b[3], { Size = UDim2.new(1, -4, 0.3, 0), Position = UDim2.new(0, 2, 0.66, 0), MaxText = 12 })
+		btn.Activated:Connect(function()
+			if b[1] == "emote" then
+				Menus.open("style", "emote")
+			elseif b[1] == "ride" then
+				Hud.toggleRide()
+			else
+				Menus.toggle(b[1])
+			end
+		end)
+		if b[1] == "wheel" then
+			wheelDot = UI.panel(btn, { Size = UDim2.new(0, 16, 0, 16), Position = UDim2.new(1, -12, 0, -4), Color = C.red, Radius = 8 })
+			wheelDot.Visible = false
+		elseif b[1] == "event" then
+			eventBtn = btn
+		elseif b[1] == "ride" then
+			rideBtn = btn
+		end
+	end
+	game:GetService("UserInputService").InputBegan:Connect(function(input, processed)
+		if not processed and input.KeyCode == Enum.KeyCode.V then
+			Hud.toggleRide()
+		end
+	end)
+
+	-- Stoppuhr fürs Laufrennen
+	raceLabel = UI.text(gui, "", { AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0.21, 0), Size = UDim2.new(0, 260, 0, 46),
+		Color = C.gold, MaxText = 36 })
+	raceLabel.TextStrokeTransparency = 0.2
+	raceLabel.Visible = false
+	game:GetService("RunService").Heartbeat:Connect(function()
+		local start = game:GetService("Players").LocalPlayer:GetAttribute("RaceStart")
+		if start then
+			raceLabel.Visible = true
+			raceLabel.Text = "⏱️ " .. string.format("%.2f", workspace:GetServerTimeNow() - start) .. " s"
+		else
+			raceLabel.Visible = false
+		end
+	end)
 
 	-- Unten: Titel, Fortschritt, Daily Routine
 	local bottom = UI.new("Frame", { Name = "Bottom", BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 1, -10),
@@ -162,6 +220,17 @@ function Hud.init(gui)
 	State.onChange(Hud.update)
 end
 
+function Hud.toggleRide()
+	local s = State.snap
+	if not s then return end
+	if s.data.vehicle == "" then
+		Effects.toast("🛹 Kein Fahrzeug", "Kauf dir im Menü ✨ Style → Fahrzeuge ein Skateboard, Auto oder Hoverboard!", "")
+		Menus.open("style", "vehicle")
+		return
+	end
+	Remotes.ToggleRide:FireServer()
+end
+
 function Hud.update()
 	local s = State.snap
 	if not s then return end
@@ -171,6 +240,18 @@ function Hud.update()
 	chips.cash.Text = Util.format(d.cash)
 	chips.glow.Text = Util.format(s.glow)
 	chips.reb.Text = tostring(d.rebirths)
+	chips.gems.Text = Util.format(d.gems)
+	if wheelDot then
+		wheelDot.Visible = d.wheel.spins > 0 or os.time() - d.wheel.last >= Config.WHEEL_COOLDOWN
+	end
+	if eventBtn then
+		local now = os.time()
+		eventBtn.BackgroundColor3 = (Logic.activeEvent(now) or Logic.isWeekend(now)) and C.orange or C.grey
+	end
+	if rideBtn then
+		local riding = game:GetService("Players").LocalPlayer:GetAttribute("Riding") == true
+		rideBtn.BackgroundColor3 = riding and C.gold or C.green
+	end
 	routineSub.Text = "+" .. Util.format(s.click) .. " Aura pro Klick"
 
 	local idx = Logic.titleIndex(s.glow)

@@ -101,6 +101,27 @@ Remotes:WaitForChild("DamagePopup").OnClientEvent:Connect(function(amount, crit,
 	Effects.damagePopup(amount, crit, position)
 end)
 
+-- Glücksrad dreht sich auf das gewonnene Feld
+Remotes:WaitForChild("WheelResult").OnClientEvent:Connect(function(index)
+	Menus.spinTo(index)
+end)
+
+-- Gym-Minispiel
+Remotes:WaitForChild("GymStart").OnClientEvent:Connect(function()
+	Menus.close()
+	Effects.gymGame(function(hits)
+		Remotes.GymFinish:FireServer(hits)
+	end)
+end)
+
+-- Robux-Käufe: nach dem Kauf Danke sagen (die Belohnung gibt der Server)
+local MarketplaceService = game:GetService("MarketplaceService")
+MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(plr, _, purchased)
+	if plr == player and purchased then
+		Effects.banner("💎 DANKE FÜR DEINEN KAUF!", "Dein Gamepass ist jetzt aktiv.", UI.C.gold)
+	end
+end)
+
 -- Begrüßung
 task.delay(2, function()
 	Effects.toast("✨ Willkommen bei Looksmaxxer 3000!", "Klicke auf Daily Routine, kauf Upgrades und öffne die 🎁 Geschenkbox!", "title")

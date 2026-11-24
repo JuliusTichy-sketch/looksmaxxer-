@@ -17,6 +17,7 @@ local Sounds = require(script.Parent:WaitForChild("Sounds"))
 local Effects = require(script.Parent:WaitForChild("Effects"))
 local CameraController = require(script.Parent:WaitForChild("CameraController"))
 local PetView = require(script.Parent:WaitForChild("PetView"))
+local Emotes = require(script.Parent:WaitForChild("Emotes"))
 local UserInputService = game:GetService("UserInputService")
 
 local Menus = {}
@@ -57,6 +58,7 @@ local TITLES = {
 	upgrades = "💪 Upgrades", pets = "🐾 Pets", worlds = "🌍 Welten", rebirth = "♻️ Rebirth",
 	leaderboard = "🏆 Globale Rangliste", rewards = "🎁 Belohnungen", settings = "⚙️ Einstellungen",
 	quests = "📋 Aufträge & Erfolge", jobs = "💼 Jobs", weapons = "⚔️ Waffen & Bosskampf", egginfo = "🎁 Box-Inhalt",
+	shop = "💎 Shop", style = "✨ Ausrüstung", wheel = "🎡 Glücksrad & Geschenke", event = "🎉 Events",
 }
 
 function Menus.open(name, arg)
@@ -494,6 +496,7 @@ BUILDERS.rewards = function(root)
 	UI.padding(list, 2)
 	local potionRows = {}
 	for i, p in ipairs(Config.Potions) do
+	if not p.hidden then
 		local row = UI.panel(list, { Size = UDim2.new(1, -10, 0, 56), Color = C.panel2, LayoutOrder = i })
 		UI.text(row, p.emoji, { Size = UDim2.new(0, 46, 1, 0), MaxText = 30 })
 		UI.text(row, p.name, { Size = UDim2.new(1, -190, 0.5, 0), Position = UDim2.new(0, 50, 0.04, 0), XAlign = Enum.TextXAlignment.Left, MaxText = 17 })
@@ -503,6 +506,7 @@ BUILDERS.rewards = function(root)
 			Remotes.BuyPotion:FireServer(p.id)
 		end, { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.new(0, 120, 0, 40), TextColor = C.dark, MaxText = 16 })
 		potionRows[p.id] = { sub = sub, btn = btn, p = p }
+	end
 	end
 
 	return function()
@@ -775,11 +779,17 @@ end
 BUILDERS.egginfo = function(root, eggIndex)
 	local egg = Config.Eggs[eggIndex or 1]
 	if not egg then return nil end
-	local station = Config.EggStations[egg.station]
+	local station = Config.EggStations[egg.station] or { emoji = egg.emoji or "🎁" }
 	local d = data()
 	local total = 0
 	for _, e in ipairs(egg.pets) do total = total + e.weight end
-	UI.text(root, station.emoji .. " <b>" .. egg.name .. "</b>  ·  <font color='" .. UI.hex(C.gold) .. "'>" .. Util.format(egg.cost) .. " Aura</font>  ·  🍀 Glück "
+	local costText = Util.format(egg.cost) .. " Aura"
+	if egg.event then
+		for _, ev in ipairs(Config.Events) do
+			if ev.id == egg.event then costText = egg.cost .. " " .. ev.token end
+		end
+	end
+	UI.text(root, station.emoji .. " <b>" .. egg.name .. "</b>  ·  <font color='" .. UI.hex(C.gold) .. "'>" .. costText .. "</font>  ·  🍀 Glück "
 		.. Util.formatMult(snap().luck), { Size = UDim2.new(1, -250, 0, 34), XAlign = Enum.TextXAlignment.Left, MaxText = 18 })
 	UI.button(root, "🎁 Öffnen", C.gold, function()
 		Remotes.HatchEgg:FireServer(egg.index, 1)
@@ -804,6 +814,291 @@ BUILDERS.egginfo = function(root, eggIndex)
 			Font = Enum.Font.GothamBold, MaxText = 12 })
 	end
 	return nil
+end
+
+
+----------------------------------------------------------------------------
+-- 💎 ROBUX-SHOP
+----------------------------------------------------------------------------
+local MarketplaceService = game:GetService("MarketplaceService")
+
+BUILDERS.shop = function(root)
+	local list = UI.scroll(root)
+	UI.list(list, false, 6)
+	UI.padding(list, 2)
+	local function build()
+		UI.clear(list)
+		local d = data()
+		local order = 0
+		local function o() order = order + 1 return order end
+		UI.text(list, "💎 Du hast <font color='" .. UI.hex(C.cyan) .. "'>" .. Util.format(d.gems) .. " Gems</font> · Gems gibt's auch am 🎡 Glücksrad, bei Spielzeit-Geschenken & Events",
+			{ Size = UDim2.new(1, -10, 0, 30), XAlign = Enum.TextXAlignment.Left, Font = Enum.Font.GothamBold, MaxText = 15, LayoutOrder = o() })
+		local function row(emoji, name, desc, btnText, btnColor, onClick, highlight)
+			local r = UI.panel(list, { Size = UDim2.new(1, -10, 0, 64), Color = highlight and C.purple or C.panel2, LayoutOrder = o() })
+			UI.text(r, emoji, { Size = UDim2.new(0, 54, 1, 0), MaxText = 34 })
+			UI.text(r, name, { Size = UDim2.new(1, -200, 0.5, 0), Position = UDim2.new(0, 58, 0.04, 0), XAlign = Enum.TextXAlignment.Left, MaxText = 18 })
+			UI.text(r, desc or "", { Size = UDim2.new(1, -200, 0.42, 0), Position = UDim2.new(0, 58, 0.54, 0), XAlign = Enum.TextXAlignment.Left,
+				Font = Enum.Font.Gotham, Color = C.muted, MaxText = 13 })
+			UI.button(r, btnText, btnColor, onClick, { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.new(0, 128, 0, 44),
+				TextColor = C.dark, MaxText = 16 })
+		end
+		UI.text(list, "🎟️ Gamepasses (einmal kaufen, für immer)", { Size = UDim2.new(1, -10, 0, 28), XAlign = Enum.TextXAlignment.Left, MaxText = 18, LayoutOrder = o() })
+		for _, gp in ipairs(Config.GamePasses) do
+			local owned = Logic.hasPass(d, gp.key)
+			row(gp.emoji, gp.name, gp.desc, owned and "✅ Besitzt du" or (gp.id > 0 and ("R$ " .. gp.robux) or "Bald verfügbar"),
+				owned and C.grey or (gp.id > 0 and C.green or C.grey), function()
+					if not owned and gp.id > 0 then
+						MarketplaceService:PromptGamePassPurchase(Players.LocalPlayer, gp.id)
+					end
+				end, gp.key == "vip")
+		end
+		UI.text(list, "💎 Gems & Pakete", { Size = UDim2.new(1, -10, 0, 28), XAlign = Enum.TextXAlignment.Left, MaxText = 18, LayoutOrder = o() })
+		for _, dp in ipairs(Config.DevProducts) do
+			if not (dp.once and d.starterPack) then
+				row(dp.emoji, dp.name, dp.desc or "", dp.id > 0 and ("R$ " .. dp.robux) or "Bald verfügbar", dp.id > 0 and C.cyan or C.grey, function()
+					if dp.id > 0 then
+						MarketplaceService:PromptProductPurchase(Players.LocalPlayer, dp.id)
+					end
+				end, dp.key == "starter")
+			end
+		end
+		UI.text(list, "🧪 Tränke für Gems", { Size = UDim2.new(1, -10, 0, 28), XAlign = Enum.TextXAlignment.Left, MaxText = 18, LayoutOrder = o() })
+		for _, p in ipairs(Config.Potions) do
+			if p.gems and not p.hidden then
+				row(p.emoji, p.name, p.desc, "💎 " .. p.gems, d.gems >= p.gems and C.cyan or C.grey, function()
+					Remotes.BuyPotion:FireServer(p.id, true)
+				end)
+			end
+		end
+		UI.text(list, "Mit Gems kaufst du auch exklusive Auren, Spuren, Hüte, Emotes & Fahrzeuge (Menü ✨).",
+			{ Size = UDim2.new(1, -10, 0, 30), Color = C.muted, Font = Enum.Font.GothamBold, MaxText = 14, LayoutOrder = o() })
+	end
+	return function(kind)
+		if kind == "full" then build() end
+	end
+end
+
+----------------------------------------------------------------------------
+-- ✨ AUSRÜSTUNG: Auren, Spuren, Hüte, Emotes, Fahrzeuge
+----------------------------------------------------------------------------
+local styleTab = "aura"
+local STYLE_TABS = {
+	{ id = "aura", name = "✨ Auren", list = Config.Auras },
+	{ id = "trail", name = "💫 Spuren", list = Config.Trails },
+	{ id = "hat", name = "👑 Hüte", list = Config.Hats },
+	{ id = "emote", name = "🕺 Emotes", list = Config.Emotes },
+	{ id = "vehicle", name = "🛹 Fahrzeuge", list = Config.Vehicles },
+}
+
+local function boostText(def, kind)
+	if kind == "hat" then
+		local parts = {}
+		if def.boost.aura then table.insert(parts, Util.formatPercent(def.boost.aura) .. " Aura") end
+		if def.boost.cash then table.insert(parts, Util.formatPercent(def.boost.cash) .. " Geld") end
+		if def.boost.luck then table.insert(parts, Util.formatPercent(def.boost.luck) .. " Glück") end
+		if def.boost.speed then table.insert(parts, "+" .. def.boost.speed .. " Tempo") end
+		return table.concat(parts, " · ")
+	elseif kind == "vehicle" then
+		return "+" .. def.speed .. " Tempo" .. (def.jump > 0 and (" · +" .. def.jump .. " Sprung") or "") .. " · Taste V"
+	elseif kind == "emote" then
+		return "Spielt eine Animation ab"
+	end
+	return "Nur Optik – sieht aber krass aus"
+end
+
+BUILDERS.style = function(root, startTab)
+	if startTab then styleTab = startTab end
+	local tabs = UI.scroll(root, { Size = UDim2.new(1, 0, 0, 40), Horizontal = true })
+	UI.list(tabs, true, 6)
+	local list = UI.scroll(root, { Size = UDim2.new(1, 0, 1, -48), Position = UDim2.new(0, 0, 0, 48) })
+	UI.list(list, false, 6)
+	UI.padding(list, 2)
+	local tabButtons = {}
+
+	local function build()
+		UI.clear(list)
+		local d = data()
+		for id, b in pairs(tabButtons) do b.BackgroundColor3 = (id == styleTab) and C.pink or C.panel2 end
+		local tab
+		for _, t in ipairs(STYLE_TABS) do if t.id == styleTab then tab = t end end
+		for i, def in ipairs(tab.list) do
+			local owned = Logic.ownsItem(d, styleTab, def.id)
+			local equipped
+			if styleTab == "vehicle" then equipped = d.vehicle == def.id else equipped = d.cosmetics[styleTab] == def.id end
+			local r = UI.panel(list, { Size = UDim2.new(1, -10, 0, 64), Color = equipped and C.purple or C.panel2, LayoutOrder = i })
+			UI.text(r, def.emoji, { Size = UDim2.new(0, 54, 1, 0), MaxText = 34 })
+			UI.text(r, def.name, { Size = UDim2.new(1, -200, 0.5, 0), Position = UDim2.new(0, 58, 0.04, 0), XAlign = Enum.TextXAlignment.Left, MaxText = 18 })
+			UI.text(r, boostText(def, styleTab), { Size = UDim2.new(1, -200, 0.42, 0), Position = UDim2.new(0, 58, 0.54, 0), XAlign = Enum.TextXAlignment.Left,
+				Font = Enum.Font.GothamBold, Color = C.green, MaxText = 13 })
+			local btnText, btnColor, action
+			if not owned then
+				local price = (def.currency == "gems" and "💎 " or "💵 ") .. Util.format(def.price)
+				local can = (def.currency == "gems" and d.gems or d.cash) >= def.price
+				btnText, btnColor = price, can and C.gold or C.grey
+				action = function() Remotes.BuyItem:FireServer(styleTab, def.id) end
+			elseif styleTab == "emote" then
+				btnText, btnColor = "▶ Abspielen", C.cyan
+				action = function()
+					Menus.close()
+					Emotes.play(def)
+				end
+			else
+				btnText, btnColor = equipped and "Ablegen" or "Ausrüsten", equipped and C.grey or C.green
+				action = function() Remotes.EquipItem:FireServer(styleTab, equipped and (styleTab == "vehicle" and "" or def.id) or def.id) end
+			end
+			UI.button(r, btnText, btnColor, action, { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.new(0, 128, 0, 44),
+				TextColor = C.dark, MaxText = 16 })
+		end
+	end
+	for i, t in ipairs(STYLE_TABS) do
+		tabButtons[t.id] = UI.button(tabs, t.name, C.panel2, function()
+			styleTab = t.id
+			build()
+		end, { Size = UDim2.new(0, 140, 1, -6), LayoutOrder = i, MaxText = 16 })
+	end
+	return function(kind)
+		if kind == "full" then build() end
+	end
+end
+
+----------------------------------------------------------------------------
+-- 🎡 GLÜCKSRAD & SPIELZEIT-GESCHENKE
+----------------------------------------------------------------------------
+local wheelFrame = nil
+function Menus.spinTo(index)
+	if not wheelFrame or not wheelFrame.Parent then return end
+	local seg = 360 / #Config.Wheel
+	local target = -((index - 0.5) * seg) - 360 * 6
+	wheelFrame.Rotation = wheelFrame.Rotation % 360
+	game:GetService("TweenService"):Create(wheelFrame, TweenInfo.new(3.6, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), { Rotation = target }):Play()
+end
+
+BUILDERS.wheel = function(root)
+	-- Rad links
+	local left = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(0.5, -6, 1, 0), Parent = root })
+	local holder = UI.new("Frame", { BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, 0),
+		Size = UDim2.new(1, 0, 0.78, 0), Parent = left })
+	UI.new("UIAspectRatioConstraint", { AspectRatio = 1, Parent = holder })
+	wheelFrame = UI.new("Frame", { BackgroundColor3 = C.panel2, Size = UDim2.new(1, 0, 1, 0), Parent = holder })
+	UI.new("UICorner", { CornerRadius = UDim.new(0.5, 0), Parent = wheelFrame })
+	UI.stroke(wheelFrame, C.gold, 4, 0)
+	local seg = 360 / #Config.Wheel
+	for i, s in ipairs(Config.Wheel) do
+		local a = math.rad((i - 0.5) * seg)
+		local chip = UI.panel(wheelFrame, { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5 + 0.36 * math.sin(a), 0, 0.5 - 0.36 * math.cos(a), 0),
+			Size = UDim2.new(0.3, 0, 0.12, 0), Color = s.color, Radius = 8 })
+		chip.Rotation = (i - 0.5) * seg
+		UI.text(chip, s.label, { Color = C.dark, MaxText = 13 })
+	end
+	UI.text(holder, "▼", { AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 0, 6), Size = UDim2.new(0, 40, 0, 34), Color = C.red, MaxText = 34 })
+	local spinBtn = UI.button(left, "", C.gold, function()
+		Remotes.SpinWheel:FireServer()
+	end, { AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 1, 0), Size = UDim2.new(0.9, 0, 0.16, 0), TextColor = C.dark, MaxText = 20 })
+
+	-- Chancen & Spielzeit-Geschenke rechts
+	local right = UI.scroll(root, { Size = UDim2.new(0.5, -6, 1, 0), Position = UDim2.new(0.5, 6, 0, 0) })
+	UI.list(right, false, 5)
+	local total = 0
+	for _, s in ipairs(Config.Wheel) do total = total + s.weight end
+	UI.text(right, "🎯 Chancen am Glücksrad", { Size = UDim2.new(1, -8, 0, 24), XAlign = Enum.TextXAlignment.Left, MaxText = 16, LayoutOrder = 1 })
+	for i, s in ipairs(Config.Wheel) do
+		UI.text(right, s.label .. "  <font color='" .. UI.hex(C.gold) .. "'>" .. Util.format(s.weight / total * 100) .. " %</font>",
+			{ Size = UDim2.new(1, -8, 0, 20), XAlign = Enum.TextXAlignment.Left, Font = Enum.Font.GothamBold, MaxText = 13, LayoutOrder = 1 + i })
+	end
+	UI.text(right, "🎁 Spielzeit-Geschenke (diese Sitzung)", { Size = UDim2.new(1, -8, 0, 26), XAlign = Enum.TextXAlignment.Left, MaxText = 16, LayoutOrder = 50 })
+	local giftButtons = {}
+	for i, g in ipairs(Config.PlaytimeGifts) do
+		giftButtons[i] = UI.button(right, "", C.grey, function()
+			Remotes.ClaimPlaytime:FireServer(i)
+		end, { Size = UDim2.new(1, -8, 0, 36), LayoutOrder = 50 + i, MaxText = 15 })
+	end
+
+	return function()
+		local d = data()
+		local remaining = Config.WHEEL_COOLDOWN - (os.time() - d.wheel.last)
+		if d.wheel.spins > 0 then
+			spinBtn.Text = "🎡 Drehen! (" .. d.wheel.spins .. " übrig)"
+			spinBtn.BackgroundColor3 = C.gold
+		elseif remaining <= 0 then
+			spinBtn.Text = "🎡 Gratis drehen!"
+			spinBtn.BackgroundColor3 = C.gold
+		else
+			spinBtn.Text = "⏳ " .. Util.formatTime(remaining)
+			spinBtn.BackgroundColor3 = C.grey
+		end
+		local player = Players.LocalPlayer
+		local joined = player:GetAttribute("JoinTime") or os.time()
+		local played = os.time() - joined
+		for i, g in ipairs(Config.PlaytimeGifts) do
+			local b = giftButtons[i]
+			if player:GetAttribute("Gift" .. i) then
+				b.Text = "✅ " .. g.label
+				b.BackgroundColor3 = C.panel2
+			elseif played >= g.minutes * 60 then
+				b.Text = "🎁 " .. g.label .. " – abholen!"
+				b.BackgroundColor3 = C.gold
+				b.TextColor3 = C.dark
+			else
+				b.Text = "⏳ " .. g.label .. " in " .. Util.formatTime(g.minutes * 60 - played)
+				b.BackgroundColor3 = C.grey
+				b.TextColor3 = C.text
+			end
+		end
+	end
+end
+
+----------------------------------------------------------------------------
+-- 🎉 EVENT
+----------------------------------------------------------------------------
+BUILDERS.event = function(root)
+	local list = UI.scroll(root)
+	UI.list(list, false, 6)
+	UI.padding(list, 2)
+	local function build()
+		UI.clear(list)
+		local d = data()
+		local now = os.time()
+		local ev = Logic.activeEvent(now)
+		local order = 0
+		local function o() order = order + 1 return order end
+		local weekend = Logic.isWeekend(now)
+		local wk = UI.panel(list, { Size = UDim2.new(1, -10, 0, 50), Color = weekend and C.green or C.panel2, LayoutOrder = o() })
+		UI.text(wk, weekend and "🎉 WOCHENEND-BOOST AKTIV: x2 Aura & x2 Glück!" or "📅 Jeden Samstag & Sonntag: x2 Aura & x2 Glück (automatisch)",
+			{ Size = UDim2.new(1, -16, 1, 0), Position = UDim2.new(0, 8, 0, 0), XAlign = Enum.TextXAlignment.Left, MaxText = 17, Color = weekend and C.dark or C.text })
+		if ev then
+			local head = UI.panel(list, { Size = UDim2.new(1, -10, 0, 96), Color = ev.color:Lerp(C.dark, 0.55), LayoutOrder = o() })
+			UI.stroke(head, ev.color, 2, 0)
+			UI.padding(head, 8)
+			UI.text(head, ev.emoji .. " <b>" .. ev.name .. "</b> läuft gerade!", { Size = UDim2.new(1, 0, 0.36, 0), XAlign = Enum.TextXAlignment.Left, MaxText = 22 })
+			UI.text(head, "Deine " .. ev.token .. ": <font color='" .. UI.hex(C.gold) .. "'>" .. Logic.eventTokens(d, ev.id) .. "</font> · Sammle " .. ev.tokenEmoji
+				.. " in allen Welten & besiege den Event-Boss am Event-Platz in Glow City!", { Size = UDim2.new(1, 0, 0.6, 0), Position = UDim2.new(0, 0, 0.38, 0),
+				XAlign = Enum.TextXAlignment.Left, Font = Enum.Font.GothamBold, MaxText = 15 })
+			UI.button(list, "🎁 Event-Box ansehen (" .. Config.EVENT_EGG_COST .. " " .. ev.token .. ")", C.gold, function()
+				Menus.open("egginfo", ev.eggIndex)
+			end, { Size = UDim2.new(1, -10, 0, 42), LayoutOrder = o(), TextColor = C.dark, MaxText = 17 })
+			UI.text(list, "Exklusive Event-Pets:", { Size = UDim2.new(1, -10, 0, 24), XAlign = Enum.TextXAlignment.Left, MaxText = 16, LayoutOrder = o() })
+			local row = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, -10, 0, 120), LayoutOrder = o(), Parent = list })
+			UI.list(row, true, 6, Enum.HorizontalAlignment.Center)
+			for _, e in ipairs(Config.Eggs[ev.eggIndex].pets) do
+				local def = Logic.petById[e.id]
+				local rarity = Config.Rarities[def.rarity]
+				local cell = UI.panel(row, { Size = UDim2.new(0.19, 0, 1, 0), Color = rarity.color:Lerp(C.dark, 0.6), Radius = 10 })
+				UI.stroke(cell, rarity.color, 2, 0)
+				PetView.make(cell, def.id, 1, false, { Size = UDim2.new(1, 0, 0.7, 0) })
+				UI.text(cell, def.name, { Size = UDim2.new(1, -4, 0.28, 0), Position = UDim2.new(0, 2, 0.7, 0), Color = rarity.color, MaxText = 12 })
+			end
+		else
+			UI.text(list, "Gerade läuft kein saisonales Event.", { Size = UDim2.new(1, -10, 0, 30), MaxText = 18, LayoutOrder = o() })
+		end
+		UI.text(list, "📅 Event-Kalender", { Size = UDim2.new(1, -10, 0, 26), XAlign = Enum.TextXAlignment.Left, MaxText = 17, LayoutOrder = o() })
+		for _, e in ipairs(Config.Events) do
+			UI.text(list, e.emoji .. " " .. e.name .. ": " .. string.format("%02d.%02d.", e.from[2], e.from[1]) .. " – " .. string.format("%02d.%02d.", e.to[2], e.to[1]),
+				{ Size = UDim2.new(1, -10, 0, 22), XAlign = Enum.TextXAlignment.Left, Font = Enum.Font.GothamBold, Color = C.muted, MaxText = 14, LayoutOrder = o() })
+		end
+	end
+	return function(kind)
+		if kind == "full" then build() end
+	end
 end
 
 

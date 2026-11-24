@@ -196,12 +196,18 @@ local function defeat(boss)
 		local data = DataService.get(player)
 		if data then
 			local aps = math.max(Logic.aps(data, GameService.currentWorld(player), os.time()), 5)
-			local cash = math.floor(150 * boss.world ^ 2.5 * (0.5 + math.min(p.share, 1)))
+			local cash = math.floor(150 * boss.world ^ 2.5 * (0.5 + math.min(p.share, 1)) * Logic.cashMult(data))
 			local aura = aps * 120
 			data.cash = data.cash + cash
 			GameService.addAura(data, aura)
 			GameService.track(player, "bossKills", 1)
 			local text = "+" .. Util.format(cash) .. " Geld · +" .. Util.format(aura) .. " Aura · Dein Anteil: " .. math.floor(p.share * 100) .. " %"
+			-- Event-Boss: Event-Münzen
+			if boss.def.event then
+				local tokens = math.floor(10 + 20 * math.min(p.share, 1))
+				data.eventTokens[boss.def.event] = Logic.eventTokens(data, boss.def.event) + tokens
+				text = text .. " · +" .. tokens .. " Event-Münzen"
+			end
 			-- seltene Boss-Waffen
 			local drop = nil
 			if boss.def.final and rng:NextNumber() < Logic.weaponById.laser.drop and Logic.weaponLevel(data, "laser") == 0 then
@@ -387,7 +393,7 @@ function CombatService.init(npcEntries)
 				local boss = {
 					def = entry.def, world = entry.world, model = model, hrp = hrp, head = model:FindFirstChild("Head") or hrp,
 					parent = model.Parent, scale = entry.def.scale or 1, radius = 3 * (entry.def.scale or 1),
-					maxHp = Config.BossHP[entry.world] or 1000, damage = {}, lastHit = 0, dead = false, nextAttack = 0,
+					maxHp = entry.def.hp or Config.BossHP[entry.world] or 1000, damage = {}, lastHit = 0, dead = false, nextAttack = 0,
 				}
 				boss.hp = boss.maxHp
 				makeHpBar(boss)

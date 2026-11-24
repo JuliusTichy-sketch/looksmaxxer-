@@ -114,6 +114,7 @@ function BattleService.fightNPC(player, entry)
 			reward.cash = 25 * world * world
 			text = string.format(Config.MogWin[rng:NextInteger(1, #Config.MogWin)], def.name)
 		end
+		reward.cash = math.floor(reward.cash * Logic.cashMult(data))
 		GameService.addAura(data, reward.aura)
 		data.cash = data.cash + reward.cash
 	else

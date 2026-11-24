@@ -175,7 +175,7 @@ function PetService.hatch(player, eggIndex, count, free)
 	local egg = Config.Eggs[eggIndex]
 	if not data or not egg then return end
 	count = (count == 3) and 3 or 1
-	if count == 3 and Logic.perkLevel(data, "triple") < 1 then
+	if count == 3 and Logic.perkLevel(data, "triple") < 1 and not Logic.hasPass(data, "triple") then
 		GameService.notify(player, "🎁 3er-Öffnen gesperrt", "Kaufe 3er-Öffnen im Rebirth-Shop.", "bad")
 		return
 	end
@@ -188,6 +188,20 @@ function PetService.hatch(player, eggIndex, count, free)
 		return
 	end
 	local cost = egg.cost * count
+	if egg.event and not free then
+		-- Event-Box: kostet Event-Münzen und gibt es nur während des Events
+		local ev = Logic.activeEvent(os.time())
+		if not ev or ev.id ~= egg.event then
+			GameService.notify(player, "🎉 Event vorbei", "Diese Box gibt es nur während des Events.", "bad")
+			return
+		end
+		if Logic.eventTokens(data, egg.event) < cost then
+			GameService.notify(player, ev.tokenEmoji .. " Zu wenig " .. ev.token, "Die Box kostet " .. cost .. " " .. ev.token .. ". Sammle sie in allen Welten!", "bad")
+			return
+		end
+		data.eventTokens[egg.event] = Logic.eventTokens(data, egg.event) - cost
+		free = true
+	end
 	if not free then
 		if data.aura < cost then
 			GameService.notify(player, "💸 Zu wenig Aura", egg.name .. " kostet " .. Util.format(cost) .. " Aura.", "bad")

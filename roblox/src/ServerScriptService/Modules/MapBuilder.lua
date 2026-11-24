@@ -14,12 +14,14 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Config = require(Shared:WaitForChild("Config"))
 local Util = require(Shared:WaitForChild("Util"))
+local Logic = require(Shared:WaitForChild("Logic"))
 
 local MapBuilder = {}
 MapBuilder.eggPrompts = {}    -- { prompt, egg, count }
 MapBuilder.npcs = {}          -- { prompt, def, world, isBoss }
 MapBuilder.portals = {}       -- { prompt, target }
 MapBuilder.boardRows = {}     -- Textzeilen der Ranglisten-Tafel
+MapBuilder.minigames = { gyms = {} }   -- Parkour, Rennen, Gym-Stationen
 
 local S = Config.WORLD_SIZE
 local HALF = S / 2
@@ -102,6 +104,8 @@ end
 local RESERVED = {
 	{ 0, 0, 55 }, { 95, -55, 70 }, { -85, -40, 50 }, { 0, -160, 40 },
 	{ 200, 0, 30 }, { -200, 0, 30 }, { 0, 100, 30 }, { -45, 60, 18 },
+	{ -150, 120, 48 }, { -150, -110, 48 }, { 40, 62, 14 },
+	{ -170, 60, 22 }, { -170, 110, 22 }, { -170, 160, 22 }, { -170, 205, 22 },
 }
 local function isFree(x, z, radius)
 	for _, r in ipairs(RESERVED) do
@@ -129,8 +133,15 @@ end
 ----------------------------------------------------------------------------
 local function tree(O, x, z, color, scale)
 	scale = scale or 1
-	part({ Size = Vector3.new(2, 10, 2) * scale, CFrame = CFrame.new(O + Vector3.new(x, 5 * scale, z)), Color = Color3.fromRGB(122, 78, 45), Material = Enum.Material.Wood })
-	part({ Shape = Enum.PartType.Ball, Size = Vector3.new(11, 11, 11) * scale, CFrame = CFrame.new(O + Vector3.new(x, 12 * scale, z)), Color = color or Color3.fromRGB(63, 143, 69), Material = Enum.Material.Grass })
+	local leaf = color or Color3.fromRGB(63, 143, 69)
+	part({ Size = Vector3.new(1.6, 11, 1.6) * scale, CFrame = CFrame.new(O + Vector3.new(x, 5.5 * scale, z)), Color = Color3.fromRGB(105, 70, 45), Material = Enum.Material.Wood })
+	part({ Size = Vector3.new(0.7, 4, 0.7) * scale, CFrame = CFrame.new(O + Vector3.new(x + 1.2 * scale, 8 * scale, z)) * CFrame.Angles(0, 0, math.rad(-40)), Color = Color3.fromRGB(105, 70, 45), Material = Enum.Material.Wood })
+	local blobs = { { 0, 13, 0, 9 }, { 2.6, 11.5, 1.2, 6.5 }, { -2.4, 11.8, -1, 6.8 }, { 0.6, 15.5, -0.8, 6 }, { -1, 12, 2.4, 6 } }
+	for i, b in ipairs(blobs) do
+		local shade = (i % 2 == 0) and 0.12 or -0.05
+		part({ Shape = Enum.PartType.Ball, Size = Vector3.new(b[4], b[4], b[4]) * scale, CFrame = CFrame.new(O + Vector3.new(x + b[1] * scale, b[2] * scale, z + b[3] * scale)),
+			Color = leaf:Lerp(shade > 0 and Color3.new(1, 1, 0.6) or Color3.new(0, 0.2, 0), math.abs(shade)), Material = Enum.Material.Grass })
+	end
 end
 
 local function palm(O, x, z, rng)
@@ -196,8 +207,22 @@ end
 local THEMES = {}
 
 THEMES.city = function(O, w, rng)
-	part({ Size = Vector3.new(S, 0.2, 26), CFrame = CFrame.new(O + Vector3.new(0, 0.1, 0)), Color = Color3.fromRGB(60, 58, 74) })
-	part({ Size = Vector3.new(26, 0.2, S), CFrame = CFrame.new(O + Vector3.new(0, 0.12, 0)), Color = Color3.fromRGB(60, 58, 74) })
+	for _, horizontal in ipairs({ true, false }) do
+		local road = horizontal and Vector3.new(S, 0.2, 24) or Vector3.new(24, 0.2, S)
+		part({ Size = road, CFrame = CFrame.new(O + Vector3.new(0, horizontal and 0.1 or 0.12, 0)), Color = Color3.fromRGB(55, 55, 60), Material = Enum.Material.Asphalt })
+		for _, side in ipairs({ -1, 1 }) do
+			local walk = horizontal and Vector3.new(S, 0.5, 4) or Vector3.new(4, 0.5, S)
+			local off = horizontal and Vector3.new(0, 0.25, side * 14) or Vector3.new(side * 14, 0.25, 0)
+			part({ Size = walk, CFrame = CFrame.new(O + off), Color = Color3.fromRGB(190, 188, 182), Material = Enum.Material.Concrete })
+		end
+		for k = -11, 11 do
+			if math.abs(k) > 1 then
+				local dash = horizontal and Vector3.new(6, 0.22, 0.5) or Vector3.new(0.5, 0.22, 6)
+				local pos = horizontal and Vector3.new(k * 20, 0.13, 0) or Vector3.new(0, 0.14, k * 20)
+				part({ Size = dash, CFrame = CFrame.new(O + pos), Color = Color3.fromRGB(245, 245, 240) })
+			end
+		end
+	end
 	local names = { "💪 IRON GYM", "✂️ SALON GLOW", "☕ CAFÉ MEWING", "🛍️ DRIP MALL", "🦷 DR. STRAHLEWEISS", "🪞 SELFIE-STUDIO", "🏋️ PROTEIN-BAR", "💈 BARBER" }
 	for i = 1, 16 do
 		local wdt, dep = rng:NextNumber(26, 40), rng:NextNumber(26, 40)
@@ -218,9 +243,9 @@ end
 
 THEMES.beach = function(O, w, rng)
 	-- Meer (man kann ein Stück hineinlaufen)
-	part({ Size = Vector3.new(S, 1, 120), CFrame = CFrame.new(O + Vector3.new(0, 0.35, 190)), Color = Color3.fromRGB(0, 170, 220),
-		Material = Enum.Material.Glass, Transparency = 0.35, CanCollide = false })
-	part({ Size = Vector3.new(S, 0.3, 8), CFrame = CFrame.new(O + Vector3.new(0, 0.2, 128)), Color = Color3.fromRGB(255, 255, 255), Transparency = 0.3, CanCollide = false })
+	pcall(function()
+		workspace.Terrain:FillBlock(CFrame.new(O + Vector3.new(0, 0, 190)), Vector3.new(S, 4, 120), Enum.Material.Water)
+	end)
 	for _ = 1, 26 do
 		local x, z = freeSpot(rng, 5, 60)
 		if x and z < 120 then palm(O, x, z, rng) end
@@ -256,9 +281,12 @@ THEMES.mountain = function(O, w, rng)
 		local size = rng:NextNumber(70, 130)
 		local x, z = math.cos(a) * r, math.sin(a) * r
 		if isFree(x, z, 20) then
-			local cf = CFrame.new(O + Vector3.new(x, size / 2, z)) * CFrame.Angles(0, -a + math.rad(90), 0)
-			part({ Class = "WedgePart", Size = Vector3.new(size, size, size * 0.6), CFrame = cf, Color = Color3.fromRGB(110, 110, 118), Material = Enum.Material.Slate })
-			part({ Class = "WedgePart", Size = Vector3.new(size * 0.4, size * 0.3, size * 0.25), CFrame = cf * CFrame.new(0, size * 0.36, size * 0.17), Color = Color3.fromRGB(245, 248, 255), Material = Enum.Material.Snow })
+			local radius = size * 0.55
+			local center = O + Vector3.new(x, -radius * 0.25, z)
+			pcall(function()
+				workspace.Terrain:FillBall(center, radius, Enum.Material.Rock)
+				workspace.Terrain:FillBall(center + Vector3.new(0, radius * 0.62, 0), radius * 0.48, Enum.Material.Snow)
+			end)
 		end
 	end
 	for _ = 1, 30 do
@@ -858,10 +886,13 @@ local function decorate(O, w, rng)
 	if extra then extra(O, w, rng) end
 end
 
+
 local GROUND_MATERIAL = {
-	city = Enum.Material.SmoothPlastic, beach = Enum.Material.Sand, mountain = Enum.Material.Grass, temple = Enum.Material.Grass,
-	fashion = Enum.Material.SmoothPlastic, hollywood = Enum.Material.Sandstone, dubai = Enum.Material.Sand, galaxy = Enum.Material.Slate,
+	city = Enum.Material.Concrete, beach = Enum.Material.Sand, mountain = Enum.Material.Grass, temple = Enum.Material.Grass,
+	fashion = Enum.Material.Pavement, hollywood = Enum.Material.Sandstone, dubai = Enum.Material.Sand, galaxy = Enum.Material.Slate,
 }
+-- Welten mit echtem Gelände (Terrain) als Boden
+local TERRAIN_GROUND = { beach = Enum.Material.Sand, mountain = Enum.Material.Grass, temple = Enum.Material.Grass, dubai = Enum.Material.Sand }
 
 ----------------------------------------------------------------------------
 -- NPCs (Rivalen & Bosse)
@@ -943,6 +974,149 @@ end
 ----------------------------------------------------------------------------
 -- Eine Welt bauen
 ----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+-- 🎉 EVENT-PLATZ (Glow City)
+----------------------------------------------------------------------------
+local function eventPlaza(O)
+	local P = O + Vector3.new(-150, 0, 120)
+	local ev = Logic.activeEvent(os.time())
+	local color = ev and ev.color or Color3.fromRGB(120, 110, 140)
+	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.6, 78, 78), CFrame = CFrame.new(P + Vector3.new(0, 0.3, 0)) * CFrame.Angles(0, 0, math.rad(90)),
+		Color = color, Material = Enum.Material.SmoothPlastic, Transparency = 0.15 })
+	for _, s in ipairs({ -14, 14 }) do
+		part({ Size = Vector3.new(3, 22, 3), CFrame = CFrame.new(P + Vector3.new(s, 11, 36)), Color = color, Material = Enum.Material.Neon })
+	end
+	local arch = part({ Size = Vector3.new(34, 6, 2), CFrame = CFrame.new(P + Vector3.new(0, 24, 36)), Color = Color3.fromRGB(20, 5, 35) })
+	if not ev then
+		local lines = {}
+		for _, e in ipairs(Config.Events) do
+			table.insert(lines, e.emoji .. " " .. e.name .. " ab " .. string.format("%02d.%02d.", e.from[2], e.from[1]))
+		end
+		surfaceSign(arch, Enum.NormalId.Back, "🎉 EVENT-PLATZ", Color3.fromRGB(20, 5, 35), WHITE)
+		local info = part({ Size = Vector3.new(26, 12, 0.6), CFrame = CFrame.new(P + Vector3.new(0, 8, 0)), Color = Color3.fromRGB(20, 5, 35) })
+		surfaceSign(info, Enum.NormalId.Back, "<b>Nächste Events</b>\n" .. table.concat(lines, "\n"), Color3.fromRGB(20, 5, 35), WHITE)
+		return
+	end
+	surfaceSign(arch, Enum.NormalId.Back, ev.emoji .. " " .. string.upper(ev.name) .. " " .. ev.emoji, Color3.fromRGB(20, 5, 35), WHITE)
+	-- passende Deko
+	local rng = Random.new(42)
+	for k = 1, 8 do
+		local a = k / 8 * math.pi * 2
+		local p = P + Vector3.new(math.cos(a) * 33, 0, math.sin(a) * 33)
+		if ev.id == "winter" then
+			for t = 0, 3 do
+				local r = 9 - t * 2
+				part({ Shape = Enum.PartType.Ball, Size = Vector3.new(r, r * 0.8, r), CFrame = CFrame.new(p + Vector3.new(0, 3 + t * 3.2, 0)), Color = Color3.fromRGB(30, 110, 50), Material = Enum.Material.Grass })
+			end
+			part({ Shape = Enum.PartType.Ball, Size = Vector3.new(1.6, 1.6, 1.6), CFrame = CFrame.new(p + Vector3.new(0, 14.5, 0)), Color = Color3.fromRGB(255, 220, 80), Material = Enum.Material.Neon })
+			for g = 1, 3 do
+				part({ Size = Vector3.new(2, 2, 2), CFrame = CFrame.new(p + Vector3.new(rng:NextNumber(-4, 4), 1, rng:NextNumber(-4, 4))),
+					Color = ({ Color3.fromRGB(230, 40, 40), Color3.fromRGB(40, 120, 230), Color3.fromRGB(240, 200, 40) })[g] })
+			end
+		elseif ev.id == "halloween" then
+			part({ Shape = Enum.PartType.Ball, Size = Vector3.new(4.5, 3.6, 4.5), CFrame = CFrame.new(p + Vector3.new(0, 1.8, 0)), Color = Color3.fromRGB(255, 130, 20) })
+			part({ Size = Vector3.new(0.5, 1, 0.5), CFrame = CFrame.new(p + Vector3.new(0, 4, 0)), Color = Color3.fromRGB(60, 120, 40) })
+			local glow = part({ Size = Vector3.new(0.5, 0.5, 0.5), CFrame = CFrame.new(p + Vector3.new(0, 2, 0)), Transparency = 1, CanCollide = false })
+			local l = Instance.new("PointLight")
+			l.Color = Color3.fromRGB(255, 140, 30)
+			l.Range = 12
+			l.Parent = glow
+			part({ Size = Vector3.new(3, 4, 0.8), CFrame = CFrame.new(p + Vector3.new(4, 2, 2)), Color = Color3.fromRGB(120, 120, 125), Material = Enum.Material.Slate })
+		else
+			palm(O, p.X - O.X, p.Z - O.Z, rng)
+		end
+	end
+	-- Event-Box
+	local egg = Config.Eggs[ev.eggIndex]
+	local ep = P + Vector3.new(16, 0, -8)
+	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(2, 13, 13), CFrame = CFrame.new(ep + Vector3.new(0, 1, 0)) * CFrame.Angles(0, 0, math.rad(90)), Color = Color3.fromRGB(40, 20, 60) })
+	local box = part({ Name = "Geschenkbox", Size = Vector3.new(7, 7, 7), CFrame = CFrame.new(ep + Vector3.new(0, 6, 0)) * CFrame.Angles(0, math.rad(20), 0), Color = ev.color, Material = Enum.Material.Glass, Reflectance = 0.2 })
+	part({ Size = Vector3.new(7.2, 7.2, 0.9), CFrame = box.CFrame, Color = Color3.new(1, 1, 1), Material = Enum.Material.Neon })
+	part({ Size = Vector3.new(0.9, 7.2, 7.2), CFrame = box.CFrame, Color = Color3.new(1, 1, 1), Material = Enum.Material.Neon })
+	billboard(box, ev.emoji .. " " .. egg.name .. "\n<font color='#ffd166'>" .. egg.cost .. " " .. ev.token .. "</font>\n<font size='14'>5 exklusive Event-Pets!</font>", 12, 4.6, 7, WHITE)
+	table.insert(MapBuilder.eggPrompts, { prompt = prompt(box, "Öffnen", egg.name, 0.25), egg = egg, count = 1 })
+	table.insert(MapBuilder.eggPrompts, { prompt = prompt(box, "3x öffnen", egg.name, 0.25, Enum.KeyCode.F), egg = egg, count = 3 })
+	table.insert(MapBuilder.eggPrompts, { prompt = prompt(box, "Inhalt ansehen", egg.name, 0, Enum.KeyCode.R), egg = egg, info = true })
+	-- Event-Boss
+	local def = {}
+	for k, v in pairs(ev.boss) do def[k] = v end
+	def.event = ev.id
+	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(4, 24, 24), CFrame = CFrame.new(P + Vector3.new(-16, 2, -10)) * CFrame.Angles(0, 0, math.rad(90)), Color = ev.color, Material = Enum.Material.Neon, Transparency = 0.3 })
+	table.insert(MapBuilder.npcs, { prompt = makeNPC(def, P + Vector3.new(-16, 4, -10), true), def = def, world = 1, isBoss = true })
+end
+
+----------------------------------------------------------------------------
+-- 🧗 DACH-PARKOUR (Glow City)
+----------------------------------------------------------------------------
+local function obbyCourse(O)
+	local base = O + Vector3.new(-150, 0, -110)
+	local pad = part({ Size = Vector3.new(10, 1, 10), CFrame = CFrame.new(base + Vector3.new(0, 0.5, 34)), Color = Color3.fromRGB(255, 120, 40), Material = Enum.Material.Neon })
+	billboard(pad, "🧗 DACH-PARKOUR\n<font size='15'>Spring bis zum goldenen Pokal!</font>", 14, 4, 6, WHITE)
+	local startPrompt = prompt(pad, "Parkour starten", "Dach-Parkour", 0)
+	local checkpoints, first, last = {}, nil, nil
+	local n = 26
+	for i = 1, n do
+		local a = i * 0.36
+		local pos = base + Vector3.new(math.cos(a) * 30, 6 + i * 3, math.sin(a) * 30)
+		local isCp = (i % 7 == 0)
+		local p = part({ Size = isCp and Vector3.new(7, 1, 7) or Vector3.new(5, 1, 5), CFrame = CFrame.new(pos),
+			Color = isCp and Color3.fromRGB(80, 230, 120) or Color3.fromHSV(i / n * 0.8, 0.55, 1), Material = isCp and Enum.Material.Neon or Enum.Material.SmoothPlastic })
+		if i == 1 then first = p end
+		if isCp then
+			table.insert(checkpoints, p)
+			billboard(p, "🚩 " .. #checkpoints, 3, 2, 3, WHITE)
+		end
+		last = pos
+	end
+	local finishPos = base + Vector3.new(math.cos((n + 1) * 0.36) * 30, 6 + (n + 1) * 3, math.sin((n + 1) * 0.36) * 30)
+	local finish = part({ Size = Vector3.new(10, 1, 10), CFrame = CFrame.new(finishPos), Color = Color3.fromRGB(255, 205, 60), Material = Enum.Material.Neon })
+	part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(3, 1.4, 1.4), CFrame = CFrame.new(finishPos + Vector3.new(0, 2, 0)) * CFrame.Angles(0, 0, math.rad(90)),
+		Color = Color3.fromRGB(255, 205, 60), Material = Enum.Material.Foil })
+	part({ Shape = Enum.PartType.Ball, Size = Vector3.new(3, 3, 3), CFrame = CFrame.new(finishPos + Vector3.new(0, 4.4, 0)), Color = Color3.fromRGB(255, 205, 60), Material = Enum.Material.Foil })
+	billboard(finish, "🏆 ZIEL", 6, 2.4, 7, Color3.fromRGB(255, 209, 102))
+	MapBuilder.minigames.obby = { start = startPrompt, first = first, checkpoints = checkpoints, finish = finish }
+end
+
+----------------------------------------------------------------------------
+-- 🏁 LAUFSTEG-RENNEN (Mailand)
+----------------------------------------------------------------------------
+local function raceTrack(O)
+	local x, z0, z1 = -170, 210, 30
+	local len = z0 - z1
+	part({ Size = Vector3.new(16, 0.4, len), CFrame = CFrame.new(O + Vector3.new(x, 0.2, (z0 + z1) / 2)), Color = Color3.fromRGB(245, 245, 245), Material = Enum.Material.Marble })
+	for _, s in ipairs({ -8.5, 8.5 }) do
+		part({ Size = Vector3.new(1, 2.5, len), CFrame = CFrame.new(O + Vector3.new(x + s, 1.25, (z0 + z1) / 2)), Color = Color3.fromRGB(255, 120, 200), Material = Enum.Material.Neon, Transparency = 0.2 })
+	end
+	for z = z0 - 30, z1 + 20, -28 do
+		part({ Size = Vector3.new(15, 1.6, 1), CFrame = CFrame.new(O + Vector3.new(x, 0.8, z)), Color = Color3.fromRGB(30, 30, 35) })
+	end
+	local start = part({ Size = Vector3.new(15, 8, 1), CFrame = CFrame.new(O + Vector3.new(x, 4, z0 - 3)), Color = Color3.fromRGB(80, 230, 120), Material = Enum.Material.Neon, Transparency = 0.6, CanCollide = false })
+	billboard(start, "🏁 LAUFSTEG-RENNEN\n<font size='15'>Lauf durchs grüne Tor – so schnell du kannst!</font>", 16, 4, 7, WHITE)
+	local finish = part({ Size = Vector3.new(15, 8, 1), CFrame = CFrame.new(O + Vector3.new(x, 4, z1 + 2)), Color = Color3.fromRGB(255, 255, 255), Material = Enum.Material.Neon, Transparency = 0.6, CanCollide = false })
+	for k = 0, 7 do
+		part({ Size = Vector3.new(1.9, 0.3, 2), CFrame = CFrame.new(O + Vector3.new(x - 7 + k * 2, 0.45, z1 + 2)), Color = (k % 2 == 0) and Color3.new(0, 0, 0) or Color3.new(1, 1, 1) })
+	end
+	billboard(finish, "🏁 ZIEL", 6, 2.4, 6, WHITE)
+	MapBuilder.minigames.race = { start = start, finish = finish }
+end
+
+----------------------------------------------------------------------------
+-- 💪 GYM-STATION
+----------------------------------------------------------------------------
+local function gymStation(O)
+	local P = O + Vector3.new(40, 0, 62)
+	part({ Size = Vector3.new(4, 1.6, 9), CFrame = CFrame.new(P + Vector3.new(0, 1.6, 0)), Color = Color3.fromRGB(30, 30, 35), Material = Enum.Material.Fabric })
+	for _, s in ipairs({ -3, 3 }) do
+		part({ Size = Vector3.new(0.4, 5, 0.4), CFrame = CFrame.new(P + Vector3.new(s, 2.5, -3)), Color = Color3.fromRGB(80, 80, 90), Material = Enum.Material.Metal })
+	end
+	local bar = part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(9, 0.4, 0.4), CFrame = CFrame.new(P + Vector3.new(0, 5, -3)), Color = Color3.fromRGB(190, 190, 200), Material = Enum.Material.Metal })
+	for _, s in ipairs({ -4, 4 }) do
+		part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.6, 2.6, 2.6), CFrame = CFrame.new(P + Vector3.new(s, 5, -3)), Color = Color3.fromRGB(20, 20, 20) })
+	end
+	billboard(bar, "💪 GYM-TRAINING\n<font size='15'>+50 % Aura (Gym-Pump)</font>", 12, 3.6, 4, WHITE)
+	table.insert(MapBuilder.minigames.gyms, prompt(bar, "Trainieren", "Gym-Station", 0.3))
+end
+
 local function buildWorld(index, mapFolder)
 	local w = Config.Worlds[index]
 	local O = Vector3.new((index - 1) * Config.WORLD_SPACING, 0, 0)
@@ -952,7 +1126,13 @@ local function buildWorld(index, mapFolder)
 	currentFolder.Parent = mapFolder
 
 	-- Boden & unsichtbare Wände
-	part({ Name = "Ground", Size = Vector3.new(S, 4, S), CFrame = CFrame.new(O + Vector3.new(0, -2, 0)), Color = w.ground, Material = GROUND_MATERIAL[w.theme] })
+	local ground = part({ Name = "Ground", Size = Vector3.new(S, 4, S), CFrame = CFrame.new(O + Vector3.new(0, -2, 0)), Color = w.ground, Material = GROUND_MATERIAL[w.theme] })
+	if TERRAIN_GROUND[w.theme] then
+		local ok = pcall(function()
+			workspace.Terrain:FillBlock(CFrame.new(O + Vector3.new(0, -2, 0)), Vector3.new(S, 4, S), TERRAIN_GROUND[w.theme])
+		end)
+		if ok then ground.Transparency = 1 end   -- das Gelände ersetzt die Bodenplatte optisch
+	end
 	for _, side in ipairs({ { HALF, 0, 2, S }, { -HALF, 0, 2, S }, { 0, HALF, S, 2 }, { 0, -HALF, S, 2 } }) do
 		part({ Name = "Wall", Size = Vector3.new(side[3], 120, side[4]), CFrame = CFrame.new(O + Vector3.new(side[1], 60, side[2])), Transparency = 1 })
 	end
@@ -1053,6 +1233,17 @@ local function buildWorld(index, mapFolder)
 	if index < #Config.Worlds then portal(200, index + 1, "➡️") end
 	if index > 1 then portal(-200, index - 1, "⬅️") end
 
+	-- Minispiele & Event-Platz
+	if index == 1 then
+		eventPlaza(O)
+		obbyCourse(O)
+		gymStation(O)
+	elseif index == 3 then
+		gymStation(O)
+	elseif index == 5 then
+		raceTrack(O)
+	end
+
 	-- Nur in Glow City: Ranglisten-Tafel & Info-Tafel
 	if index == 1 then
 		local board = part({ Name = "Rangliste", Size = Vector3.new(40, 26, 1), CFrame = CFrame.new(O + Vector3.new(0, 15, 100)), Color = Color3.fromRGB(20, 5, 35) })
@@ -1110,6 +1301,22 @@ function MapBuilder.build()
 	local pets = workspace:FindFirstChild("Pets") or Instance.new("Folder")
 	pets.Name = "Pets"
 	pets.Parent = workspace
+
+	-- realistischere Beleuchtung (falls in Studio nicht schon eingestellt)
+	local Lighting = game:GetService("Lighting")
+	pcall(function() Lighting.Technology = Enum.Technology.Future end)
+	pcall(function()
+		Lighting.GlobalShadows = true
+		Lighting.EnvironmentDiffuseScale = 1
+		Lighting.EnvironmentSpecularScale = 1
+		Lighting.Brightness = 2.5
+		workspace.Terrain.Decoration = true
+		workspace.Terrain.WaterWaveSize = 0.25
+		workspace.Terrain.WaterTransparency = 0.6
+		workspace.Terrain.WaterColor = Color3.fromRGB(20, 150, 190)
+		workspace.Terrain:SetMaterialColor(Enum.Material.Grass, Color3.fromRGB(95, 150, 70))
+		workspace.Terrain:SetMaterialColor(Enum.Material.Sand, Color3.fromRGB(230, 205, 150))
+	end)
 
 	for i = 1, #Config.Worlds do
 		local ok, err = pcall(buildWorld, i, mapFolder)
