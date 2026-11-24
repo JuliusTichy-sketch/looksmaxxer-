@@ -498,19 +498,28 @@ Config.Codes = {
 ----------------------------------------------------------------------------
 Config.Sounds = {
 	Click       = "",   -- (absichtlich leer: kein Sound bei der Daily Routine)
-	Buy         = "",   -- Suchbegriff: "cash register" / "ka-ching"
-	TitleUp     = "",   -- "phonk cowbell" / "level up"
-	BattleStart = "",   -- "vine boom" / "bass boom"
-	BattleWin   = "",   -- "phonk drop" / "victory"
-	BattleLose  = "",   -- "sad trombone" / "fail"
-	Hatch       = "",   -- "drum roll"
-	HatchRare   = "",   -- "anime wow" / "choir"
-	Rebirth     = "",   -- "power up"
-	Error       = "",   -- "error" / "bruh"
-	Notify      = "",   -- "notification" / "pop"
+	Buy         = "rbxassetid://134810204798705", -- Cash Register
+	TitleUp     = "rbxassetid://112485797063762", -- UI - Level Up
+	BattleStart = "rbxassetid://140367458608473", -- Vine Boom
+	BattleWin   = "rbxassetid://12222253",        -- victory.wav (Roblox)
+	BattleLose  = "rbxassetid://77067845523190",  -- Sad Trombone
+	Hatch       = "rbxassetid://4718483268",      -- Drum Roll
+	HatchRare   = "rbxassetid://121538758381608", -- Angelical Choir
+	Rebirth     = "rbxassetid://3406813517",      -- Power Up
+	Error       = "rbxassetid://87519554692663",  -- UI Negative Error
+	Notify      = "rbxassetid://17208361335",     -- Roblox Notification
 }
 -- Hintergrundmusik pro Welt (1–8). Leer = keine Musik.
-Config.Music = { "", "", "", "", "", "", "", "" }
+Config.Music = {
+	"rbxassetid://95131770144654",  -- 1 Glow City: AURA = ∞ (Phonk)
+	"rbxassetid://9046863253",      -- 2 Miami Beach: Poolside
+	"rbxassetid://120519322089791", -- 3 Iron Mountain: Cinematic Metal Action
+	"rbxassetid://140722099430139", -- 4 Mewing-Tempel: Morning (Lofi)
+	"rbxassetid://85735197482652",  -- 5 Mailand: Drift Night Phonk
+	"rbxassetid://140658568629873", -- 6 Hollywood Hills: Ghost Protocol
+	"rbxassetid://129098116998483", -- 7 Dubai Skyline: Toma Funk Phonk
+	"rbxassetid://110642731627320", -- 8 Aura-Galaxie: Space Bridge (Ambient)
+}
 
 -- Farben der Glitzer-Aura um den Spieler (wechselt mit jedem Rebirth)
 Config.AuraColors = {
@@ -729,21 +738,21 @@ Config.PlaytimeGifts = {
 -- id = 0 → im Spiel steht "Bald verfügbar".
 ----------------------------------------------------------------------------
 Config.GamePasses = {
-	{ key = "vip",      id = 0, emoji = "👑", name = "VIP",               robux = 299, desc = "+25 % Aura & Geld, goldenes VIP-Namensschild." },
-	{ key = "x2aura",   id = 0, emoji = "✨", name = "Doppelte Aura",     robux = 399, desc = "Für immer x2 Aura." },
-	{ key = "lucky",    id = 0, emoji = "🍀", name = "Glückspilz",        robux = 249, desc = "Für immer x2 Glück beim Box-Öffnen." },
-	{ key = "petslots", id = 0, emoji = "🐾", name = "+3 Pet-Plätze",     robux = 299, desc = "3 Pets mehr gleichzeitig ausrüsten." },
-	{ key = "triple",   id = 0, emoji = "🎁", name = "3er-Öffnen",        robux = 199, desc = "Öffne 3 Boxen auf einmal – sofort, ohne Rebirth-Shop." },
-	{ key = "speed",    id = 0, emoji = "⚡", name = "Turbo-Laufen",      robux = 99,  desc = "+8 Laufgeschwindigkeit für immer." },
+	{ key = "vip",      id = 2100196859, emoji = "👑", name = "VIP",               robux = 299, desc = "+25 % Aura & Geld, goldenes VIP-Namensschild." },
+	{ key = "x2aura",   id = 2100370934, emoji = "✨", name = "Doppelte Aura",     robux = 399, desc = "Für immer x2 Aura." },
+	{ key = "lucky",    id = 2099398873, emoji = "🍀", name = "Glückspilz",        robux = 249, desc = "Für immer x2 Glück beim Box-Öffnen." },
+	{ key = "petslots", id = 2098714908, emoji = "🐾", name = "+3 Pet-Plätze",     robux = 299, desc = "3 Pets mehr gleichzeitig ausrüsten." },
+	{ key = "triple",   id = 2098366898, emoji = "🎁", name = "3er-Öffnen",        robux = 199, desc = "Öffne 3 Boxen auf einmal – sofort, ohne Rebirth-Shop." },
+	{ key = "speed",    id = 2099392903, emoji = "⚡", name = "Turbo-Laufen",      robux = 99,  desc = "+8 Laufgeschwindigkeit für immer." },
 }
 Config.DevProducts = {
-	{ key = "gems100",  id = 0, emoji = "💎", name = "100 Gems",          robux = 49,  reward = { gems = 100 } },
-	{ key = "gems550",  id = 0, emoji = "💎", name = "550 Gems",          robux = 199, reward = { gems = 550 } },
-	{ key = "gems1200", id = 0, emoji = "💎", name = "1.200 Gems",        robux = 399, reward = { gems = 1200 } },
-	{ key = "gems3000", id = 0, emoji = "💎", name = "3.000 Gems",        robux = 899, reward = { gems = 3000 } },
-	{ key = "starter",  id = 0, emoji = "🎁", name = "Starter-Paket",     robux = 99,  once = true,
+	{ key = "gems100",  id = 3735709644, emoji = "💎", name = "100 Gems",          robux = 49,  reward = { gems = 100 } },
+	{ key = "gems550",  id = 3735709693, emoji = "💎", name = "550 Gems",          robux = 199, reward = { gems = 550 } },
+	{ key = "gems1200", id = 3735709713, emoji = "💎", name = "1.200 Gems",        robux = 399, reward = { gems = 1200 } },
+	{ key = "gems3000", id = 3735709732, emoji = "💎", name = "3.000 Gems",        robux = 899, reward = { gems = 3000 } },
+	{ key = "starter",  id = 3735709751, emoji = "🎁", name = "Starter-Paket",     robux = 99,  once = true,
 	  reward = { gems = 150, cash = 2000, scale = true, potion = "aura2" }, desc = "Nur einmal kaufbar!" },
-	{ key = "aurapack", id = 0, emoji = "✨", name = "Aura-Paket",        robux = 79,  reward = { auraSeconds = 900 }, desc = "Sofort 15 Minuten deiner Aura/s." },
+	{ key = "aurapack", id = 3735709765, emoji = "✨", name = "Aura-Paket",        robux = 79,  reward = { auraSeconds = 900 }, desc = "Sofort 15 Minuten deiner Aura/s." },
 }
 
 ----------------------------------------------------------------------------
