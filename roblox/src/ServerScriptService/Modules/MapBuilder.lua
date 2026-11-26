@@ -1219,8 +1219,7 @@ local function course(O, def)
 	table.insert(MapBuilder.minigames.courses, {
 		id = def.id, title = def.title, start = startPrompt, startCf = startPad.CFrame, first = first,
 		checkpoints = checkpoints, finish = finish, kills = def.killParts or {}, reward = def.reward,
-		points = pts, jumps = def.jumps, finishPos = def.finish, size = def.size,
-		points = pts, jumps = def.jumps, finishPos = def.finish, size = def.size,
+		points = pts, jumps = def.jumps, finishPos = def.finish, size = def.size, firstTop = O + pts[1],
 	})
 end
 

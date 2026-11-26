@@ -41,9 +41,20 @@ function Hud.init(gui)
 		Size = UDim2.new(0.66, 0, 0.08, 0), Parent = gui })
 	if touch then
 		-- ganz nach oben in die Roblox-Leiste, rechts neben die Roblox-Knöpfe
-		top.Position = UDim2.new(0.63, 0, 0, -50)
-		top.Size = UDim2.new(0.56, 0, 0, 38)
-		UI.new("UISizeConstraint", { MinSize = Vector2.new(280, 32), MaxSize = Vector2.new(560, 40), Parent = top })
+		-- (Höhe der Leiste wird vom Gerät abgefragt, damit nichts abgeschnitten wird)
+		local inset = 58
+		pcall(function() inset = game:GetService("GuiService"):GetGuiInset().Y end)
+		if inset >= 48 then
+			local h = math.min(40, inset - 12)
+			top.Position = UDim2.new(0.63, 0, 0, -inset + (inset - h) / 2)
+			top.Size = UDim2.new(0.56, 0, 0, h)
+			UI.new("UISizeConstraint", { MinSize = Vector2.new(280, h), MaxSize = Vector2.new(560, h), Parent = top })
+		else
+			-- schmale Leiste: direkt darunter, aber klein
+			top.Position = UDim2.new(0.5, 0, 0, 2)
+			top.Size = UDim2.new(0.56, 0, 0, 34)
+			UI.new("UISizeConstraint", { MinSize = Vector2.new(280, 30), MaxSize = Vector2.new(560, 34), Parent = top })
+		end
 	else
 		UI.new("UISizeConstraint", { MinSize = Vector2.new(320, 44), MaxSize = Vector2.new(900, 62), Parent = top })
 	end

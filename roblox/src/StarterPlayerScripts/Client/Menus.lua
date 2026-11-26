@@ -1020,7 +1020,7 @@ BUILDERS.wheel = function(root)
 		UI.text(right, s.label .. "  <font color='" .. UI.hex(C.gold) .. "'>" .. Util.format(s.weight / total * 100) .. " %</font>",
 			{ Size = UDim2.new(1, -8, 0, 20), XAlign = Enum.TextXAlignment.Left, Font = Enum.Font.GothamBold, MaxText = 13, LayoutOrder = 1 + i })
 	end
-	UI.text(right, "🎁 Spielzeit-Geschenke (diese Sitzung)", { Size = UDim2.new(1, -8, 0, 26), XAlign = Enum.TextXAlignment.Left, MaxText = 16, LayoutOrder = 50 })
+	UI.text(right, "🎁 Spielzeit-Geschenke (heute)", { Size = UDim2.new(1, -8, 0, 26), XAlign = Enum.TextXAlignment.Left, MaxText = 16, LayoutOrder = 50 })
 	local giftButtons = {}
 	for i, g in ipairs(Config.PlaytimeGifts) do
 		giftButtons[i] = UI.button(right, "", C.grey, function()

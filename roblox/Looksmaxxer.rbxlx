@@ -2688,6 +2688,7 @@ local function defaultData()
 		vehicle = "",                -- ausgewähltes Fahrzeug
 		cosmetics = { owned = {}, aura = "", trail = "", hat = "" },
 		records = { obbyLast = 0, raceBest = 0, gymLast = 0, courses = {} },
+		playtime = { day = "", seconds = 0, claimed = {} },   -- Spielzeit-Geschenke pro Tag
 	}
 end
 DataService.defaultData = defaultData
@@ -2741,11 +2742,12 @@ function DataService.isSaving(player)
 	return store ~= nil and loadedOk[player] == true
 end
 
+-- gibt true zurück, wenn der Stand sicher gespeichert ist (ohne DataStore, z. B. in Studio: true)
 function DataService.save(player)
 	local data = profiles[player]
-	if not data or not store or not loadedOk[player] then
-		return
-	end
+	if not data then return false end
+	if not store then return true end
+	if not loadedOk[player] then return false end
 	data.lastOnline = os.time()
 	local ok, err = pcall(function()
 		store:UpdateAsync("u_" .. player.UserId, function()
@@ -2755,6 +2757,7 @@ function DataService.save(player)
 	if not ok then
 		warn("[Looksmaxxer] Speichern fehlgeschlagen:", err)
 	end
+	return ok
 end
 
 function DataService.release(player)
@@ -5367,8 +5370,7 @@ local function course(O, def)
 	table.insert(MapBuilder.minigames.courses, {
 		id = def.id, title = def.title, start = startPrompt, startCf = startPad.CFrame, first = first,
 		checkpoints = checkpoints, finish = finish, kills = def.killParts or {}, reward = def.reward,
-		points = pts, jumps = def.jumps, finishPos = def.finish, size = def.size,
-		points = pts, jumps = def.jumps, finishPos = def.finish, size = def.size,
+		points = pts, jumps = def.jumps, finishPos = def.finish, size = def.size, firstTop = O + pts[1],
 	})
 end
 
@@ -6288,9 +6290,11 @@ end
 local function initCourse(c)
 	local attr = "CP_" .. c.id
 	local function backToCheckpoint(player)
+		-- immer über der Oberkante in Weltkoordinaten landen (Bojen/Planeten sind gedreht bzw. rund)
 		local cp = player:GetAttribute(attr) or 0
-		local target = (cp > 0 and c.checkpoints[cp]) or c.first
-		if target then teleportTo(player, target.CFrame * CFrame.new(0, 4, 0)) end
+		local cpPart = cp > 0 and c.checkpoints[cp]
+		local pos = cpPart and (cpPart.Position + Vector3.new(0, cpPart.Size.Y / 2, 0)) or c.firstTop
+		if pos then teleportTo(player, CFrame.new(pos + Vector3.new(0, 4, 0))) end
 	end
 	c.start.Triggered:Connect(function(player)
 		local cp = player:GetAttribute(attr) or 0
@@ -6495,26 +6499,42 @@ MarketplaceService.ProcessReceipt = function(info)
 		return Enum.ProductPurchaseDecision.NotProcessedYet
 	end
 	-- Schon gutgeschrieben? (Roblox kann denselben Kauf mehrmals melden)
+	-- Erst "Granted" melden, wenn der Stand wirklich gespeichert ist – sonst versucht Roblox es später nochmal.
 	if data.purchases[info.PurchaseId] then
-		return Enum.ProductPurchaseDecision.PurchaseGranted
+		if DataService.save(player) then
+			return Enum.ProductPurchaseDecision.PurchaseGranted
+		end
+		return Enum.ProductPurchaseDecision.NotProcessedYet
 	end
 	local product = productById[info.ProductId]
 	if not product then
 		warn("[Looksmaxxer] Unbekanntes Produkt:", info.ProductId)
 		return Enum.ProductPurchaseDecision.NotProcessedYet
 	end
-	-- Liste der Käufe klein halten
+	-- Liste der Käufe klein halten: nur Einträge älter als 30 Tage entfernen
 	local count = 0
 	for _ in pairs(data.purchases) do count = count + 1 end
-	if count > 300 then data.purchases = {} end
+	if count > 300 then
+		local cutoff = os.time() - 30 * 86400
+		for id, t in pairs(data.purchases) do
+			if type(t) ~= "number" or t < cutoff then data.purchases[id] = nil end
+		end
+	end
 
+	local reward = product.reward
+	if product.once and data.starterPack then
+		-- Einmal-Paket doppelt gekauft (z. B. auf zwei Geräten): stattdessen nur die Gems
+		reward = { gems = product.reward.gems or 0 }
+	end
 	if product.once then data.starterPack = true end
-	local text = RewardService.give(player, data, product.reward)
-	data.purchases[info.PurchaseId] = true
-	DataService.save(player)
+	local text = RewardService.give(player, data, reward)
+	data.purchases[info.PurchaseId] = os.time()
 	GameService.notify(player, product.emoji .. " " .. product.name .. " erhalten!", text .. " · Danke! 💖", "title")
 	GameService.sendFull(player)
-	return Enum.ProductPurchaseDecision.PurchaseGranted
+	if DataService.save(player) then
+		return Enum.ProductPurchaseDecision.PurchaseGranted
+	end
+	return Enum.ProductPurchaseDecision.NotProcessedYet
 end
 
 return MonetizationService
@@ -7194,11 +7214,11 @@ Remotes.SpinWheel.OnServerEvent:Connect(function(player)
 		if x <= 0 then index = i break end
 	end
 	local seg = Config.Wheel[index]
-	-- Ergebnis erst nach der Dreh-Animation gutschreiben
+	-- Gewinn sofort gutschreiben (geht auch beim Verlassen nicht verloren), Anzeige erst nach der Dreh-Animation
+	local text = give(player, data, seg.reward)
 	Remotes.WheelResult:FireClient(player, index)
 	task.delay(4, function()
 		if not player.Parent then return end
-		local text = give(player, data, seg.reward)
 		GameService.notify(player, "🎡 Gewonnen: " .. seg.label, text, "good")
 		GameService.sendFull(player)
 	end)
@@ -7207,30 +7227,62 @@ end)
 ----------------------------------------------------------------------------
 -- 🎁 SPIELZEIT-GESCHENKE (pro Spielsitzung)
 ----------------------------------------------------------------------------
-local claimedGifts = {}   -- [player] = { [i] = true }
-table.insert(GameService.joinHooks, function(player)
-	player:SetAttribute("JoinTime", os.time())
-	claimedGifts[player] = {}
+-- Spielzeit zählt pro Tag (UTC) und wird gespeichert: Neu-Beitreten setzt die Geschenke NICHT zurück.
+local lastTick = {}   -- [player] = os.time() der letzten Zählung
+local function today() return os.date("!%Y-%m-%d") end
+
+local function syncPlaytime(player, data)
+	local pt = data.playtime
+	local now = os.time()
+	if pt.day ~= today() then
+		pt.day = today()
+		pt.seconds = 0
+		pt.claimed = {}
+	end
+	pt.seconds = pt.seconds + math.max(0, now - (lastTick[player] or now))
+	lastTick[player] = now
+	-- Anzeige im Glücksrad-Menü: "JoinTime" so setzen, dass jetzt - JoinTime = heutige Spielzeit
+	player:SetAttribute("JoinTime", now - pt.seconds)
+	for gi = 1, #Config.PlaytimeGifts do
+		player:SetAttribute("Gift" .. gi, pt.claimed[tostring(gi)] == true or nil)
+	end
+end
+
+table.insert(GameService.joinHooks, function(player, data)
+	lastTick[player] = os.time()
+	syncPlaytime(player, data)
+end)
+task.spawn(function()
+	while true do
+		task.wait(30)
+		for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+			local data = DataService.get(player)
+			if data and lastTick[player] then syncPlaytime(player, data) end
+		end
+	end
 end)
 Remotes.ClaimPlaytime.OnServerEvent:Connect(function(player, i)
 	local data = DataService.get(player)
-	local gift = Config.PlaytimeGifts[tonumber(i) or 0]
-	if not data or not gift then return end
-	claimedGifts[player] = claimedGifts[player] or {}
-	if claimedGifts[player][i] then return end
-	local joined = player:GetAttribute("JoinTime") or os.time()
-	if os.time() - joined < gift.minutes * 60 then
-		GameService.notify(player, "⏳ Noch nicht", "Dieses Geschenk gibt es nach " .. gift.minutes .. " Minuten Spielzeit.", "")
+	local idx = tonumber(i)
+	local gift = idx and Config.PlaytimeGifts[idx]
+	if not data or not gift or not lastTick[player] then return end
+	syncPlaytime(player, data)
+	local key = tostring(idx)
+	if data.playtime.claimed[key] then return end
+	if data.playtime.seconds < gift.minutes * 60 then
+		GameService.notify(player, "⏳ Noch nicht", "Dieses Geschenk gibt es nach " .. gift.minutes .. " Minuten Spielzeit (heute).", "")
 		return
 	end
-	claimedGifts[player][i] = true
-	player:SetAttribute("Gift" .. tostring(i), true)
+	data.playtime.claimed[key] = true
+	player:SetAttribute("Gift" .. key, true)
 	local text = give(player, data, gift.reward)
 	GameService.notify(player, "🎁 Spielzeit-Geschenk!", text, "good")
 	GameService.sendFull(player)
 end)
 game:GetService("Players").PlayerRemoving:Connect(function(player)
-	claimedGifts[player] = nil
+	local data = DataService.get(player)
+	if data and lastTick[player] then syncPlaytime(player, data) end
+	lastTick[player] = nil
 end)
 
 
@@ -8743,9 +8795,20 @@ function Hud.init(gui)
 		Size = UDim2.new(0.66, 0, 0.08, 0), Parent = gui })
 	if touch then
 		-- ganz nach oben in die Roblox-Leiste, rechts neben die Roblox-Knöpfe
-		top.Position = UDim2.new(0.63, 0, 0, -50)
-		top.Size = UDim2.new(0.56, 0, 0, 38)
-		UI.new("UISizeConstraint", { MinSize = Vector2.new(280, 32), MaxSize = Vector2.new(560, 40), Parent = top })
+		-- (Höhe der Leiste wird vom Gerät abgefragt, damit nichts abgeschnitten wird)
+		local inset = 58
+		pcall(function() inset = game:GetService("GuiService"):GetGuiInset().Y end)
+		if inset >= 48 then
+			local h = math.min(40, inset - 12)
+			top.Position = UDim2.new(0.63, 0, 0, -inset + (inset - h) / 2)
+			top.Size = UDim2.new(0.56, 0, 0, h)
+			UI.new("UISizeConstraint", { MinSize = Vector2.new(280, h), MaxSize = Vector2.new(560, h), Parent = top })
+		else
+			-- schmale Leiste: direkt darunter, aber klein
+			top.Position = UDim2.new(0.5, 0, 0, 2)
+			top.Size = UDim2.new(0.56, 0, 0, 34)
+			UI.new("UISizeConstraint", { MinSize = Vector2.new(280, 30), MaxSize = Vector2.new(560, 34), Parent = top })
+		end
 	else
 		UI.new("UISizeConstraint", { MinSize = Vector2.new(320, 44), MaxSize = Vector2.new(900, 62), Parent = top })
 	end
@@ -10048,7 +10111,7 @@ BUILDERS.wheel = function(root)
 		UI.text(right, s.label .. "  <font color='" .. UI.hex(C.gold) .. "'>" .. Util.format(s.weight / total * 100) .. " %</font>",
 			{ Size = UDim2.new(1, -8, 0, 20), XAlign = Enum.TextXAlignment.Left, Font = Enum.Font.GothamBold, MaxText = 13, LayoutOrder = 1 + i })
 	end
-	UI.text(right, "🎁 Spielzeit-Geschenke (diese Sitzung)", { Size = UDim2.new(1, -8, 0, 26), XAlign = Enum.TextXAlignment.Left, MaxText = 16, LayoutOrder = 50 })
+	UI.text(right, "🎁 Spielzeit-Geschenke (heute)", { Size = UDim2.new(1, -8, 0, 26), XAlign = Enum.TextXAlignment.Left, MaxText = 16, LayoutOrder = 50 })
 	local giftButtons = {}
 	for i, g in ipairs(Config.PlaytimeGifts) do
 		giftButtons[i] = UI.button(right, "", C.grey, function()
@@ -10864,6 +10927,18 @@ local function hookPad(pad)
 		local v = hrp.AssemblyLinearVelocity
 		if typeof(dir) == "Vector3" then
 			hrp.AssemblyLinearVelocity = Vector3.new(dir.X, power, dir.Z)
+			-- Seitwärts-Schwung bis zur Landung halten (sonst bremst die Luftsteuerung ihn ab)
+			local started = os.clock()
+			local conn
+			conn = game:GetService("RunService").Heartbeat:Connect(function()
+				local t = os.clock() - started
+				if t > 1.6 or not hrp.Parent or (t > 0.25 and hum.FloorMaterial ~= Enum.Material.Air) then
+					conn:Disconnect()
+					return
+				end
+				local cur = hrp.AssemblyLinearVelocity
+				hrp.AssemblyLinearVelocity = Vector3.new(dir.X, cur.Y, dir.Z)
+			end)
 		else
 			hrp.AssemblyLinearVelocity = Vector3.new(v.X, power, v.Z)
 		end

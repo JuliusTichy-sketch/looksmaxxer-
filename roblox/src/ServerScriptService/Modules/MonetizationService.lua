@@ -72,26 +72,42 @@ MarketplaceService.ProcessReceipt = function(info)
 		return Enum.ProductPurchaseDecision.NotProcessedYet
 	end
 	-- Schon gutgeschrieben? (Roblox kann denselben Kauf mehrmals melden)
+	-- Erst "Granted" melden, wenn der Stand wirklich gespeichert ist – sonst versucht Roblox es später nochmal.
 	if data.purchases[info.PurchaseId] then
-		return Enum.ProductPurchaseDecision.PurchaseGranted
+		if DataService.save(player) then
+			return Enum.ProductPurchaseDecision.PurchaseGranted
+		end
+		return Enum.ProductPurchaseDecision.NotProcessedYet
 	end
 	local product = productById[info.ProductId]
 	if not product then
 		warn("[Looksmaxxer] Unbekanntes Produkt:", info.ProductId)
 		return Enum.ProductPurchaseDecision.NotProcessedYet
 	end
-	-- Liste der Käufe klein halten
+	-- Liste der Käufe klein halten: nur Einträge älter als 30 Tage entfernen
 	local count = 0
 	for _ in pairs(data.purchases) do count = count + 1 end
-	if count > 300 then data.purchases = {} end
+	if count > 300 then
+		local cutoff = os.time() - 30 * 86400
+		for id, t in pairs(data.purchases) do
+			if type(t) ~= "number" or t < cutoff then data.purchases[id] = nil end
+		end
+	end
 
+	local reward = product.reward
+	if product.once and data.starterPack then
+		-- Einmal-Paket doppelt gekauft (z. B. auf zwei Geräten): stattdessen nur die Gems
+		reward = { gems = product.reward.gems or 0 }
+	end
 	if product.once then data.starterPack = true end
-	local text = RewardService.give(player, data, product.reward)
-	data.purchases[info.PurchaseId] = true
-	DataService.save(player)
+	local text = RewardService.give(player, data, reward)
+	data.purchases[info.PurchaseId] = os.time()
 	GameService.notify(player, product.emoji .. " " .. product.name .. " erhalten!", text .. " · Danke! 💖", "title")
 	GameService.sendFull(player)
-	return Enum.ProductPurchaseDecision.PurchaseGranted
+	if DataService.save(player) then
+		return Enum.ProductPurchaseDecision.PurchaseGranted
+	end
+	return Enum.ProductPurchaseDecision.NotProcessedYet
 end
 
 return MonetizationService

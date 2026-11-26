@@ -60,6 +60,7 @@ local function defaultData()
 		vehicle = "",                -- ausgewähltes Fahrzeug
 		cosmetics = { owned = {}, aura = "", trail = "", hat = "" },
 		records = { obbyLast = 0, raceBest = 0, gymLast = 0, courses = {} },
+		playtime = { day = "", seconds = 0, claimed = {} },   -- Spielzeit-Geschenke pro Tag
 	}
 end
 DataService.defaultData = defaultData
@@ -113,11 +114,12 @@ function DataService.isSaving(player)
 	return store ~= nil and loadedOk[player] == true
 end
 
+-- gibt true zurück, wenn der Stand sicher gespeichert ist (ohne DataStore, z. B. in Studio: true)
 function DataService.save(player)
 	local data = profiles[player]
-	if not data or not store or not loadedOk[player] then
-		return
-	end
+	if not data then return false end
+	if not store then return true end
+	if not loadedOk[player] then return false end
 	data.lastOnline = os.time()
 	local ok, err = pcall(function()
 		store:UpdateAsync("u_" .. player.UserId, function()
@@ -127,6 +129,7 @@ function DataService.save(player)
 	if not ok then
 		warn("[Looksmaxxer] Speichern fehlgeschlagen:", err)
 	end
+	return ok
 end
 
 function DataService.release(player)

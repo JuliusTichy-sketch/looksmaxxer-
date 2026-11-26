@@ -119,6 +119,18 @@ local function hookPad(pad)
 		local v = hrp.AssemblyLinearVelocity
 		if typeof(dir) == "Vector3" then
 			hrp.AssemblyLinearVelocity = Vector3.new(dir.X, power, dir.Z)
+			-- Seitwärts-Schwung bis zur Landung halten (sonst bremst die Luftsteuerung ihn ab)
+			local started = os.clock()
+			local conn
+			conn = game:GetService("RunService").Heartbeat:Connect(function()
+				local t = os.clock() - started
+				if t > 1.6 or not hrp.Parent or (t > 0.25 and hum.FloorMaterial ~= Enum.Material.Air) then
+					conn:Disconnect()
+					return
+				end
+				local cur = hrp.AssemblyLinearVelocity
+				hrp.AssemblyLinearVelocity = Vector3.new(dir.X, cur.Y, dir.Z)
+			end)
 		else
 			hrp.AssemblyLinearVelocity = Vector3.new(v.X, power, v.Z)
 		end

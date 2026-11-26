@@ -92,9 +92,11 @@ end
 local function initCourse(c)
 	local attr = "CP_" .. c.id
 	local function backToCheckpoint(player)
+		-- immer über der Oberkante in Weltkoordinaten landen (Bojen/Planeten sind gedreht bzw. rund)
 		local cp = player:GetAttribute(attr) or 0
-		local target = (cp > 0 and c.checkpoints[cp]) or c.first
-		if target then teleportTo(player, target.CFrame * CFrame.new(0, 4, 0)) end
+		local cpPart = cp > 0 and c.checkpoints[cp]
+		local pos = cpPart and (cpPart.Position + Vector3.new(0, cpPart.Size.Y / 2, 0)) or c.firstTop
+		if pos then teleportTo(player, CFrame.new(pos + Vector3.new(0, 4, 0))) end
 	end
 	c.start.Triggered:Connect(function(player)
 		local cp = player:GetAttribute(attr) or 0

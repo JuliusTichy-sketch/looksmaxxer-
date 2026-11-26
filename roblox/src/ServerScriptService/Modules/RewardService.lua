@@ -156,11 +156,11 @@ Remotes.SpinWheel.OnServerEvent:Connect(function(player)
 		if x <= 0 then index = i break end
 	end
 	local seg = Config.Wheel[index]
-	-- Ergebnis erst nach der Dreh-Animation gutschreiben
+	-- Gewinn sofort gutschreiben (geht auch beim Verlassen nicht verloren), Anzeige erst nach der Dreh-Animation
+	local text = give(player, data, seg.reward)
 	Remotes.WheelResult:FireClient(player, index)
 	task.delay(4, function()
 		if not player.Parent then return end
-		local text = give(player, data, seg.reward)
 		GameService.notify(player, "🎡 Gewonnen: " .. seg.label, text, "good")
 		GameService.sendFull(player)
 	end)
@@ -169,30 +169,62 @@ end)
 ----------------------------------------------------------------------------
 -- 🎁 SPIELZEIT-GESCHENKE (pro Spielsitzung)
 ----------------------------------------------------------------------------
-local claimedGifts = {}   -- [player] = { [i] = true }
-table.insert(GameService.joinHooks, function(player)
-	player:SetAttribute("JoinTime", os.time())
-	claimedGifts[player] = {}
+-- Spielzeit zählt pro Tag (UTC) und wird gespeichert: Neu-Beitreten setzt die Geschenke NICHT zurück.
+local lastTick = {}   -- [player] = os.time() der letzten Zählung
+local function today() return os.date("!%Y-%m-%d") end
+
+local function syncPlaytime(player, data)
+	local pt = data.playtime
+	local now = os.time()
+	if pt.day ~= today() then
+		pt.day = today()
+		pt.seconds = 0
+		pt.claimed = {}
+	end
+	pt.seconds = pt.seconds + math.max(0, now - (lastTick[player] or now))
+	lastTick[player] = now
+	-- Anzeige im Glücksrad-Menü: "JoinTime" so setzen, dass jetzt - JoinTime = heutige Spielzeit
+	player:SetAttribute("JoinTime", now - pt.seconds)
+	for gi = 1, #Config.PlaytimeGifts do
+		player:SetAttribute("Gift" .. gi, pt.claimed[tostring(gi)] == true or nil)
+	end
+end
+
+table.insert(GameService.joinHooks, function(player, data)
+	lastTick[player] = os.time()
+	syncPlaytime(player, data)
+end)
+task.spawn(function()
+	while true do
+		task.wait(30)
+		for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+			local data = DataService.get(player)
+			if data and lastTick[player] then syncPlaytime(player, data) end
+		end
+	end
 end)
 Remotes.ClaimPlaytime.OnServerEvent:Connect(function(player, i)
 	local data = DataService.get(player)
-	local gift = Config.PlaytimeGifts[tonumber(i) or 0]
-	if not data or not gift then return end
-	claimedGifts[player] = claimedGifts[player] or {}
-	if claimedGifts[player][i] then return end
-	local joined = player:GetAttribute("JoinTime") or os.time()
-	if os.time() - joined < gift.minutes * 60 then
-		GameService.notify(player, "⏳ Noch nicht", "Dieses Geschenk gibt es nach " .. gift.minutes .. " Minuten Spielzeit.", "")
+	local idx = tonumber(i)
+	local gift = idx and Config.PlaytimeGifts[idx]
+	if not data or not gift or not lastTick[player] then return end
+	syncPlaytime(player, data)
+	local key = tostring(idx)
+	if data.playtime.claimed[key] then return end
+	if data.playtime.seconds < gift.minutes * 60 then
+		GameService.notify(player, "⏳ Noch nicht", "Dieses Geschenk gibt es nach " .. gift.minutes .. " Minuten Spielzeit (heute).", "")
 		return
 	end
-	claimedGifts[player][i] = true
-	player:SetAttribute("Gift" .. tostring(i), true)
+	data.playtime.claimed[key] = true
+	player:SetAttribute("Gift" .. key, true)
 	local text = give(player, data, gift.reward)
 	GameService.notify(player, "🎁 Spielzeit-Geschenk!", text, "good")
 	GameService.sendFull(player)
 end)
 game:GetService("Players").PlayerRemoving:Connect(function(player)
-	claimedGifts[player] = nil
+	local data = DataService.get(player)
+	if data and lastTick[player] then syncPlaytime(player, data) end
+	lastTick[player] = nil
 end)
 
 
