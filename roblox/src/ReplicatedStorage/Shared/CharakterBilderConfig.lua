@@ -13,10 +13,10 @@
 local CharakterBilderConfig = {
 
 	-- 🧟 Charakter_Vorher.png  (alle Attribute auf Minimum)
-	VORHER = "",   -- ⬅️ HIER EINTRAGEN, z. B. "rbxassetid://1234567890"
+	VORHER = "rbxassetid://130585970837388",   -- Charakter_Vorher (hochgeladen am 26.11.2026)
 
 	-- 😎 Charakter_Nachher.png (alle Attribute komplett gemaxxt)
-	NACHHER = "",  -- ⬅️ HIER EINTRAGEN, z. B. "rbxassetid://9876543210"
+	NACHHER = "rbxassetid://124633394210800",  -- Charakter_Nachher (hochgeladen am 26.11.2026)
 
 	-- Optional für später: Zwischenbilder. "ab" = Fortschritt von 0 bis 1 (0.5 = 50 %).
 	-- Das Spiel blendet dann immer zwischen den zwei passenden Bildern über.

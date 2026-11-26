@@ -11,6 +11,8 @@
   (Universe 10778030768). Wenn neue Produkte dazukommen, neue Einträge mit `id = 0` anlegen und dem
   Nutzer sagen, dass sie noch bei Roblox erstellt werden müssen – bestehende IDs nicht verändern.
 
+- `CharakterBilderConfig.lua` (gleicher Ordner): `VORHER`/`NACHHER` sind echte, hochgeladene Bild-IDs – nicht leeren.
+
 ## Nach Änderungen
 - `python3 roblox/build_place.py` ausführen, damit `roblox/Looksmaxxer.rbxlx` zum Quellcode passt.
 
