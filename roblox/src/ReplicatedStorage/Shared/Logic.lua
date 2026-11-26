@@ -89,6 +89,24 @@ function Logic.catLevels(levels, cat)
 	return total
 end
 
+-- Glow-Up-Fortschritt fürs Vorher/Nachher-Bild: 0 (alles Minimum) bis 1 (alles gemaxxt)
+-- pro Kategorie: Stufen ÷ (Anzahl Upgrades × Höchststufe), dann Durchschnitt der Kategorien
+function Logic.glowUpProgress(levels, cats)
+	if not cats or #cats == 0 then return 0 end
+	local sum = 0
+	for _, cat in ipairs(cats) do
+		local have, max = 0, 0
+		for _, u in ipairs(Config.Upgrades) do
+			if u.cat == cat then
+				have = have + math.min((levels and levels[u.id]) or 0, Config.MAX_LEVEL)
+				max = max + Config.MAX_LEVEL
+			end
+		end
+		if max > 0 then sum = sum + have / max end
+	end
+	return math.clamp(sum / #cats, 0, 1)
+end
+
 -- Punkte in einer Kategorie für Mog Battles
 function Logic.catScore(levels, cat, rebirths)
 	local total = 0

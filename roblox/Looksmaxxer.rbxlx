@@ -1,5 +1,47 @@
 <roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
-<Item class="ReplicatedStorage" referent="RBX00000006"><Properties><string name="Name">ReplicatedStorage</string></Properties><Item class="Folder" referent="RBX00000005"><Properties><string name="Name">Shared</string></Properties><Item class="ModuleScript" referent="RBX00000001"><Properties><string name="Name">Config</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ReplicatedStorage" referent="RBX00000007"><Properties><string name="Name">ReplicatedStorage</string></Properties><Item class="Folder" referent="RBX00000006"><Properties><string name="Name">Shared</string></Properties><Item class="ModuleScript" referent="RBX00000001"><Properties><string name="Name">CharakterBilderConfig</string><ProtectedString name="Source"><![CDATA[--[[
+	CHARAKTER-BILDER – Vorher/Nachher-Bild des Charakters im 💪 Upgrades-Menü.
+
+	██████████████████████████████████████████████████████████████████████
+	██  HIER DIE BILD-IDs EINTRAGEN                                     ██
+	██  So bekommst du die ID: Studio → Asset Manager (oder Toolbox →   ██
+	██  "Meine Bilder") → Rechtsklick aufs Bild → "Copy Asset ID".      ██
+	██  Dann zwischen die Anführungszeichen einfügen, z. B.:            ██
+	██      VORHER = "rbxassetid://1234567890",                          ██
+	██████████████████████████████████████████████████████████████████████
+]]
+
+local CharakterBilderConfig = {
+
+	-- 🧟 Charakter_Vorher.png  (alle Attribute auf Minimum)
+	VORHER = "",   -- ⬅️ HIER EINTRAGEN, z. B. "rbxassetid://1234567890"
+
+	-- 😎 Charakter_Nachher.png (alle Attribute komplett gemaxxt)
+	NACHHER = "",  -- ⬅️ HIER EINTRAGEN, z. B. "rbxassetid://9876543210"
+
+	-- Optional für später: Zwischenbilder. "ab" = Fortschritt von 0 bis 1 (0.5 = 50 %).
+	-- Das Spiel blendet dann immer zwischen den zwei passenden Bildern über.
+	ZWISCHEN = {
+		-- { ab = 0.5, id = "rbxassetid://..." },
+	},
+
+	----------------------------------------------------------------------------
+	-- Einstellungen (normalerweise nicht ändern)
+	----------------------------------------------------------------------------
+	-- Diese 7 Kategorien zählen für den Glow-Up (Selbstbewusstsein "conf" absichtlich nicht)
+	ATTRIBUTE = { "skin", "hair", "fit", "sleep", "posture", "style", "teeth" },
+
+	-- Kurve: 1 = genau linear. Kleiner als 1 = frühe Upgrades sind schon deutlicher sichtbar.
+	-- 0.5 bedeutet: 10 % Fortschritt → ca. 32 % sichtbar, 50 % → ca. 71 %. 0 % und 100 % bleiben exakt.
+	KURVE = 0.5,
+
+	SEITENVERHAELTNIS = 876 / 1080,   -- Breite ÷ Höhe der Bilder (0.811)
+	UEBERGANG_SEKUNDEN = 0.6,         -- Dauer der weichen Überblendung
+}
+
+return CharakterBilderConfig
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX00000002"><Properties><string name="Name">Config</string><ProtectedString name="Source"><![CDATA[--[[
 	==========================================================================
 	CONFIG – alle Spieldaten von Looksmaxxer 3000 (Roblox-Version)
 	Hier kannst du Preise, Texte, Welten, Pets usw. ganz einfach ändern.
@@ -815,7 +857,7 @@ Config.GYM_COOLDOWN = 45
 
 return Config
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000002"><Properties><string name="Name">Logic</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000003"><Properties><string name="Name">Logic</string><ProtectedString name="Source"><![CDATA[--[[
 	LOGIC – alle Spielformeln an einem Ort (Server & Client)
 	Der Server rechnet damit wirklich, der Client nur zum Anzeigen.
 ]]
@@ -904,6 +946,24 @@ function Logic.catLevels(levels, cat)
 		end
 	end
 	return total
+end
+
+-- Glow-Up-Fortschritt fürs Vorher/Nachher-Bild: 0 (alles Minimum) bis 1 (alles gemaxxt)
+-- pro Kategorie: Stufen ÷ (Anzahl Upgrades × Höchststufe), dann Durchschnitt der Kategorien
+function Logic.glowUpProgress(levels, cats)
+	if not cats or #cats == 0 then return 0 end
+	local sum = 0
+	for _, cat in ipairs(cats) do
+		local have, max = 0, 0
+		for _, u in ipairs(Config.Upgrades) do
+			if u.cat == cat then
+				have = have + math.min((levels and levels[u.id]) or 0, Config.MAX_LEVEL)
+				max = max + Config.MAX_LEVEL
+			end
+		end
+		if max > 0 then sum = sum + have / max end
+	end
+	return math.clamp(sum / #cats, 0, 1)
 end
 
 -- Punkte in einer Kategorie für Mog Battles
@@ -1220,7 +1280,7 @@ end
 
 return Logic
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000003"><Properties><string name="Name">PetModels</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000004"><Properties><string name="Name">PetModels</string><ProtectedString name="Source"><![CDATA[--[[
 	PETMODELS – baut aus der Beschreibung eines Pets (Config.Pets[..].look)
 	eine echte 3D-Figur aus Teilen: Körper, Kopf, Augen, Ohren, Beine, Schwanz, Flügel …
 	Wird vom Server (Pets in der Welt) UND vom Client (3D-Vorschau in Menüs) benutzt.
@@ -1742,7 +1802,7 @@ end
 
 return PetModels
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000004"><Properties><string name="Name">Util</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000005"><Properties><string name="Name">Util</string><ProtectedString name="Source"><![CDATA[--[[
 	UTIL – kleine Hilfsfunktionen (Server & Client)
 ]]
 
@@ -1839,7 +1899,7 @@ return Util
 ]]></ProtectedString></Properties></Item>
 </Item>
 </Item>
-<Item class="ServerScriptService" referent="RBX0000001C"><Properties><string name="Name">ServerScriptService</string></Properties><Item class="Script" referent="RBX00000007"><Properties><string name="Name">Main</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ServerScriptService" referent="RBX0000001D"><Properties><string name="Name">ServerScriptService</string></Properties><Item class="Script" referent="RBX00000008"><Properties><string name="Name">Main</string><ProtectedString name="Source"><![CDATA[--[[
 	MAIN – startet das Spiel auf dem Server.
 	Reihenfolge: Remotes → Karte bauen → Systeme starten → Spieler laden.
 ]]
@@ -1915,7 +1975,7 @@ GameService.start()
 
 print("[Looksmaxxer 3000] Server gestartet – viel Spaß beim Glow-Up! ✨")
 ]]></ProtectedString></Properties></Item>
-<Item class="Folder" referent="RBX0000001B"><Properties><string name="Name">Modules</string></Properties><Item class="ModuleScript" referent="RBX00000008"><Properties><string name="Name">BattleService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="Folder" referent="RBX0000001C"><Properties><string name="Name">Modules</string></Properties><Item class="ModuleScript" referent="RBX00000009"><Properties><string name="Name">BattleService</string><ProtectedString name="Source"><![CDATA[--[[
 	BATTLESERVICE – Mog Battles
 	• gegen andere Spieler (Anfrage → Annehmen/Ablehnen)
 	• gegen den Rivalen und den Boss jeder Welt
@@ -2154,7 +2214,7 @@ end)
 
 return BattleService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000009"><Properties><string name="Name">CombatService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000000A"><Properties><string name="Name">CombatService</string><ProtectedString name="Source"><![CDATA[--[[
 	COMBATSERVICE – Waffen & Echtzeit-Bosskämpfe
 
 	Waffen:
@@ -2626,7 +2686,7 @@ end)
 
 return CombatService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000000A"><Properties><string name="Name">DataService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000000B"><Properties><string name="Name">DataService</string><ProtectedString name="Source"><![CDATA[--[[
 	DATASERVICE – lädt und speichert den Spielstand jedes Spielers (DataStore).
 
 	Wichtig: Damit das Speichern in Roblox Studio funktioniert, muss das Spiel
@@ -2798,7 +2858,7 @@ end)
 
 return DataService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000000B"><Properties><string name="Name">EventService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000000C"><Properties><string name="Name">EventService</string><ProtectedString name="Source"><![CDATA[--[[
 	EVENTSERVICE – saisonale Events (Winter, Halloween, Sommer) laufen automatisch nach Kalender.
 	Während eines Events liegen in allen Welten Sammelobjekte (z. B. ❄️ Schneeflocken).
 	Mit den Event-Münzen öffnet man die Event-Box in Glow City (exklusive Pets!).
@@ -2909,7 +2969,7 @@ end
 
 return EventService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000000C"><Properties><string name="Name">FanService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000000D"><Properties><string name="Name">FanService</string><ProtectedString name="Source"><![CDATA[--[[
 	FANSERVICE – in jeder Welt laufen Leute herum, die du als Fans gewinnen kannst.
 	• Promi-Level 1–10: je höher, desto mehr Charisma brauchst du
 	• Du wählst einen von 3 Sprüchen/Aktionen (manche helfen, manche nicht 😄)
@@ -3168,7 +3228,7 @@ end)
 
 return FanService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000000D"><Properties><string name="Name">GameService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000000E"><Properties><string name="Name">GameService</string><ProtectedString name="Source"><![CDATA[--[[
 	GAMESERVICE – das Herzstück auf dem Server:
 	Klicks, Upgrades, Aura pro Sekunde, Rebirth, Welten, Titel,
 	Namensschild & Aussehen des Avatars, Offline-Verdienst.
@@ -3631,7 +3691,7 @@ end)
 
 return GameService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000000E"><Properties><string name="Name">JobService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000000F"><Properties><string name="Name">JobService</string><ProtectedString name="Source"><![CDATA[--[[
 	JOBSERVICE – Geld verdienen mit Jobs.
 	Ablauf: Spieler startet Job → Minispiel läuft auf dem Gerät →
 	Ergebnis (3 Versuche) wird geschickt → Server prüft und zahlt.
@@ -3707,7 +3767,7 @@ end)
 
 return JobService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000000F"><Properties><string name="Name">LeaderboardService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000010"><Properties><string name="Name">LeaderboardService</string><ProtectedString name="Source"><![CDATA[--[[
 	LEADERBOARDSERVICE – globale Rangliste (Top 500) über ALLE Server.
 	Gespeichert wird die "Glow-Power" jedes Spielers in einem OrderedDataStore.
 	Alle 2 Minuten: eigene Werte hochladen, Top 500 neu laden.
@@ -3826,7 +3886,7 @@ end
 
 return LeaderboardService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000010"><Properties><string name="Name">LookService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000011"><Properties><string name="Name">LookService</string><ProtectedString name="Source"><![CDATA[--[[
 	LOOKSERVICE – dein Avatar verändert sich sichtbar mit den Upgrades.
 	Am Anfang: richtig hässlich. Mit jeder Stufe wird es langsam besser.
 
@@ -4149,7 +4209,7 @@ end
 
 return LookService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000011"><Properties><string name="Name">MapBuilder</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000012"><Properties><string name="Name">MapBuilder</string><ProtectedString name="Source"><![CDATA[--[[
 	MAPBUILDER – baut beim Serverstart alle 8 Welten automatisch auf:
 	Boden, Deko je nach Thema, Geschenkbox-Stand, Rivale, Boss, Portale,
 	Ranglisten-Tafel und Info-Tafel.
@@ -6196,7 +6256,7 @@ end
 
 return MapBuilder
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000012"><Properties><string name="Name">MinigameService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000013"><Properties><string name="Name">MinigameService</string><ProtectedString name="Source"><![CDATA[--[[
 	MINIGAMESERVICE – Minispiele auf der Karte
 	🧗 Dach-Parkour (Glow City): Springe von Plattform zu Plattform bis ganz nach oben. Mit Checkpoints.
 	🏁 Laufsteg-Rennen (Mailand): So schnell wie möglich vom Start zum Ziel. Bestzeit wird gespeichert.
@@ -6425,7 +6485,7 @@ end)
 
 return MinigameService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000013"><Properties><string name="Name">MonetizationService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000014"><Properties><string name="Name">MonetizationService</string><ProtectedString name="Source"><![CDATA[--[[
 	MONETIZATIONSERVICE – Robux-Einnahmen
 	• Gamepasses (einmal kaufen, für immer): VIP, Doppelte Aura, Glückspilz, +3 Pet-Plätze, 3er-Öffnen, Turbo-Laufen
 	• Entwicklerprodukte (mehrfach kaufbar): Gems-Pakete, Starter-Paket, Aura-Paket
@@ -6539,7 +6599,7 @@ end
 
 return MonetizationService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000014"><Properties><string name="Name">PetService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000015"><Properties><string name="Name">PetService</string><ProtectedString name="Source"><![CDATA[--[[
 	PETSERVICE – Geschenkboxen öffnen, Pets ausrüsten, fusionieren, löschen.
 	Die Pet-Figuren in der Welt werden hier erstellt; bewegt werden sie
 	auf jedem Gerät vom Client-Skript "PetFollow".
@@ -6879,7 +6939,7 @@ end)
 
 return PetService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000015"><Properties><string name="Name">QuestService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000016"><Properties><string name="Name">QuestService</string><ProtectedString name="Source"><![CDATA[--[[
 	QUESTSERVICE – tägliche Aufträge (3 pro Tag) und Erfolge (je 4 Stufen).
 
 	Aufträge: Beim ersten Login des Tages werden 3 zufällige Aufträge gewählt.
@@ -6995,7 +7055,7 @@ end)
 
 return QuestService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000016"><Properties><string name="Name">Remotes</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000017"><Properties><string name="Name">Remotes</string><ProtectedString name="Source"><![CDATA[--[[
 	REMOTES – die "Leitungen" zwischen Server und Spieler.
 	Der Server erstellt sie beim Start in ReplicatedStorage/Remotes.
 ]]
@@ -7056,7 +7116,7 @@ folder.Parent = ReplicatedStorage
 
 return Remotes
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000017"><Properties><string name="Name">RewardService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000018"><Properties><string name="Name">RewardService</string><ProtectedString name="Source"><![CDATA[--[[
 	REWARDSERVICE – tägliche Belohnungen (7-Tage-Serie), Promo-Codes und Tränke.
 ]]
 
@@ -7288,7 +7348,7 @@ end)
 
 return RewardService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000018"><Properties><string name="Name">ShopService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000019"><Properties><string name="Name">ShopService</string><ProtectedString name="Source"><![CDATA[--[[
 	SHOPSERVICE – Ausrüstung & Fahrzeuge kaufen/ausrüsten (mit Geld oder Gems),
 	Fahrzeug aufsteigen/absteigen.
 ]]
@@ -7376,7 +7436,7 @@ end)
 
 return ShopService
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000019"><Properties><string name="Name">StyleLook</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000001A"><Properties><string name="Name">StyleLook</string><ProtectedString name="Source"><![CDATA[--[[
 	STYLELOOK – zeigt die Ausrüstung am Avatar:
 	Aura (Glitzer, Feuer, Rauch, Regenbogen), Spur beim Laufen, Hut, Fahrzeug unter den Füßen.
 	Wird bei jeder Änderung neu gebaut (GameService.refreshCharacter).
@@ -7623,7 +7683,7 @@ end
 
 return StyleLook
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000001A"><Properties><string name="Name">TradeService</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000001B"><Properties><string name="Name">TradeService</string><ProtectedString name="Source"><![CDATA[--[[
 	TRADESERVICE – Pets & Geld zwischen Spielern tauschen.
 
 	Sicherheit gegen Betrug:
@@ -7864,7 +7924,7 @@ return TradeService
 ]]></ProtectedString></Properties></Item>
 </Item>
 </Item>
-<Item class="StarterPlayer" referent="RBX0000002B"><Properties><string name="Name">StarterPlayer</string></Properties><Item class="StarterPlayerScripts" referent="RBX0000002A"><Properties><string name="Name">StarterPlayerScripts</string></Properties><Item class="LocalScript" referent="RBX00000029"><Properties><string name="Name">Client</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="StarterPlayer" referent="RBX0000002D"><Properties><string name="Name">StarterPlayer</string></Properties><Item class="StarterPlayerScripts" referent="RBX0000002C"><Properties><string name="Name">StarterPlayerScripts</string></Properties><Item class="LocalScript" referent="RBX0000002B"><Properties><string name="Name">Client</string><ProtectedString name="Source"><![CDATA[--[[
 	CLIENT – startet die Oberfläche auf dem Gerät des Spielers
 	und empfängt alle Nachrichten vom Server.
 ]]
@@ -7885,6 +7945,7 @@ local PetFollow = require(script:WaitForChild("PetFollow"))
 local WorldFx = require(script:WaitForChild("WorldFx"))
 local CameraController = require(script:WaitForChild("CameraController"))
 local TradeUI = require(script:WaitForChild("TradeUI"))
+local CharakterBild = require(script:WaitForChild("CharakterBild"))
 local UserInputService = game:GetService("UserInputService")
 
 -- Haupt-Oberfläche
@@ -7900,6 +7961,7 @@ PetFollow.init()
 WorldFx.init()
 CameraController.init()
 TradeUI.init(gui)
+CharakterBild.init()   -- feiert, wenn alle 7 Attribute gemaxxt sind
 CameraController.onMouseLookChanged(function(on)
 	Effects.toast(on and "🖱️ Maus-Kamera AN" or "🖱️ Maus-Kamera AUS", on and "Die Kamera folgt jetzt deiner Maus. Strg drücken zum Ausschalten (z. B. für Menüs)." or "Kamera drehen: Maustaste gedrückt halten und ziehen.", "")
 end)
@@ -7998,7 +8060,7 @@ task.delay(2, function()
 		Effects.toast("🖱️ Kamera", "Maustaste halten + ziehen = drehen · Mausrad = zoomen · Strg = Maus-Kamera", "")
 	end
 end)
-]]></ProtectedString></Properties><Item class="ModuleScript" referent="RBX0000001D"><Properties><string name="Name">CameraController</string><ProtectedString name="Source"><![CDATA[--[[
+]]></ProtectedString></Properties><Item class="ModuleScript" referent="RBX0000001E"><Properties><string name="Name">CameraController</string><ProtectedString name="Source"><![CDATA[--[[
 	CAMERACONTROLLER – eigene Kamerasteuerung für alle Geräte
 
 	PC:
@@ -8219,7 +8281,234 @@ end
 
 return CameraController
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000001E"><Properties><string name="Name">Effects</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000001F"><Properties><string name="Name">CharakterBild</string><ProtectedString name="Source"><![CDATA[--[[
+	CHARAKTERBILD – zeigt das Vorher/Nachher-Bild des Charakters (im 💪 Upgrades-Menü)
+	und feiert einmal, wenn alle 7 Attribute gemaxxt sind.
+
+	Die Bild-IDs stehen in ReplicatedStorage › Shared › CharakterBilderConfig.
+	Die Attributwerte (Upgrade-Stufen) kommen vom Server (State.snap.data.levels).
+]]
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local Logic = require(Shared:WaitForChild("Logic"))
+local Bilder = require(Shared:WaitForChild("CharakterBilderConfig"))
+local UI = require(script.Parent:WaitForChild("UI"))
+local State = require(script.Parent:WaitForChild("State"))
+local Sounds = require(script.Parent:WaitForChild("Sounds"))
+
+local CharakterBild = {}
+local C = UI.C
+local BG = Color3.fromRGB(222, 222, 226)   -- passt zum hellgrauen Bildhintergrund
+
+-- Fortschritt 0..1 aus dem Spielstand
+function CharakterBild.progress(data)
+	return Logic.glowUpProgress(data and data.levels, Bilder.ATTRIBUTE)
+end
+
+-- Bildstufen: Vorher (0) → Zwischenbilder → Nachher (1); leere IDs werden übersprungen
+local function stages()
+	local list = {}
+	if Bilder.VORHER ~= "" then table.insert(list, { ab = 0, id = Bilder.VORHER }) end
+	for _, z in ipairs(Bilder.ZWISCHEN or {}) do
+		if z.id and z.id ~= "" and type(z.ab) == "number" and z.ab > 0 and z.ab < 1 then
+			table.insert(list, { ab = z.ab, id = z.id })
+		end
+	end
+	if Bilder.NACHHER ~= "" then table.insert(list, { ab = 1, id = Bilder.NACHHER }) end
+	table.sort(list, function(a, b) return a.ab < b.ab end)
+	return list
+end
+
+-- welches Bild unten, welches oben und wie sichtbar das obere ist (0..1)
+local function blend(p)
+	local list = stages()
+	if #list == 0 then return nil end
+	if #list == 1 then return list[1].id, nil, 0 end
+	local k = 1
+	for i = 1, #list - 1 do
+		if p >= list[i].ab then k = i end
+	end
+	local a, b = list[k], list[k + 1]
+	local t = math.clamp((p - a.ab) / math.max(b.ab - a.ab, 0.0001), 0, 1)
+	local v = t ^ (Bilder.KURVE or 1)
+	return a.id, b.id, v
+end
+
+local function imageLabel(parent, z)
+	local img = UI.new("ImageLabel", {
+		Name = "Bild", BackgroundTransparency = 1, Size = UDim2.new(1, 0, 1, 0),
+		ScaleType = Enum.ScaleType.Fit, ImageTransparency = 1, ZIndex = z, Parent = parent,
+	})
+	UI.new("UIAspectRatioConstraint", { AspectRatio = Bilder.SEITENVERHAELTNIS, Parent = img })
+	UI.corner(img, 10)
+	return img
+end
+
+-- Baut die Anzeige in "parent" (füllt die Breite, Höhe ergibt sich aus 0.811).
+-- Rückgabe: { holder = Frame, set = function(progress, sofort) }
+function CharakterBild.create(parent)
+	local holder = UI.panel(parent, { Name = "CharakterBild", Size = UDim2.new(1, 0, 1, -30), Color = BG, Radius = 10, LayoutOrder = 1 })
+	UI.new("UIAspectRatioConstraint", { AspectRatio = Bilder.SEITENVERHAELTNIS, AspectType = Enum.AspectType.FitWithinMaxSize,
+		DominantAxis = Enum.DominantAxis.Height, Parent = holder })
+	UI.stroke(holder, C.pink, 2, 0.3)
+	local bottom = imageLabel(holder, 2)
+	local top = imageLabel(holder, 3)
+	local missing = UI.text(holder, "🖼️ Bilder fehlen noch\n<font size='12'>IDs in CharakterBilderConfig eintragen</font>",
+		{ Color = Color3.fromRGB(80, 70, 100), MaxText = 16, ZIndex = 4 })
+
+	local info = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 26), LayoutOrder = 2, Parent = parent })
+	local barBg = UI.panel(info, { Size = UDim2.new(1, 0, 0, 6), Position = UDim2.new(0, 0, 1, -6), Color = C.dark, Radius = 3 })
+	local bar = UI.panel(barBg, { Size = UDim2.new(0, 0, 1, 0), Color = C.pink, Radius = 3 })
+	UI.gradient(bar, C.pink, C.gold, 0)
+	local label = UI.text(info, "", { Size = UDim2.new(1, 0, 1, -8), Color = C.gold, MaxText = 16 })
+	-- Text & Balken genau so breit wie das Bild
+	holder:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+		info.Size = UDim2.new(0, holder.AbsoluteSize.X, 0, 26)
+	end)
+
+	local last = nil
+	local currentTween = nil
+	local function set(p, instant)
+		p = math.clamp(p or 0, 0, 1)
+		label.Text = p >= 1 and "👑 FULLY LOOKSMAXXED!" or ("✨ Glow-Up: " .. math.floor(p * 100) .. " %")
+		bar.Size = UDim2.new(p, 0, 1, 0)
+		if last ~= nil and math.abs(last - p) < 0.00001 and not instant then return end
+		last = p
+		local lowId, highId, v = blend(p)
+		missing.Visible = lowId == nil
+		if not lowId then
+			bottom.ImageTransparency, top.ImageTransparency = 1, 1
+			return
+		end
+		bottom.ImageTransparency = 0
+		local segmentChanged = bottom.Image ~= lowId or top.Image ~= (highId or "")
+		bottom.Image = lowId
+		top.Image = highId or ""
+		local target = highId and (1 - v) or 1
+		if currentTween then currentTween:Cancel() end
+		if instant or segmentChanged then
+			top.ImageTransparency = target
+		else
+			currentTween = TweenService:Create(top, TweenInfo.new(Bilder.UEBERGANG_SEKUNDEN or 0.6, Enum.EasingStyle.Sine, Enum.EasingDirection.Out),
+				{ ImageTransparency = target })
+			currentTween:Play()
+		end
+	end
+	return { holder = holder, set = set }
+end
+
+----------------------------------------------------------------------------
+-- 👑 Feier, wenn alles gemaxxt ist
+----------------------------------------------------------------------------
+local CONFETTI = { C.pink, C.gold, C.cyan, C.green, C.purple, Color3.new(1, 1, 1) }
+
+function CharakterBild.celebrate()
+	local gui = UI.new("ScreenGui", { Name = "FullyLooksmaxxed", ResetOnSpawn = false, IgnoreGuiInset = true, DisplayOrder = 30,
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling, Parent = Players.LocalPlayer:WaitForChild("PlayerGui") })
+	local bg = UI.new("TextButton", { Text = "", AutoButtonColor = false, BackgroundColor3 = Color3.new(0, 0, 0), BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 1, 0), Parent = gui })
+	TweenService:Create(bg, TweenInfo.new(0.4), { BackgroundTransparency = 0.35 }):Play()
+
+	-- sich drehende Lichtstrahlen
+	local rays = UI.new("Frame", { BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.45, 0),
+		Size = UDim2.new(0, 10, 0, 10), Parent = bg })
+	for k = 0, 11 do
+		local ray = UI.new("Frame", { BackgroundColor3 = C.gold, BorderSizePixel = 0, AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 0.5, 0),
+			Size = UDim2.new(0, 26, 0, 900), Rotation = k * 30, BackgroundTransparency = 0.75, Parent = rays })
+		UI.new("UIGradient", { Transparency = NumberSequence.new(0, 1), Rotation = 90, Parent = ray })
+	end
+	TweenService:Create(rays, TweenInfo.new(8, Enum.EasingStyle.Linear), { Rotation = 180 }):Play()
+
+	-- das Nachher-Bild groß in der Mitte
+	local card = UI.new("Frame", { BackgroundColor3 = BG, AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.45, 0),
+		Size = UDim2.new(0, 0, 0.55, 0), Parent = bg })
+	UI.new("UIAspectRatioConstraint", { AspectRatio = Bilder.SEITENVERHAELTNIS, AspectType = Enum.AspectType.FitWithinMaxSize,
+		DominantAxis = Enum.DominantAxis.Height, Parent = card })
+	UI.corner(card, 16)
+	UI.stroke(card, C.gold, 4, 0)
+	if Bilder.NACHHER ~= "" then
+		local img = imageLabel(card, 2)
+		img.Image = Bilder.NACHHER
+		img.ImageTransparency = 0
+	else
+		UI.text(card, "😎", { MaxText = 100 })
+	end
+	card.Size = UDim2.new(0.55, 0, 0.55, 0)
+	local cardScale = UI.new("UIScale", { Scale = 0.2, Parent = card })
+	TweenService:Create(cardScale, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()
+
+	local title = UI.text(bg, "<b>FULLY LOOKSMAXXED!</b>", { AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0.75, 0),
+		Size = UDim2.new(0.9, 0, 0.11, 0), Color = C.gold, MaxText = 70 })
+	title.TextStrokeTransparency = 0
+	title.TextStrokeColor3 = Color3.fromRGB(80, 20, 90)
+	local sub = UI.text(bg, "Alle 7 Attribute gemaxxt – absolute Gigachad-Energie 🗿👑", { AnchorPoint = Vector2.new(0.5, 0),
+		Position = UDim2.new(0.5, 0, 0.86, 0), Size = UDim2.new(0.8, 0, 0.05, 0), Font = Enum.Font.GothamBold, MaxText = 22 })
+	sub.TextStrokeTransparency = 0.3
+	local titleScale = UI.new("UIScale", { Scale = 0, Parent = title })
+	task.delay(0.35, function()
+		TweenService:Create(titleScale, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()
+	end)
+
+	-- Konfetti
+	for i = 1, 70 do
+		local c = UI.new("Frame", { BackgroundColor3 = CONFETTI[(i % #CONFETTI) + 1], BorderSizePixel = 0, AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.new(math.random(), 0, -0.05, 0), Size = UDim2.new(0, math.random(6, 12), 0, math.random(10, 18)),
+			Rotation = math.random(0, 360), Parent = bg })
+		TweenService:Create(c, TweenInfo.new(math.random(25, 45) / 10, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+			Position = UDim2.new(c.Position.X.Scale + (math.random() - 0.5) * 0.3, 0, 1.08, 0), Rotation = c.Rotation + math.random(-540, 540),
+		}):Play()
+	end
+
+	Sounds.play("Rebirth")
+	task.delay(0.5, function() Sounds.play("TitleUp") end)
+
+	local closed = false
+	local function close()
+		if closed then return end
+		closed = true
+		TweenService:Create(cardScale, TweenInfo.new(0.25), { Scale = 0 }):Play()
+		TweenService:Create(titleScale, TweenInfo.new(0.25), { Scale = 0 }):Play()
+		TweenService:Create(bg, TweenInfo.new(0.3), { BackgroundTransparency = 1 }):Play()
+		task.delay(0.35, function() gui:Destroy() end)
+	end
+	-- antippen schließt (erst nach kurzer Zeit, damit man es nicht aus Versehen wegklickt)
+	task.delay(1.2, function() bg.Activated:Connect(close) end)
+	task.delay(7, close)
+end
+
+-- Wächter: feiert genau dann, wenn der Fortschritt von unter 100 % auf 100 % springt.
+-- (Der erste Stand nach dem Beitreten zählt nur als Ausgangswert → keine Feier beim Neubeitritt.)
+function CharakterBild.init()
+	local before = nil
+	State.onChange(function(kind)
+		if kind ~= "full" or not State.snap then return end
+		local p = CharakterBild.progress(State.snap.data)
+		if before ~= nil and before < 1 and p >= 1 then
+			CharakterBild.celebrate()
+		end
+		before = p
+	end)
+	-- Bilder vorladen, damit beim ersten Öffnen nichts aufploppt
+	task.spawn(function()
+		local ids = {}
+		for _, s in ipairs(stages()) do
+			local img = Instance.new("ImageLabel")
+			img.Image = s.id
+			table.insert(ids, img)
+		end
+		if #ids > 0 then
+			pcall(function() game:GetService("ContentProvider"):PreloadAsync(ids) end)
+		end
+	end)
+end
+
+return CharakterBild
+]]></ProtectedString></Properties></Item>
+<Item class="ModuleScript" referent="RBX00000020"><Properties><string name="Name">Effects</string><ProtectedString name="Source"><![CDATA[--[[
 	EFFECTS – alles, was kurz aufpoppt:
 	Nachrichten (Toasts), große Banner, fliegende Zahlen,
 	Box-Öffnen-Animation, Mog-Battle-Ansicht, Herausforderungen, Bestätigungen.
@@ -8719,7 +9008,7 @@ end
 
 return Effects
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX0000001F"><Properties><string name="Name">Emotes</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000021"><Properties><string name="Name">Emotes</string><ProtectedString name="Source"><![CDATA[--[[
 	EMOTES – spielt Emotes (Animationen) am eigenen Avatar ab.
 	Eigene Animationen sieht jeder andere Spieler automatisch auch.
 ]]
@@ -8752,7 +9041,7 @@ end
 
 return Emotes
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000020"><Properties><string name="Name">Hud</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000022"><Properties><string name="Name">Hud</string><ProtectedString name="Source"><![CDATA[--[[
 	HUD – die ständige Anzeige:
 	oben die Werte, links die Menü-Knöpfe, unten der Daily-Routine-Knopf
 	mit Titel und Fortschritt zum nächsten Titel.
@@ -9089,7 +9378,7 @@ end
 
 return Hud
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000021"><Properties><string name="Name">Menus</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000023"><Properties><string name="Name">Menus</string><ProtectedString name="Source"><![CDATA[--[[
 	MENUS – alle Menüfenster:
 	💪 Upgrades · 🐾 Pets · 🌍 Welten · ♻️ Rebirth · 🏆 Rangliste · 🎁 Belohnungen · ⚙️ Einstellungen
 ]]
@@ -9109,6 +9398,7 @@ local Effects = require(script.Parent:WaitForChild("Effects"))
 local CameraController = require(script.Parent:WaitForChild("CameraController"))
 local PetView = require(script.Parent:WaitForChild("PetView"))
 local Emotes = require(script.Parent:WaitForChild("Emotes"))
+local CharakterBild = require(script.Parent:WaitForChild("CharakterBild"))
 local UserInputService = game:GetService("UserInputService")
 
 local Menus = {}
@@ -9207,6 +9497,22 @@ BUILDERS.upgrades = function(root)
 	UI.list(list, false, 6)
 	UI.padding(list, 2)
 
+	-- Vorher/Nachher-Bild des Charakters links neben der Liste (höchstens 38 % der Breite)
+	local portraitCol = UI.new("Frame", { Name = "Portrait", BackgroundTransparency = 1, Position = UDim2.new(0, 0, 0, 86),
+		Size = UDim2.new(0.38, 0, 1, -86), Parent = root })
+	UI.list(portraitCol, false, 4, Enum.HorizontalAlignment.Left)
+	local portrait = CharakterBild.create(portraitCol)
+	local function fitList()
+		local w = portrait.holder.AbsoluteSize.X
+		if w > 0 then
+			list.Position = UDim2.new(0, w + 8, 0, 86)
+			list.Size = UDim2.new(1, -(w + 8), 1, -86)
+		end
+	end
+	portrait.holder:GetPropertyChangedSignal("AbsoluteSize"):Connect(fitList)
+	task.defer(fitList)
+	portrait.set(CharakterBild.progress(data()), true)
+
 	local rows = {}
 	local tabButtons = {}
 	local amountButtons = {}
@@ -9282,6 +9588,7 @@ BUILDERS.upgrades = function(root)
 	buildRows()
 	return function()
 		update()
+		portrait.set(CharakterBild.progress(data()), false)
 	end
 end
 
@@ -10210,7 +10517,7 @@ end
 
 return Menus
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000022"><Properties><string name="Name">PetFollow</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000024"><Properties><string name="Name">PetFollow</string><ProtectedString name="Source"><![CDATA[--[[
 	PETFOLLOW – bewegt alle Pets (von allen Spielern) flüssig hinter ihren Besitzern her.
 	Läuft auf jedem Gerät selbst, damit es ruckelfrei aussieht.
 	Pets laufen leicht hüpfend, schauen in Laufrichtung, Regenbogen-Pets wechseln die Farbe.
@@ -10271,7 +10578,7 @@ end
 
 return PetFollow
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000023"><Properties><string name="Name">PetView</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000025"><Properties><string name="Name">PetView</string><ProtectedString name="Source"><![CDATA[--[[
 	PETVIEW – zeigt ein Pet als drehbare 3D-Vorschau in Menüs (ViewportFrame).
 ]]
 
@@ -10329,7 +10636,7 @@ end
 
 return PetView
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000024"><Properties><string name="Name">Sounds</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000026"><Properties><string name="Name">Sounds</string><ProtectedString name="Source"><![CDATA[--[[
 	SOUNDS – spielt Soundeffekte und Hintergrundmusik.
 	Die Sound-IDs stehen in Config.Sounds / Config.Music.
 ]]
@@ -10392,7 +10699,7 @@ end
 
 return Sounds
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000025"><Properties><string name="Name">State</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000027"><Properties><string name="Name">State</string><ProtectedString name="Source"><![CDATA[--[[
 	STATE – speichert auf dem Gerät den letzten Spielstand vom Server
 	und informiert alle Menüs, wenn sich etwas ändert.
 ]]
@@ -10441,7 +10748,7 @@ end
 
 return State
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000026"><Properties><string name="Name">TradeUI</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000028"><Properties><string name="Name">TradeUI</string><ProtectedString name="Source"><![CDATA[--[[
 	TRADEUI – das Handelsfenster.
 	Links: dein Angebot + deine Pets (antippen = hinzufügen/entfernen) + Geld.
 	Rechts: was der andere anbietet.
@@ -10623,7 +10930,7 @@ end
 
 return TradeUI
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000027"><Properties><string name="Name">UI</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX00000029"><Properties><string name="Name">UI</string><ProtectedString name="Source"><![CDATA[--[[
 	UI – kleine Helfer, um Oberflächen per Code zu bauen.
 	Farben und Schriften des Spiels sind hier festgelegt.
 ]]
@@ -10806,7 +11113,7 @@ end
 
 return UI
 ]]></ProtectedString></Properties></Item>
-<Item class="ModuleScript" referent="RBX00000028"><Properties><string name="Name">WorldFx</string><ProtectedString name="Source"><![CDATA[--[[
+<Item class="ModuleScript" referent="RBX0000002A"><Properties><string name="Name">WorldFx</string><ProtectedString name="Source"><![CDATA[--[[
 	WORLDFX – Licht, Atmosphäre, Wolken, Bloom und Musik passend zur Welt,
 	und versteckt den eigenen "Mog Battle"-Knopf am eigenen Körper.
 ]]

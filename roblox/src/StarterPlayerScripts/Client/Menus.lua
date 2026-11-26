@@ -18,6 +18,7 @@ local Effects = require(script.Parent:WaitForChild("Effects"))
 local CameraController = require(script.Parent:WaitForChild("CameraController"))
 local PetView = require(script.Parent:WaitForChild("PetView"))
 local Emotes = require(script.Parent:WaitForChild("Emotes"))
+local CharakterBild = require(script.Parent:WaitForChild("CharakterBild"))
 local UserInputService = game:GetService("UserInputService")
 
 local Menus = {}
@@ -116,6 +117,22 @@ BUILDERS.upgrades = function(root)
 	UI.list(list, false, 6)
 	UI.padding(list, 2)
 
+	-- Vorher/Nachher-Bild des Charakters links neben der Liste (höchstens 38 % der Breite)
+	local portraitCol = UI.new("Frame", { Name = "Portrait", BackgroundTransparency = 1, Position = UDim2.new(0, 0, 0, 86),
+		Size = UDim2.new(0.38, 0, 1, -86), Parent = root })
+	UI.list(portraitCol, false, 4, Enum.HorizontalAlignment.Left)
+	local portrait = CharakterBild.create(portraitCol)
+	local function fitList()
+		local w = portrait.holder.AbsoluteSize.X
+		if w > 0 then
+			list.Position = UDim2.new(0, w + 8, 0, 86)
+			list.Size = UDim2.new(1, -(w + 8), 1, -86)
+		end
+	end
+	portrait.holder:GetPropertyChangedSignal("AbsoluteSize"):Connect(fitList)
+	task.defer(fitList)
+	portrait.set(CharakterBild.progress(data()), true)
+
 	local rows = {}
 	local tabButtons = {}
 	local amountButtons = {}
@@ -191,6 +208,7 @@ BUILDERS.upgrades = function(root)
 	buildRows()
 	return function()
 		update()
+		portrait.set(CharakterBild.progress(data()), false)
 	end
 end
 

@@ -19,6 +19,7 @@ local PetFollow = require(script:WaitForChild("PetFollow"))
 local WorldFx = require(script:WaitForChild("WorldFx"))
 local CameraController = require(script:WaitForChild("CameraController"))
 local TradeUI = require(script:WaitForChild("TradeUI"))
+local CharakterBild = require(script:WaitForChild("CharakterBild"))
 local UserInputService = game:GetService("UserInputService")
 
 -- Haupt-Oberfläche
@@ -34,6 +35,7 @@ PetFollow.init()
 WorldFx.init()
 CameraController.init()
 TradeUI.init(gui)
+CharakterBild.init()   -- feiert, wenn alle 7 Attribute gemaxxt sind
 CameraController.onMouseLookChanged(function(on)
 	Effects.toast(on and "🖱️ Maus-Kamera AN" or "🖱️ Maus-Kamera AUS", on and "Die Kamera folgt jetzt deiner Maus. Strg drücken zum Ausschalten (z. B. für Menüs)." or "Kamera drehen: Maustaste gedrückt halten und ziehen.", "")
 end)
